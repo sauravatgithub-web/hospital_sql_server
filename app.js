@@ -8,7 +8,7 @@ import cookieParser from 'cookie-parser';
 import { connectDB } from './utils/features.js';
 import { errorMiddleware } from './middlewares/error.js';
 
-
+import authenticateRoute from './routers/authenticationRouter.js'
 
 const corsOptions = {
     origin: ['http://localhost:3000'],
@@ -44,6 +44,8 @@ app.use(cors(corsOptions));
 app.get('/', (req, res) => {
     res.send('Welcome to MySQL project');
 })
+
+app.use('/api/v1/login', authenticateRoute);
 
 app.use(errorMiddleware);
 
