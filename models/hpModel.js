@@ -2,33 +2,30 @@ import { hash } from 'bcrypt';
 import mongoose, { Types } from 'mongoose';
 import validator from 'validator';
 
-const doctorSchema = new mongoose.Schema({
-  dname: {
+const hpSchema = new mongoose.Schema({
+  hname: {
     type: String,
     required: [true, 'Please tell us your name!']
   },
-  daddr: { type: String },
-  dspec: { type: String },
-  inTime: { type: String },
-  outTime: { type: String },
-  phoneNumber: {
+  haddr: { type: String },
+  h_phoneNumber: {
     type: String,
     required: [true, "Please provide a phone number"],
     unique: true,
   },
-  d_email: {
+  h_email: {
     type: String,
     required: [true, 'Please provide your email'],
     unique: true,
     lowercase: true,
     validate: [validator.isEmail, 'Please provide a valid email'],
   },
-  d_userName :{
+  h_userName :{
     type : String,
     unique : true,
     default : function(){
-      const namePart = this.dname.toLowerCase().split(' ');
-      const emailPart = this.d_email.toLowerCase().split('@')[0];
+      const namePart = this.hname.toLowerCase().split(' ');
+      const emailPart = this.h_email.toLowerCase().split('@')[0];
       return `${namePart.join('_')}_${emailPart}`;
     }
   },
@@ -41,14 +38,22 @@ const doctorSchema = new mongoose.Schema({
   gender: {
     type: String,
     enum: ['Male', 'Female'],
+  },
+  uni: {
+    type: String,
+    required: [true, "Please enter university name"],
+  },
+  degree: {
+    type: String,
+    required: [true, 'Please mention your latest degree'],
   }
 });
 
-doctorSchema.pre('save', async function(next) {
+hpSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next();  
   this.password = await hash(this.password, 10);
 });
 
-const Doctor = mongoose.model('Doctor', doctorSchema);
+const Hospital_Professional = mongoose.model('Hospital_Professional', hpSchema);
 
-export default Doctor;
+export default Hospital_Professional;
