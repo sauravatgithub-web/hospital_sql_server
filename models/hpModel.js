@@ -46,7 +46,15 @@ const hpSchema = new mongoose.Schema({
   degree: {
     type: String,
     required: [true, 'Please mention your latest degree'],
-  }
+  },
+  supervisedBy: [{
+    type: Types.ObjectId,
+    ref: "Doctor"
+  }],
+  appointments: [{ 
+      type: Types.ObjectId, 
+      ref: "Appointment"
+  }],
 });
 
 hpSchema.pre('save', async function(next) {

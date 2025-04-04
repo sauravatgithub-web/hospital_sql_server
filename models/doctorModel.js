@@ -47,7 +47,20 @@ const doctorSchema = new mongoose.Schema({
     enum: ['Admin', 'Doctor', 'Nurse', 'Deo', 'Fdo'],
     default: 'Doctor'
   },
-  appointments: [{ type: Types.ObjectId, ref: "Appointment" }],
+  qualification: { type: String },
+  DOJ: {
+    type: Date,
+    default: Date.now
+  },
+  room: { type: String },
+  hps: [{
+    type: Types.ObjectId,
+    ref: "Hospital_Professional"
+  }],
+  appointments: [{ 
+    type: Types.ObjectId, 
+    ref: "Appointment"
+  }],
 });
 
 doctorSchema.pre('save', async function(next) {

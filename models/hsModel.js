@@ -54,7 +54,11 @@ const hsSchema = new mongoose.Schema({
     type: String,
     enum: ['admin', 'Doctor', 'Nurse', 'Deo', 'Fdo'],
     default: 'Deo'
-  }
+  },
+  appointments: [{ 
+      type: Types.ObjectId, 
+      ref: "Appointment"
+  }],
 });
 
 hsSchema.pre('save', async function(next) {

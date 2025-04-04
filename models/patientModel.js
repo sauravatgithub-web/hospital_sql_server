@@ -39,10 +39,7 @@ const patientSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please mention your latest degree'],
   },
-  disease: { type: Types.ObjectId, ref: "Disease" },
-  assignedRoom: { type: Types.ObjectId, ref: "Room" },
-  appointments: [{ type: Types.ObjectId, ref: "Appointment" }],
-  treatments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Treatment" }]
+  appointments: [{ type: Types.ObjectId, ref: "Appointment" }]
 });
 
 patientSchema.pre('save', async function(next) {
