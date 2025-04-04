@@ -29,6 +29,10 @@ const nurseSchema = new mongoose.Schema({
       return `${namePart.join('_')}_${emailPart}`;
     }
   },
+  shift:{
+    type : String,
+    enum: ['Morning' , 'Afternoon' , 'Evening', 'Night']
+  },
   password: {
     type: String,
     required: [true, 'Please provide a password'],

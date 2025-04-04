@@ -1,0 +1,55 @@
+import Patient from '../models/patientModel.js';
+import { tryCatch } from '../middlewares/error.js';
+import { ErrorHandler } from '../utils/utility.js';
+
+const createPatient = tryCatch(async (req, res, next) => {
+    const {
+      name, addr, phoneNumber, password,
+      gender, guardian_name, guardian_phoneNo
+    } = req.body;
+  
+    if (!name || !phoneNumber || !password || !guardian_name || !guardian_phoneNo)
+      return next(new ErrorHandler("Insufficient input", 404));
+  
+    const reqData = {
+      pname: name,
+      paddr: addr,
+      p_phoneNumber: phoneNumber,
+      password,
+      gender,
+      guardian_name,
+      guardian_phoneNo
+    };
+  
+    await Patient.create(reqData);
+    return res.status(200).json({ success: true, message: "Patient created" });
+  });
+
+const updatePatient = tryCatch(async (req, res, next) => {
+    const { id } = req.params;
+    const updateFields = req.body;
+  
+    const fieldMap = {
+      name: 'pname',
+      addr: 'paddr',
+      phoneNumber: 'p_phoneNumber'
+    };
+  
+    const patient = await Patient.findById(id);
+    if (!patient) {
+        return next(new ErrorHandler("Patient not found",404));
+    }
+  
+    Object.keys(updateFields).forEach(key => {
+      const mappedKey = fieldMap[key] || key;
+      if (updateFields[key] !== null && updateFields[key] !== undefined) {
+        patient[mappedKey] = updateFields[key];
+      }
+    });
+  
+    await patient.save();
+    return res.status(200).json({ message: 'Patient updated successfully', patient });
+  });
+
+export {createPatient, updatePatient}
+  
