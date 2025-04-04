@@ -4,7 +4,6 @@ import { tryCatch } from "../middlewares/error.js";
 import { ErrorHandler } from "../utils/utility.js";
 import Doctor from "../models/doctorModel.js";
 import Nurse from "../models/nurseModel.js";
-import Hp from "../models/hpModel.js";
 import Hs from "../models/hsModel.js";
 
 const sendOTP = async (email, message, next) => {
@@ -21,12 +20,16 @@ const sendOTP = async (email, message, next) => {
 };
 
 const emailVerification = tryCatch(async (req, res, next) => {
-	const { email, resetting } = req.body;
+	const { email, resetting, role } = req.body;
 	if (!email) return next(new ErrorHandler("Please fill your email", 404));
 
+    let user;
 	if (resetting) {
-		const User = await Doctor.findOne({ email });
-		if (!User) return next(new ErrorHandler("Doctor do not exists", 404));
+        if(role === "Doctor") user = await Doctor.findOne({ d_email : email });
+        else if (role === "Nurse") user = await Nurse.findOne({n_email : email});
+        else user = await Nurse.findOne({ s_email : email});
+
+		if (!user) return next(new ErrorHandler("User do not exists", 404));
 	}
 
 	sendOTP(email, "Email Verification", next);
@@ -39,15 +42,13 @@ const emailVerification = tryCatch(async (req, res, next) => {
 });
 
 const confirmOTP = tryCatch(async (req, res, next) => {
-	// const { email, resetting, otp, secretAnswer } = req.body;
-	const { email, resetting, otp } = req.body;
+	const { email, resetting, otp, role } = req.body;
 	if (!email || !otp) return next(new ErrorHandler("Please fill all fields", 404));
 
-	// if (resetting && !secretAnswer) return next(new ErrorHandler("Please fill secret answer", 404));
-
-	const User = await Doctor.findOne({ email });
-	// if (resetting && secretAnswer !== Customer.secretAnswer)
-	// 	return next(new ErrorHandler("Please give coreect answer", 404));
+    let user;
+	if(role === "Doctor") user = await Doctor.findOne({ d_email : email });
+    else if (role === "Nurse") user = await Nurse.findOne({n_email : email});
+    else user = await Nurse.findOne({ s_email : email});
 
 	const sharedOTP = emailTokens[email];
 
@@ -68,14 +69,13 @@ const login = tryCatch(async (req, res, next) => {
     let user;
     if (role === "Doctor") user = await Doctor.findOne({ d_email : email }).select("+password");
     else if (role === "Nurse") user = await Nurse.findOne({ n_email : email }).select("+password");
-    else if (role === "Hp") user = await Hp.findOne({ h_email : email }).select("+password");
     else user = await Hs.findOne({ s_email : email }).select("+password");
 
     if (!user) return next(new ErrorHandler("Invalid credentials", 404));
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return next(new ErrorHandler("Invalid credentials", 401));
 
-    const name = role === "Doctor" ? user.d_name : role === "Nurse" ? user.n_name : role === "Hp" ? user.h_name : user.s_name;
+    const name = role === "Doctor" ? user.d_name : role === "Nurse" ? user.n_name : user.s_name;
     
     if(toRemember) sendToken(res, user, 200, `Welcome back, ${name}`);
     return res.status(200).json({ success: true, message: `Welcome back, ${name}`, user: user});
@@ -96,14 +96,12 @@ const updateUserName = tryCatch(async (req, res) => {
     let user;
     if (role === "Doctor") user = await Doctor.findById(req.user);
     else if (role === "Nurse") user = await Nurse.findById(req.user);
-    else if (role === "Hp") user = await Hp.findById(req.user);
     else user = await Hs.findById(req.user);
 
     if (!user) return next(new ErrorHandler("User not found", 404));
 
     if (role === "Doctor") user.d_name = newUserName;
     else if (role === "Nurse") user.n_name = newUserName;
-    else if (role === "Hp") user.h_name = newUserName;
     else user.s_name = newUserName;
 
     await user.save();
@@ -111,6 +109,8 @@ const updateUserName = tryCatch(async (req, res) => {
 });
 
 export {
+    emailVerification,
+    confirmOTP,
     login,
     logOut,
     updateUserName

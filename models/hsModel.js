@@ -49,6 +49,11 @@ const hsSchema = new mongoose.Schema({
   },
   shift: {
     type: String,
+  },
+  role: {
+    type: String,
+    enum: ['admin', 'Doctor', 'Nurse', 'Deo', 'Fdo'],
+    default: 'Deo'
   }
 });
 

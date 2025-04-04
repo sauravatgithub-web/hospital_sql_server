@@ -41,6 +41,11 @@ const doctorSchema = new mongoose.Schema({
   gender: {
     type: String,
     enum: ['Male', 'Female'],
+  },
+  role: {
+    type: String,
+    enum: ['Admin', 'Doctor', 'Nurse', 'Deo', 'Fdo'],
+    default: 'Doctor'
   }
 });
 
