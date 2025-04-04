@@ -39,4 +39,4 @@ const sendEmail = (email, subject, sharedToken) => {
     });
 }
 
-return { ErrorHandler, sendEmail }
+export { ErrorHandler, sendEmail }
