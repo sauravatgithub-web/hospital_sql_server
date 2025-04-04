@@ -3,7 +3,7 @@ import mongoose, { Types } from 'mongoose';
 import validator from 'validator';
 
 const doctorSchema = new mongoose.Schema({
-  dname: {
+  d_name: {
     type: String,
     required: [true, 'Please tell us your name!']
   },

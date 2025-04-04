@@ -3,11 +3,11 @@ import mongoose, { Types } from 'mongoose';
 import validator from 'validator';
 
 const hsSchema = new mongoose.Schema({
-  sname: {
+  s_name: {
     type: String,
     required: [true, 'Please tell us your name!']
   },
-  saddr: { type: String },
+  s_addr: { type: String },
   s_phoneNumber: {
     type: String,
     required: [true, "Please provide a phone number"],

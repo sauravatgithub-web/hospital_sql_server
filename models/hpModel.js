@@ -3,7 +3,7 @@ import mongoose, { Types } from 'mongoose';
 import validator from 'validator';
 
 const hpSchema = new mongoose.Schema({
-  hname: {
+  h_name: {
     type: String,
     required: [true, 'Please tell us your name!']
   },

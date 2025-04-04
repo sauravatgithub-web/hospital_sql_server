@@ -1,12 +1,20 @@
 import { hash } from 'bcrypt';
 import mongoose, { Types } from 'mongoose';
+import validator from 'validator';
 
 const nurseSchema = new mongoose.Schema({
-  nname: {
+  n_name: {
     type: String,
     required: [true, 'Please tell us your name!']
   },
-  naddr: { type: String },
+  n_email: {
+      type: String,
+      required: [true, 'Please provide your email'],
+      unique: true,
+      lowercase: true,
+      validate: [validator.isEmail, 'Please provide a valid email'],
+    },
+  n_addr: { type: String },
   n_phoneNumber: {
     type: String,
     required: [true, "Please provide a phone number"],
