@@ -1,13 +1,15 @@
 import bcrypt, { hash } from "bcrypt";
 import { cookieOption, sendToken } from "../utils/features.js";
 import { tryCatch } from "../middlewares/error.js";
-import { ErrorHandler } from "../utils/utility.js";
+import { ErrorHandler, sendEmail } from "../utils/utility.js";
 import Doctor from "../models/doctorModel.js";
 import Nurse from "../models/nurseModel.js";
 import Hs from "../models/hsModel.js";
 
+const emailTokens = {};
+
 const sendOTP = async (email, message, next) => {
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otp = Math.floor(10000 + Math.random() * 90000).toString();
     const expirationTime = new Date(Date.now() + 2 * 60 * 60 * 1000);
     const sharedToken = `${otp}`;
     console.log(otp);
@@ -20,52 +22,51 @@ const sendOTP = async (email, message, next) => {
 };
 
 const emailVerification = tryCatch(async (req, res, next) => {
-	const { email, resetting, role } = req.body;
+	const { email, role } = req.body;
 	if (!email) return next(new ErrorHandler("Please fill your email", 404));
 
     let user;
-	if (resetting) {
-        if(role === "Doctor") user = await Doctor.findOne({ d_email : email });
-        else if (role === "Nurse") user = await Nurse.findOne({n_email : email});
-        else user = await Nurse.findOne({ s_email : email});
+    if(role === "Doctor") user = await Doctor.findOne({ d_email : email });
+    else if (role === "Nurse") user = await Nurse.findOne({n_email : email});
+    else user = await Nurse.findOne({ s_email : email});
 
-		if (!user) return next(new ErrorHandler("User do not exists", 404));
-	}
+    if (!user) return next(new ErrorHandler("User do not exists", 404));
 
 	sendOTP(email, "Email Verification", next);
 	res.status(200).json({
 		success: true,
 		role: role,
-		secretQuestion: secretQuestion,
 		message: "An OTP has been sent to your email.",
 	});
 });
 
 const confirmOTP = tryCatch(async (req, res, next) => {
-	const { email, resetting, otp, role } = req.body;
+	const { email, otp, role } = req.body;
 	if (!email || !otp) return next(new ErrorHandler("Please fill all fields", 404));
 
     let user;
 	if(role === "Doctor") user = await Doctor.findOne({ d_email : email });
     else if (role === "Nurse") user = await Nurse.findOne({n_email : email});
-    else user = await Nurse.findOne({ s_email : email});
+    else user = await Hs.findOne({ s_email : email});
 
 	const sharedOTP = emailTokens[email];
 
-	if (sharedOTP && sharedOTP.otp == otp && Date.now() < sharedOTP.expirationTime) {
+	if(sharedOTP && sharedOTP.otp == otp && Date.now() < sharedOTP.expirationTime) {
 		return res.status(200).json({ success: true, message: "OTP has been successfully verified." });
-	} else if (sharedOTP && sharedOTP.otp != otp) {
+	} 
+    else if(sharedOTP && sharedOTP.otp != otp) {
 		return res.status(400).json({ success: false, message: "Incorrect OTP entered." });
-	} else return res.status(400).json({ success: false, message: "OTP expired." });
+	} 
+    else return res.status(400).json({ success: false, message: "OTP expired." });
 });
 
 
 const login = tryCatch(async (req, res, next) => {
     const { email, password, role } = req.body;
-    if (!email || !password || role) {
+    if(!email || !password || !role) {
         return next(new ErrorHandler("Please fill all the fields", 404));
     }
-
+    
     let user;
     if (role === "Doctor") user = await Doctor.findOne({ d_email : email }).select("+password");
     else if (role === "Nurse") user = await Nurse.findOne({ n_email : email }).select("+password");
@@ -75,10 +76,8 @@ const login = tryCatch(async (req, res, next) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return next(new ErrorHandler("Invalid credentials", 401));
 
-    const name = role === "Doctor" ? user.d_name : role === "Nurse" ? user.n_name : user.s_name;
-    
-    if(toRemember) sendToken(res, user, 200, `Welcome back, ${name}`);
-    return res.status(200).json({ success: true, message: `Welcome back, ${name}`, user: user});
+    const name = (role === "Doctor") ? user.d_name : role === "Nurse" ? user.n_name : user.s_name;
+    sendToken(res, user, 200, `Welcome back, ${name}`);
 });
 
 const logOut = tryCatch(async (req, res) => {
@@ -108,10 +107,35 @@ const updateUserName = tryCatch(async (req, res) => {
     return res.status(200).json({ success: true });
 });
 
+const getMyProfile = tryCatch(async (req, res) => {
+    let user = await Doctor.findById(req.user);
+    return res.status(200).json({
+        success: true,
+        user,
+    });
+});
+
+const setNewPassword = tryCatch(async (req, res, next) => {
+    const { email, password, role } = req.body;
+    if (!email || !password) return next(new ErrorHandler("Please fill all the fields", 404));
+
+    let user;
+    if(role === "Doctor") user = await Doctor.findOne({ d_email: email });
+    else if(role === "Nurse") user = await Nurse.findOne({ n_email: email });
+    else user = await Hs.findOne({ s_email: email });
+    if (!user) return next(new ErrorHandler("User do not exists", 404));
+
+    user.password = password;
+    await user.save();
+    return res.status(200).json({ success: true, user: user, message: "Password has been updated." });
+});
+
 export {
     emailVerification,
     confirmOTP,
     login,
+    getMyProfile,
     logOut,
-    updateUserName
+    updateUserName,
+    setNewPassword
 };

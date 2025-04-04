@@ -26,8 +26,8 @@ const doctorSchema = new mongoose.Schema({
   d_userName :{
     type : String,
     unique : true,
-    default : function(){
-      const namePart = this.dname.toLowerCase().split(' ');
+    default : function() {
+      const namePart = this.d_name.toLowerCase().split(' ');
       const emailPart = this.d_email.toLowerCase().split('@')[0];
       return `${namePart.join('_')}_${emailPart}`;
     }
