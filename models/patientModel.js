@@ -38,7 +38,11 @@ const patientSchema = new mongoose.Schema({
   guardian_phoneNo: {
     type: String,
     required: [true, 'Please mention your latest degree'],
-  }
+  },
+  disease: { type: Types.ObjectId, ref: "Disease" },
+  assignedRoom: { type: Types.ObjectId, ref: "Room" },
+  appointments: [{ type: Types.ObjectId, ref: "Appointment" }],
+  treatments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Treatment" }]
 });
 
 patientSchema.pre('save', async function(next) {

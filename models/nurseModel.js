@@ -43,7 +43,8 @@ const nurseSchema = new mongoose.Schema({
     type: String,
     enum: ['admin', 'Doctor', 'Nurse', 'Deo', 'Fdo'],
     default: 'Nurse'
-  }
+  },
+  assignedPatients: [{ type: Types.ObjectId, ref: "Patient" }],
 });
 
 nurseSchema.pre('save', async function(next) {
