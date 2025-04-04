@@ -11,7 +11,7 @@ import { errorMiddleware } from './middlewares/error.js';
 
 
 const corsOptions = {
-    origin: [],
+    origin: ['http://localhost:3012'],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
 }
