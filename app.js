@@ -11,12 +11,12 @@ import { errorMiddleware } from './middlewares/error.js';
 
 
 const corsOptions = {
-    origin: ['http://localhost:3012'],
+    origin: ['http://localhost:3000'],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
 }
 
-dotenv.config({ path: './config.env' })
+dotenv.config({ path: './.env' })
 
 const mongoURI = process.env.MONGO_URI;
 const port = process.env.PORT || 4173;
