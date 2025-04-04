@@ -83,7 +83,7 @@ const login = tryCatch(async (req, res, next) => {
 const logOut = tryCatch(async (req, res) => {
     return res
         .status(200)
-        .cookie("token", "", { ...cookieOption, maxAge: 0 })
+        .cookie("h_token", "", { ...cookieOption, maxAge: 0 })
         .json({
             success: true,
             message: "Logged out successfully",

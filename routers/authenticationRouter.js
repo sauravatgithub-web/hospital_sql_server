@@ -22,6 +22,6 @@ router.post('/setPassword', setNewPassword);
 router.use(isAuthenticated); 
 router.get("/me", getMyProfile);
 // router.get("/updateUserName",updateUserName);
-// router.get("/logOut", logOut);
+router.get("/logOut", logOut);
 
 export default router;
