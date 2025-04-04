@@ -45,7 +45,7 @@ app.get('/', (req, res) => {
     res.send('Welcome to MySQL project');
 })
 
-app.use('/api/v1/login', authenticateRoute);
+app.use('/api/v1/auth', authenticateRoute);
 
 app.use(errorMiddleware);
 
