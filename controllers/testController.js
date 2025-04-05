@@ -2,6 +2,18 @@ import Test from '../models/testModel.js';
 import { tryCatch } from '../middlewares/error.js';
 import { ErrorHandler } from '../utils/utility.js';
 
+const getAllTest = tryCatch(async(req, res) => {
+  const allTest = await Test.find();
+  return res.status(200).json({ success: true, data: allTest });
+});
+
+const getThisTest = tryCatch(async(req, res, next) => {
+  const name = req.params.name;
+  const test = await Test.find({tname : name});
+  if(!test) return next(new ErrorHandler("Incorrect test name", 404));
+  return res.status(200).json({ success: true, test : test });
+});
+
 const createTest = tryCatch(async (req, res, next) => {
     const { name, equip, appointment, room } = req.body;
   
@@ -32,4 +44,4 @@ const updateTest = tryCatch(async (req, res, next) => {
 });
   
 
-export {createTest, updateTest}
+export {getAllTest, getThisTest, createTest, updateTest}

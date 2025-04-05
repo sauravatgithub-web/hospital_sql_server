@@ -2,6 +2,18 @@ import Treatment from '../models/treatmentModel.js';
 import { tryCatch } from '../middlewares/error.js';
 import { ErrorHandler } from '../utils/utility.js';
 
+const getAllTreatment = tryCatch(async(req, res) => {
+  const allTreatment = await Treatment.find();
+  return res.status(200).json({ success: true, data: allTreatment });
+});
+
+const getThisTreatment = tryCatch(async(req, res, next) => {
+  const name = req.params.name;
+  const treatment = await Treatment.find({trname : name});
+  if(!treatment) return next(new ErrorHandler("Incorrect test name", 404));
+  return res.status(200).json({ success: true, treatment : treatment });
+});
+
 const createTreatment = tryCatch(async (req, res, next) => {
     const { name, desc, disease } = req.body;
   
@@ -29,6 +41,6 @@ const updateTreatment = tryCatch(async (req, res, next) => {
     return res.status(200).json({ success: true, message: "Treatment updated", treatment: updatedTreatment });
   });
 
-export {createTreatment, updateTreatment}
+export {getAllTreatment, getThisTreatment, createTreatment, updateTreatment}
   
   

@@ -2,6 +2,18 @@ import Room from '../models/roomModel.js';
 import { tryCatch } from '../middlewares/error.js';
 import { ErrorHandler } from '../utils/utility.js';
 
+const getAllRoom = tryCatch(async(req, res) => {
+  const allRoom = await Room.find();
+  return res.status(200).json({ success: true, data: allRoom });
+});
+
+const getThisRoom = tryCatch(async(req, res, next) => {
+  const name = req.params.name;
+  const room = await Room.find({name});
+  if(!room) return next(new ErrorHandler("Incorrect room name", 404));
+  return res.status(200).json({ success: true, patient : patient });
+});
+
 const createRoom = tryCatch(async (req, res, next) => {
     const { type, capacity, isAC } = req.body;
   
@@ -31,4 +43,4 @@ const updateRoom = tryCatch(async (req, res, next) => {
   
 
 
-export {createRoom, updateRoom}
+export {getAllRoom, getThisRoom, createRoom, updateRoom}

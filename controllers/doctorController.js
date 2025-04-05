@@ -2,6 +2,18 @@ import Doctor from '../models/doctorModel.js';
 import { tryCatch } from '../middlewares/error.js';
 import { ErrorHandler } from '../utils/utility.js';
 
+const getAllDoctor = tryCatch(async(req, res) => {
+    const allDoctor = await Doctor.find();
+    return res.status(200).json({ success: true, data: allDoctor });
+});
+
+const getThisDoctor = tryCatch(async(req, res, next) => {
+    const name = req.params.name;
+    const doctor = await Doctor.find({d_name : name});
+    if(!doctor) return next(new ErrorHandler("Incorrect doctor name", 404));
+    return res.status(200).json({ success: true, doctor: doctor });
+});
+
 const createDoctor = tryCatch(async(req,res,next) => {
     const  {
         name, addr, spec, inTime, outTime, phoneNumber, email, gender, qualification, room, password
@@ -50,4 +62,4 @@ const updateDoctor = tryCatch(async(req,res,next)=>{
 });
 
 
-export { createDoctor, updateDoctor }
+export {getAllDoctor,getThisDoctor, createDoctor, updateDoctor }

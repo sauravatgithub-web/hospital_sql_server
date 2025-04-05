@@ -2,6 +2,18 @@ import Hospital_Staff  from '../models/hsModel.js';
 import { tryCatch } from '../middlewares/error.js';
 import { ErrorHandler } from '../utils/utility.js';
 
+const getAllHospitalStaff = tryCatch(async(req, res) => {
+    const allHospitalStaff = await Hospital_Staff.find();
+    return res.status(200).json({ success: true, data: allHospitalStaff });
+});
+
+const getThisHospitalStaff = tryCatch(async(req, res, next) => {
+    const name = req.params.name;
+    const hs = await Hospital_Staff.find({s_name : name});
+    if(!hs) return next(new ErrorHandler("Incorrect Hospital Staff name", 404));
+    return res.status(200).json({ success: true, hs : hs });
+});
+
 const createHospitalStaff = tryCatch(async (req, res, next) => {
     const {
       name, addr, phoneNumber, email, password, gender, department, designation, shift, role
@@ -54,4 +66,4 @@ const createHospitalStaff = tryCatch(async (req, res, next) => {
     return res.status(200).json({ message: 'Hospital staff updated successfully', staff });
   });
 
-export { createHospitalStaff , updateHospitalStaff }
+export {getAllHospitalStaff, getThisHospitalStaff, createHospitalStaff , updateHospitalStaff }

@@ -2,6 +2,18 @@ import Appointment from '../models/appointmentModel';
 import { tryCatch } from '../middlewares/error.js';
 import { ErrorHandler } from '../utils/utility.js';
 
+const getAllAppointment = tryCatch(async(req, res) => {
+    const allAppointment = await Appointment.find();
+    return res.status(200).json({ success: true, data: allAppointment });
+});
+
+const getThisAppointment = tryCatch(async(req, res, next) => {
+    const id = req.params.id;
+    const appointment = await Appointment.find({id});
+    if(!appointment) return next(new ErrorHandler("Incorrect appointment id", 404));
+    return res.status(200).json({ success: true, appointment: appointment });
+});
+
 const createAppointment = tryCatch(async (req, res, next) => {
     const { patient, doctor } = req.body;
 
@@ -29,4 +41,4 @@ const updateAppointment = tryCatch(async (req, res, next) => {
     return res.status(200).json({ message: 'Appointment updated successfully' });
 });
 
-export { createAppointment, updateAppointment };
+export {getAllAppointment,getThisAppointment, createAppointment, updateAppointment };
