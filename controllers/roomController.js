@@ -15,13 +15,13 @@ const getThisRoom = tryCatch(async(req, res, next) => {
 });
 
 const createRoom = tryCatch(async (req, res, next) => {
-    const { tor, capacity, isAC } = req.body;
+    const { type, capacity, isAC } = req.body;
   
-    if (!tor || !capacity || !isAC)
+    if (!type || !capacity || !isAC)
       return next(new ErrorHandler("Insufficient input", 400));
   
     const newRoom = await Room.create({
-      tor,
+      type,
       capacity,
       isAC
     });

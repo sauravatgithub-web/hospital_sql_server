@@ -1,7 +1,11 @@
 import mongoose, { Types } from 'mongoose';
 
 const roomSchema = new mongoose.Schema({
-  tor : {type : String},
+  name: { type: String },
+  type : {
+    enum: ["Consultation", "ICU", "General Ward", "Test Room"],
+    default: "Consultation",
+  },
   capacity : {type : Number},
   isAC : {type : Boolean},
   appointment: [{type: Types.ObjectId, ref: "Appointment" }],
