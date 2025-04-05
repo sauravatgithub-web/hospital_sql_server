@@ -2,6 +2,18 @@ import Nurse from '../models/nurseModel.js';
 import { tryCatch } from '../middlewares/error.js';
 import { ErrorHandler } from '../utils/utility.js';
 
+const getAllNurse = tryCatch(async(req, res) => {
+    const allNurse = await Nurse.find();
+    return res.status(200).json({ success: true, data: allNurse });
+});
+
+const getThisNurse = tryCatch(async(req, res, next) => {
+    const name = req.params.name;
+    const nurse = await Nurse.find({n_name : name});
+    if(!nurse) return next(new ErrorHandler("Incorrect nurse name", 404));
+    return res.status(200).json({ success: true, nusre : nurse });
+});
+
 const createNurse = tryCatch(async(req,res,next) => {
     const  {
         name, addr, phoneNumber, email, gender, password, shift
@@ -50,4 +62,4 @@ const updateNurse = tryCatch(async(req,res,next)=>{
 });
 
 
-export { createNurse, updateNurse }
+export {getAllNurse, getThisNurse, createNurse, updateNurse }
