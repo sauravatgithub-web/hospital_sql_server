@@ -10,7 +10,7 @@ import { errorMiddleware } from './middlewares/error.js';
 
 import authenticateRoute from './routers/authenticationRouter.js';
 import appointmentRoute  from './routers/appointmentRouter.js';
-import dieseaseRoute     from './routers/dieseaseRouter.js';
+import diseaseRoute     from './routers/diseaseRouter.js';
 import doctorRoute       from './routers/doctorRouter.js';
 import drugsRoute        from './routers/drugsRouter.js';
 import fdoRoute          from './routers/fdoRouter.js';
@@ -58,7 +58,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/v1/auth', authenticateRoute);
 app.use('/api/v1/appointment', appointmentRoute);
-app.use('/api/v1/disease', dieseaseRoute);
+app.use('/api/v1/disease', diseaseRoute);
 app.use('/api/v1/doctor', doctorRoute);
 app.use('/api/v1/drugs', drugsRoute);
 app.use('/api/v1/fdo', fdoRoute);

@@ -3,6 +3,7 @@ import mongoose, { Types } from 'mongoose';
 const roomSchema = new mongoose.Schema({
   name: { type: String },
   type : {
+    type: String,
     enum: ["Consultation", "ICU", "General Ward", "Test Room"],
     default: "Consultation",
   },
