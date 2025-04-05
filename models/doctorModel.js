@@ -52,7 +52,7 @@ const doctorSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
-  room: { type: String },
+  room: { type: Types.ObjectId, ref: "Room" },
   hps: [{
     type: Types.ObjectId,
     ref: "Hospital_Professional"

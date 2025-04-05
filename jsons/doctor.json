@@ -1,0 +1,146 @@
+[
+    {
+        "_id": "doc1",
+        "d_name": "Dr. Amit Kumar",
+        "daddr": "Patna, Bihar",
+        "dspec": "Cardiologist",
+        "inTime": "09:00",
+        "outTime": "17:00",
+        "phoneNumber": "9876543210",
+        "d_email": "amit.kumar@example.com",
+        "d_userName": "dr_amit_kumar_amit.kumar",
+        "password": "********",
+        "gender": "Male",
+        "role": "Doctor",
+        "qualification": "MD",
+        "DOJ": "2022-05-01T00:00:00.000Z",
+        "room": {
+            "_id": "room1",
+            "tor": "Consultation",
+            "capacity": 1,
+            "isAC": true
+        },
+        "hps": [
+            {
+                "_id": "nurse1",
+                "name": "Rita Sharma",
+                "role": "Nurse",
+                "shift": "Morning"
+            }
+        ],
+        "appointments": [
+            {
+                "_id": "app1",
+                "date": "2024-05-01",
+                "patient": {
+                    "_id": "pat1",
+                    "name": "Rajeev Kumar"
+                }
+            },
+            {
+                "_id": "app2",
+                "date": "2024-06-15",
+                "patient": {
+                    "_id": "pat2",
+                    "name": "Suman Sinha"
+                }
+            }
+        ]
+    },
+    {
+        "_id": "doc2",
+        "d_name": "Dr. Neha Singh",
+        "daddr": "Ranchi, Jharkhand",
+        "dspec": "Pediatrician",
+        "inTime": "10:00",
+        "outTime": "16:00",
+        "phoneNumber": "9876500000",
+        "d_email": "neha.singh@example.com",
+        "d_userName": "dr_neha_singh_neha.singh",
+        "password": "********",
+        "gender": "Female",
+        "role": "Doctor",
+        "qualification": "MBBS, DCH",
+        "DOJ": "2021-11-10T00:00:00.000Z",
+        "room": {
+            "_id": "room2",
+            "tor": "Pediatric",
+            "capacity": 1,
+            "isAC": false
+        },
+        "hps": [
+            {
+                "_id": "nurse2",
+                "name": "Anjali Mehta",
+                "role": "Nurse",
+                "shift": "Evening"
+            }
+        ],
+        "appointments": [
+            {
+                "_id": "app3",
+                "date": "2024-04-20",
+                "patient": {
+                    "_id": "pat3",
+                    "name": "Baby Rohan"
+                }
+            },
+            {
+                "_id": "app4",
+                "date": "2024-07-10",
+                "patient": {
+                    "_id": "pat4",
+                    "name": "Baby Sia"
+                }
+            }
+        ]
+    },
+    {
+        "_id": "doc3",
+        "d_name": "Dr. Rohan Verma",
+        "daddr": "Delhi",
+        "dspec": "Orthopedic",
+        "inTime": "08:00",
+        "outTime": "14:00",
+        "phoneNumber": "9123456789",
+        "d_email": "rohan.verma@example.com",
+        "d_userName": "dr_rohan_verma_rohan.verma",
+        "password": "********",
+        "gender": "Male",
+        "role": "Doctor",
+        "qualification": "MS Ortho",
+        "DOJ": "2023-01-01T00:00:00.000Z",
+        "room": {
+            "_id": "room3",
+            "tor": "Orthopedic",
+            "capacity": 2,
+            "isAC": true
+        },
+        "hps": [
+            {
+                "_id": "nurse3",
+                "name": "Mohit Das",
+                "role": "Physiotherapist",
+                "shift": "Morning"
+            }
+        ],
+        "appointments": [
+            {
+                "_id": "app5",
+                "date": "2024-03-10",
+                "patient": {
+                    "_id": "pat5",
+                    "name": "Rakesh Tiwari"
+                }
+            },
+            {
+                "_id": "app6",
+                "date": "2024-08-12",
+                "patient": {
+                    "_id": "pat6",
+                    "name": "Meena Singh"
+                }
+            }
+        ]
+    }
+]

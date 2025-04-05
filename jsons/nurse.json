@@ -1,0 +1,59 @@
+[
+    {
+        "_id": "nurse1",
+        "n_name": "Priya Sharma",
+        "gender": "Female",
+        "qualification": "BSc Nursing",
+        "phoneNumber": "9111122233",
+        "room": {
+            "_id": "room1",
+            "tor": "Consultation"
+        },
+        "tests": [
+            {
+                "_id": "test1",
+                "tname": "Blood Test"
+            }
+        ],
+        "n_userName": "priya_nurse_priya",
+        "password": "********"
+    },
+    {
+        "_id": "nurse2",
+        "n_name": "Sunita Yadav",
+        "gender": "Female",
+        "qualification": "GNM",
+        "phoneNumber": "9222233344",
+        "room": {
+            "_id": "room2",
+            "tor": "Pediatric"
+        },
+        "tests": [
+            {
+                "_id": "test3",
+                "tname": "MRI"
+            }
+        ],
+        "n_userName": "sunita_nurse_sunita",
+        "password": "********"
+    },
+    {
+        "_id": "nurse3",
+        "n_name": "Ravi Verma",
+        "gender": "Male",
+        "qualification": "ANM",
+        "phoneNumber": "9333344455",
+        "room": {
+            "_id": "room3",
+            "tor": "Orthopedic"
+        },
+        "tests": [
+            {
+                "_id": "test2",
+                "tname": "X-Ray"
+            }
+        ],
+        "n_userName": "ravi_nurse_ravi",
+        "password": "********"
+    }
+]

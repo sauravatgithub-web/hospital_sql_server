@@ -1,0 +1,104 @@
+[
+    {
+        "_id": "dis1",
+        "disname": "Diabetes",
+        "dissymp": "Increased thirst, frequent urination",
+        "disdesc": "Chronic metabolic disorder",
+        "appointments": [
+            {
+                "_id": "app1",
+                "date": "2024-05-01",
+                "patient": "pat1",
+                "doctor": "doc1"
+            },
+            {
+                "_id": "app2",
+                "date": "2024-06-15",
+                "patient": "pat2",
+                "doctor": "doc2"
+            }
+        ],
+        "treatment": [
+            {
+                "_id": "treat1",
+                "medicine": "Metformin",
+                "duration": "6 months",
+                "doctor": "doc1"
+            },
+            {
+                "_id": "treat2",
+                "medicine": "Insulin",
+                "duration": "1 year",
+                "doctor": "doc2"
+            }
+        ]
+    },
+    {
+        "_id": "dis2",
+        "disname": "Asthma",
+        "dissymp": "Shortness of breath, wheezing",
+        "disdesc": "Inflammatory disease of airways",
+        "appointments": [
+            {
+                "_id": "app3",
+                "date": "2024-04-20",
+                "patient": "pat3",
+                "doctor": "doc3"
+            },
+            {
+                "_id": "app4",
+                "date": "2024-07-10",
+                "patient": "pat4",
+                "doctor": "doc4"
+            }
+        ],
+        "treatment": [
+            {
+                "_id": "treat3",
+                "medicine": "Albuterol",
+                "duration": "3 months",
+                "doctor": "doc3"
+            },
+            {
+                "_id": "treat4",
+                "medicine": "Fluticasone",
+                "duration": "6 months",
+                "doctor": "doc4"
+            }
+        ]
+    },
+    {
+        "_id": "dis3",
+        "disname": "Arthritis",
+        "dissymp": "Joint pain, stiffness",
+        "disdesc": "Joint inflammation",
+        "appointments": [
+            {
+                "_id": "app5",
+                "date": "2024-03-10",
+                "patient": "pat5",
+                "doctor": "doc5"
+            },
+            {
+                "_id": "app6",
+                "date": "2024-08-12",
+                "patient": "pat6",
+                "doctor": "doc6"
+            }
+        ],
+        "treatment": [
+            {
+                "_id": "treat5",
+                "medicine": "Ibuprofen",
+                "duration": "2 months",
+                "doctor": "doc5"
+            },
+            {
+                "_id": "treat6",
+                "medicine": "Methotrexate",
+                "duration": "4 months",
+                "doctor": "doc6"
+            }
+        ]
+    }
+]
