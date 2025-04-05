@@ -8,10 +8,10 @@
         "h_userName": "manoj_admin_manoj",
         "password": "********",
         "role": "Receptionist",
-        "doctor": {
+        "doctor": [{
             "_id": "doc1",
             "d_name": "Dr. Amit Kumar"
-        }
+        }]
     },
     {
         "_id": "hp2",
@@ -22,10 +22,10 @@
         "h_userName": "meena_staff_meena",
         "password": "********",
         "role": "Staff",
-        "doctor": {
+        "doctor": [{
             "_id": "doc2",
             "d_name": "Dr. Neha Singh"
-        }
+        }]
     },
     {
         "_id": "hp3",
@@ -36,9 +36,9 @@
         "h_userName": "rakesh_helper_rakesh",
         "password": "********",
         "role": "Helper",
-        "doctor": {
+        "doctor": [{
             "_id": "doc3",
             "d_name": "Dr. Rohan Verma"
-        }
+        }]
     }
 ]
