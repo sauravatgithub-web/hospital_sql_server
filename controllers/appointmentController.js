@@ -1,4 +1,4 @@
-import Appointment from '../models/appointmentModel';
+import Appointment from '../models/appointmentModel.js';
 import { tryCatch } from '../middlewares/error.js';
 import { ErrorHandler } from '../utils/utility.js';
 

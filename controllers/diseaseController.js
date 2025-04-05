@@ -1,4 +1,4 @@
-import Disease from '../models/diseaseModel';
+import Disease from '../models/diseaseModel.js';
 import { tryCatch } from '../middlewares/error.js';
 import { ErrorHandler } from '../utils/utility.js';
 
