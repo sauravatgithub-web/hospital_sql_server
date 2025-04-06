@@ -16,9 +16,8 @@ const patientSchema = new mongoose.Schema({
     type : String,
     unique : true,
     default : function(){
-      const namePart = this.hname.toLowerCase().split(' ');
-      const emailPart = this.h_email.toLowerCase().split('@')[0];
-      return `${namePart.join('_')}_${emailPart}`;
+      const namePart = this.pname.toLowerCase().split(' ');
+      return `${namePart}`;
     }
   },
   password: {

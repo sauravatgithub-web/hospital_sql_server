@@ -4,7 +4,20 @@ import { ErrorHandler } from '../utils/utility.js';
 
 const getAllHospitalProfessional = tryCatch(async(req, res) => {
     const allHp = await Hospital_Professional.find();
-    return res.status(200).json({ success: true, products: allHp });
+    console.log(allHp);
+    const modifiedHps = allHp.map(hp => ({
+      _id: hp._id,
+      name: hp.h_name,
+      addr: hp.haddr,
+      phoneNumber: hp.h_phoneNumber,
+      email: hp.h_email,
+      userName: hp.h_userName,
+      gender: hp.gender,
+      uni: hp.uni,
+      degree: hp.degree,
+      supervisedBy: hp.supervisedBy,
+    }))
+    return res.status(200).json({ success: true, data: modifiedHps });
 });
 
 const getThisHospitalProfessional = tryCatch(async(req, res, next) => {
@@ -16,21 +29,23 @@ const getThisHospitalProfessional = tryCatch(async(req, res, next) => {
 
 const createHospitalProfessional = tryCatch(async (req, res, next) => {
     const {
-      name, addr, phoneNumber, email, password, gender, uni, degree
+      name, addr, phoneNumber, email, gender, uni, degree, supervisedBy
     } = req.body;
   
-    if (!name || !addr || !phoneNumber || !email || !password || !uni || !degree)
+    if (!name || !addr || !phoneNumber || !email || !uni || !degree)
       return next(new ErrorHandler("Insufficient input", 404));
+
+    const password = "password";
   
     const reqData = {
       h_name: name,
       haddr: addr,
       h_phoneNumber: phoneNumber,
       h_email: email,
-      password,
+      password: password,
       gender,
       uni,
-      degree
+      degree,
     };
   
     await Hospital_Professional.create(reqData);

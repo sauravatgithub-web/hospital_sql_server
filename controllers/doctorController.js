@@ -1,4 +1,5 @@
 import Doctor from '../models/doctorModel.js';
+import Room from '../models/roomModel.js';
 import { tryCatch } from '../middlewares/error.js';
 import { ErrorHandler } from '../utils/utility.js';
 
@@ -51,8 +52,8 @@ const createDoctor = tryCatch(async(req,res,next) => {
     return res.status(200).json({ success: true });
 });
 
-const updateDoctor = tryCatch(async(req,res,next)=>{
-    const { id } = req.params;
+const updateDoctor = tryCatch(async(req, res, next) => {
+    const { id } = req.body;
     const updateFields = req.body;
     
     const fieldMap = {

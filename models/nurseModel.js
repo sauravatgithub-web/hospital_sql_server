@@ -43,6 +43,9 @@ const nurseSchema = new mongoose.Schema({
     type: String,
     enum: ['Male', 'Female'],
   },
+  qualification: {
+    type: String,
+  },
   role: {
     type: String,
     enum: ['admin', 'Doctor', 'Nurse', 'Deo', 'Fdo'],

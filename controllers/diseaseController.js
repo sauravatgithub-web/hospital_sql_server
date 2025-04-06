@@ -21,7 +21,7 @@ const getThisDisease = tryCatch(async(req, res, next) => {
 });
 
 const createDisease = tryCatch(async (req, res, next) => {
-    const { name , symp, desc } = req.body;
+    const { name, symp, desc } = req.body;
     if( !name || !symp || !desc ) return next(new ErrorHandler("Insufficient input",404));
 
     const reqData = {
@@ -35,7 +35,7 @@ const createDisease = tryCatch(async (req, res, next) => {
 });
 
 const updateDisease = tryCatch(async (req, res, next) => {
-    const { id } = req.params;
+    const { id } = req.body;
     const updateFields = req.body;
   
     const disease = await Disease.findByIdAndUpdate(id, updateFields, { new: true });

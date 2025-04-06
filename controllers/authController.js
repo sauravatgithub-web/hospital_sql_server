@@ -112,8 +112,6 @@ const updateUserName = tryCatch(async (req, res) => {
 });
 
 const getMyProfile = tryCatch(async (req, res) => {
-    console.log(req.user);
-    console.log(userRole);
     let user;
     if(userRole === "Doctor") user = await Doctor.findById(req.user);
     else if(userRole === "Nurse") user = await Nurse.findById(req.user);

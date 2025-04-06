@@ -3,7 +3,8 @@ import {
     getAllDisease, 
     getThisDisease, 
     createDisease,
-    updateDisease } from '../controllers/diseaseController.js'
+    updateDisease 
+} from '../controllers/diseaseController.js'
 
 const router = express.Router();
 router.get('/all', getAllDisease);

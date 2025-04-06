@@ -12,6 +12,8 @@ const getAllNurse = tryCatch(async(req, res) => {
         email: nurse.n_email,
         userName: nurse.n_userName,
         gender: nurse.gender,
+        shift: nurse.shift,
+        qualification: nurse.qualification
     }));   
     return res.status(200).json({ success: true, data: modifiedNurses });
 });
@@ -25,7 +27,7 @@ const getThisNurse = tryCatch(async(req, res, next) => {
 
 const createNurse = tryCatch(async(req,res,next) => {
     const  {
-        name, addr, phoneNumber, email, gender, shift
+        name, addr, phoneNumber, email, gender, shift, qualification
     } = req.body
 
     if(!name || !addr || !phoneNumber || !email || !shift || !gender) 
@@ -38,14 +40,14 @@ const createNurse = tryCatch(async(req,res,next) => {
         n_addr : addr,
         n_phoneNumber : phoneNumber, 
         n_email : email, 
-        gender, password: password, shift
+        gender, password: password, shift, qualification
     }
     await Nurse.create(reqData);
     return res.status(200).json({ success: true });
 });
 
-const updateNurse = tryCatch(async(req,res,next)=>{
-    const { id } = req.params;
+const updateNurse = tryCatch(async(req, res, next) => {
+    const { id } = req.body;
     const updateFields = req.body;
     
     const fieldMap = {
@@ -64,13 +66,13 @@ const updateNurse = tryCatch(async(req,res,next)=>{
     Object.keys(updateFields).forEach(key => {
         const mappedKey = fieldMap[key] || key;
         if (updateFields[key] !== null && updateFields[key] !== undefined) {
-            doctor[mappedKey] = updateFields[key];
+            nurse[mappedKey] = updateFields[key];
         }
     });
     
-    await Nurse.save();
+    await nurse.save();
     return res.status(200).json({ message: 'Nurse updated successfully', nurse });
 });
 
 
-export {getAllNurse, getThisNurse, createNurse, updateNurse }
+export { getAllNurse, getThisNurse, createNurse, updateNurse }

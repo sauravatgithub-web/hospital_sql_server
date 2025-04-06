@@ -4,7 +4,12 @@ import { ErrorHandler } from '../utils/utility.js';
 
 const getAllDrug = tryCatch(async(req, res) => {
     const allDrug = await Drug.find();
-    return res.status(200).json({ success: true, data: allDrug });
+    const modifiedDrugs = allDrug.map(drug => ({
+      _id: drug._id,
+      name: drug.dgname,
+      composition: drug.dgcomposition
+    }))
+    return res.status(200).json({ success: true, data: modifiedDrugs });
 });
 
 const getThisDrug = tryCatch(async(req, res, next) => {
@@ -22,19 +27,19 @@ const createDrug = tryCatch(async (req, res, next) => {
     dgname : name,
     dgcomposition : composition
   }
-  const drug = await Drug.create({ reqData });
+  const drug = await Drug.create(reqData);
   return res.status(201).json({ message: 'Drug created successfully', drug });
 });
 
 const updateDrug = tryCatch(async (req, res, next) => {
-  const { id } = req.params;
-  const updateFields = req.body;
+  const { id, name, composition } = req.body;
 
-  const drug = await Drug.findByIdAndUpdate(id, updateFields, { new: true });
+  const drug = await Drug.findById(id);
+  if(!drug) return next(new ErrorHandler("Drug not found",404));
 
-  if (!drug) {
-    return next(new ErrorHandler("Drug not found",404));
-  }
+  drug.dgname = name;
+  drug.dgcomposition = composition;
+  await drug.save();
 
   return res.status(200).json({ message: 'Drug updated successfully', drug });
 });

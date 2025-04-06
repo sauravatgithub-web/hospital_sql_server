@@ -4,7 +4,17 @@ import { ErrorHandler } from '../utils/utility.js';
 
 const getAllPatient = tryCatch(async(req, res) => {
     const allPatient = await Patient.find();
-    return res.status(200).json({ success: true, data: allPatient });
+    const modifiedPatients = allPatient.map(patient => ({
+      _id: patient._id,
+      name: patient.pname,
+      gender: patient.gender,
+      phoneNumber: patient.p_phoneNumber,
+      gname: patient.guardian_name,
+      gPhoneNumber: patient.guardian_phoneNo,
+      addr: patient.paddr,
+      userName: patient.p_userName
+    }))
+    return res.status(200).json({ success: true, data: modifiedPatients });
 });
 
 const getThisPatient = tryCatch(async(req, res, next) => {
@@ -16,18 +26,20 @@ const getThisPatient = tryCatch(async(req, res, next) => {
 
 const createPatient = tryCatch(async (req, res, next) => {
     const {
-      name, addr, phoneNumber, password,
+      name, addr, phoneNumber,
       gender, guardian_name, guardian_phoneNo
     } = req.body;
   
-    if (!name || !phoneNumber || !password || !guardian_name || !guardian_phoneNo)
+    if (!name || !phoneNumber || !guardian_name || !guardian_phoneNo)
       return next(new ErrorHandler("Insufficient input", 404));
+
+    const password = "password";
   
     const reqData = {
       pname: name,
       paddr: addr,
       p_phoneNumber: phoneNumber,
-      password,
+      password: password,
       gender,
       guardian_name,
       guardian_phoneNo
@@ -38,7 +50,7 @@ const createPatient = tryCatch(async (req, res, next) => {
   });
 
 const updatePatient = tryCatch(async (req, res, next) => {
-    const { id } = req.params;
+    const { id } = req.body;
     const updateFields = req.body;
   
     const fieldMap = {

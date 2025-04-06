@@ -8,7 +8,7 @@ const getAllTreatment = tryCatch(async(req, res) => {
     _id: treatment._id,
     name: treatment.trname,
     disease: treatment.disease,
-    desc: treatment.desc
+    desc: treatment.trdesc
   }))
   return res.status(200).json({ success: true, data: modifiedTreatment });
 });
