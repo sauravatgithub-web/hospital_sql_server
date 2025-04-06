@@ -2,10 +2,25 @@ import Hospital_Staff  from '../models/hsModel.js';
 import { tryCatch } from '../middlewares/error.js';
 import { ErrorHandler } from '../utils/utility.js';
 
-const getAllHospitalStaff = tryCatch(async(req, res) => {
-    const allHospitalStaff = await Hospital_Staff.find();
-    return res.status(200).json({ success: true, data: allHospitalStaff });
+const getAllHospitalStaff = tryCatch(async (req, res) => {
+  const allStaff = await Hospital_Staff.find();
+  const modifiedStaff = allStaff.map(staff => ({
+    _id: staff.id,
+    name: staff.s_name,
+    addr: staff.s_addr,
+    phoneNumber: staff.s_phoneNumber,
+    email: staff.s_email,
+    userName: staff.s_userName,
+    gender: staff.gender,
+    department: staff.department,
+    designation: staff.designation,
+    shift: staff.shift,
+    role: staff.role,
+    appointments: staff.appointments
+  }));
+  return res.status(200).json({ success: true, hospitalStaff: modifiedStaff });
 });
+  
 
 const getThisHospitalStaff = tryCatch(async(req, res, next) => {
     const name = req.params.name;

@@ -6,9 +6,9 @@ import {
     updateHospitalStaff } from '../controllers/hsController.js'
 
 const router = express.Router();
-router.get('/allHospitalStaff', getAllHospitalStaff);
+router.get('/all', getAllHospitalStaff);
 router.get('/thisHospitalStaff/:name', getThisHospitalStaff);
-router.post('/createHospitalStaff', createHospitalStaff);
-router.put('/updateHospitalStaff', updateHospitalStaff);
+router.post('/new', createHospitalStaff);
+router.put('/update', updateHospitalStaff);
 
 export default router;

@@ -6,9 +6,9 @@ import {
     updateTest } from '../controllers/testController.js'
 
 const router = express.Router();
-router.get('/allTest', getAllTest);
+router.get('/all', getAllTest);
 router.get('/thisTest/:name', getThisTest);
-router.post('/createTest', createTest);
-router.put('/updateTest', updateTest);
+router.post('/new', createTest);
+router.put('/update', updateTest);
 
 export default router;

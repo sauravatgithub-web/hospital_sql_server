@@ -3,8 +3,21 @@ import { tryCatch } from '../middlewares/error.js';
 import { ErrorHandler } from '../utils/utility.js';
 
 const getAllHospitalProfessional = tryCatch(async(req, res) => {
-    const allHp = await Hospital_Professional.find();
-    return res.status(200).json({ success: true, products: allHp });
+  const allHp = await Hospital_Professional.find();
+  modifiedHp = allHp.map(hp=>({
+    _id : hp.id,
+    name: hp.h_name,
+    addr: hp.haddr,
+    phoneNumber: hp.h_phoneNumber,
+    email: hp.h_email,
+    userName: hp.h_userName,
+    gender: hp.gender,
+    uni: hp.uni,
+    degree: hp.degree,
+    supervisedBy: hp.supervisedBy,
+    appointments: hp.appointments
+  }));
+  return res.status(200).json({ success: true, products: modifiedHp });
 });
 
 const getThisHospitalProfessional = tryCatch(async(req, res, next) => {

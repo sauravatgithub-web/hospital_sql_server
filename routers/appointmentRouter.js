@@ -6,9 +6,9 @@ import {
     updateAppointment } from '../controllers/appointmentController.js'
 
 const router = express.Router();
-router.get('/allAppointment', getAllAppointment);
+router.get('/all', getAllAppointment);
 router.get('/thisAppointment/:id', getThisAppointment);
-router.post('/createAppointment', createAppointment);
-router.put('/updateAppointment', updateAppointment);
+router.post('/new', createAppointment);
+router.put('/update', updateAppointment);
 
 export default router;

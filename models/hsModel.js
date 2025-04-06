@@ -24,7 +24,7 @@ const hsSchema = new mongoose.Schema({
     type : String,
     unique : true,
     default : function(){
-      const namePart = this.sname.toLowerCase().split(' ');
+      const namePart = this.s_name.toLowerCase().split(' ');
       const emailPart = this.s_email.toLowerCase().split('@')[0];
       return `${namePart.join('_')}_${emailPart}`;
     }
@@ -54,11 +54,6 @@ const hsSchema = new mongoose.Schema({
   },
   shift: {
     type: String,
-  },
-  role: {
-    type: String,
-    enum: ['admin', 'Doctor', 'Nurse', 'Deo', 'Fdo'],
-    default: 'Deo'
   },
   appointments: [{ 
       type: Types.ObjectId, 
