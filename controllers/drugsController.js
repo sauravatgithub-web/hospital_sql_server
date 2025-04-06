@@ -3,6 +3,13 @@ import { tryCatch } from '../middlewares/error.js';
 import { ErrorHandler } from '../utils/utility.js';
 
 const getAllDrug = tryCatch(async(req, res) => {
+    const allDrugs = await Drug.find();
+    const modifiedDrugs = allDrugs.map(drug => ({
+      _id: drug._id,
+      name: drug.dgname,
+      composition: drug.dgcomposition
+  }));
+    return res.status(200).json({ success: true, data: modifiedDrugs });
     const allDrug = await Drug.find();
     const modifiedDrugs = allDrug.map(drug => ({
       _id: drug._id,

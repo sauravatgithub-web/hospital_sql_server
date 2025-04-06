@@ -2,6 +2,21 @@ import Patient from '../models/patientModel.js';
 import { tryCatch } from '../middlewares/error.js';
 import { ErrorHandler } from '../utils/utility.js';
 
+const getAllPatient = tryCatch(async (req, res) => {
+  const allPatients = await Patient.find();
+  const modifiedPatients = allPatients.map(pt => ({
+    _id: pt.id,
+    name: pt.pname,
+    addr: pt.paddr,
+    phoneNumber: pt.p_phoneNumber,
+    email: pt.p_email,
+    userName: pt.p_userName,
+    gender: pt.gender,
+    guardianName: pt.guardian_name,
+    guardianPhoneNumber: pt.guardian_phoneNo,
+    appointments: pt.appointments
+  }));
+  return res.status(200).json({ success: true, patients: modifiedPatients });
 const getAllPatient = tryCatch(async(req, res) => {
     const allPatient = await Patient.find();
     const modifiedPatients = allPatient.map(patient => ({
@@ -16,6 +31,7 @@ const getAllPatient = tryCatch(async(req, res) => {
     }))
     return res.status(200).json({ success: true, data: modifiedPatients });
 });
+  
 
 const getThisPatient = tryCatch(async(req, res, next) => {
     const name = req.params.name;

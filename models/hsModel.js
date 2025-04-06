@@ -24,7 +24,7 @@ const hsSchema = new mongoose.Schema({
     type : String,
     unique : true,
     default : function(){
-      const namePart = this.sname.toLowerCase().split(' ');
+      const namePart = this.s_name.toLowerCase().split(' ');
       const emailPart = this.s_email.toLowerCase().split('@')[0];
       return `${namePart.join('_')}_${emailPart}`;
     }
