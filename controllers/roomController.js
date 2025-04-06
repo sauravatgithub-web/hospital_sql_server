@@ -14,19 +14,24 @@ const getThisRoom = tryCatch(async(req, res, next) => {
   return res.status(200).json({ success: true, patient : patient });
 });
 
+const getAllVacantDocRooms = tryCatch(async(req, res) => {
+  const allRooms = await Room.find({ type: 'Consultation', vacancy: 1 });
+  return res.status(200).json({ success: true, data: allRooms });
+});
+
 const createRoom = tryCatch(async (req, res, next) => {
-    const { type, capacity, isAC } = req.body;
-    if(!type || !capacity || !isAC) return next(new ErrorHandler("Insufficient input", 400));
-    console.log(type, capacity, isAC);
-  
-    const newRoom = await Room.create({
-      type,
-      capacity,
-      isAC
-    });
-  
-    return res.status(200).json({ success: true, message: "Room created", room: newRoom });
+  const { name, type, capacity, isAC } = req.body;
+  if( !name || !type || !capacity || !isAC ) return next(new ErrorHandler("Insufficient input", 400));
+
+  const newRoom = await Room.create({
+    name, 
+    type,
+    capacity,
+    isAC
   });
+
+  return res.status(200).json({ success: true, message: "Room created", room: newRoom });
+});
   
 const updateRoom = tryCatch(async (req, res, next) => {
     const { id } = req.params;
@@ -42,4 +47,4 @@ const updateRoom = tryCatch(async (req, res, next) => {
   
 
 
-export {getAllRoom, getThisRoom, createRoom, updateRoom}
+export {getAllRoom, getThisRoom, getAllVacantDocRooms, createRoom, updateRoom}

@@ -4,7 +4,13 @@ import { ErrorHandler } from '../utils/utility.js';
 
 const getAllTreatment = tryCatch(async(req, res) => {
   const allTreatment = await Treatment.find();
-  return res.status(200).json({ success: true, data: allTreatment });
+  const modifiedTreatment = allTreatment.map(treatment => ({
+    _id: treatment._id,
+    name: treatment.trname,
+    disease: treatment.disease,
+    desc: treatment.desc
+  }))
+  return res.status(200).json({ success: true, data: modifiedTreatment });
 });
 
 const getThisTreatment = tryCatch(async(req, res, next) => {
@@ -15,19 +21,17 @@ const getThisTreatment = tryCatch(async(req, res, next) => {
 });
 
 const createTreatment = tryCatch(async (req, res, next) => {
-    const { name, desc, disease } = req.body;
-  
-    if (!name || !disease)
-      return next(new ErrorHandler("Insufficient input", 400));
-    const reqData = {
-        trname : name,
-        trdesc : desc,
-        disease  
-    }
-    const newTreatment = await Treatment.create({reqData});
-  
-    return res.status(200).json({ success: true, message: "Treatment created", treatment: newTreatment });
-  });
+  const { name, desc, disease } = req.body;
+  if (!name || !disease) return next(new ErrorHandler("Insufficient input", 400));
+
+  const reqData = {
+      trname : name,
+      trdesc : desc,
+      disease  
+  }
+  const newTreatment = await Treatment.create(reqData);
+  return res.status(200).json({ success: true, message: "Treatment created", treatment: newTreatment });
+});
 
 const updateTreatment = tryCatch(async (req, res, next) => {
     const { id } = req.params;

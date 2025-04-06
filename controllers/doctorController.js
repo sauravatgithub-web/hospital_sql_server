@@ -34,7 +34,7 @@ const createDoctor = tryCatch(async(req,res,next) => {
         name, addr, spec, inTime, outTime, phoneNumber, email, gender, qualification, room
     } = req.body;
 
-    if(!name || !addr || !phoneNumber || !email || !spec || !inTime || !outTime) 
+    if(!name || !addr || !phoneNumber || !email || !spec || !inTime || !outTime || !room) 
         return next(new ErrorHandler("Insufficient input", 404));
 
     const password = "password";
@@ -45,7 +45,7 @@ const createDoctor = tryCatch(async(req,res,next) => {
         inTime, outTime, phoneNumber, 
         d_email : email, 
         gender, qualification,
-        password: password
+        password: password, room
     }
     await Doctor.create(reqData);
     return res.status(200).json({ success: true });

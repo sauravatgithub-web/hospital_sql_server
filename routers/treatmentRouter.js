@@ -6,9 +6,9 @@ import {
     updateTreatment } from '../controllers/treatmentController.js'
 
 const router = express.Router();
-router.get('/allTreatment', getAllTreatment);
+router.get('/all', getAllTreatment);
 router.get('/thisTreatment/:name', getThisTreatment);
-router.post('/createTreatment', createTreatment);
-router.put('/updateTreatment', updateTreatment);
+router.post('/new', createTreatment);
+router.put('/update', updateTreatment);
 
 export default router;

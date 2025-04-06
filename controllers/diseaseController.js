@@ -3,8 +3,14 @@ import { tryCatch } from '../middlewares/error.js';
 import { ErrorHandler } from '../utils/utility.js';
 
 const getAllDisease = tryCatch(async(req, res) => {
-    const allDisease = await Disease.find();
-    return res.status(200).json({ success: true, data: allDisease });
+    const allDiseases = await Disease.find();
+    const modifiedDiseases = allDiseases.map(disease => ({
+        _id: disease._id,
+        name: disease.disname,
+        symp: disease.dissymp,
+        desc: disease.disdesc
+    }));
+    return res.status(200).json({ success: true, data: modifiedDiseases });
 });
 
 const getThisDisease = tryCatch(async(req, res, next) => {
@@ -16,7 +22,7 @@ const getThisDisease = tryCatch(async(req, res, next) => {
 
 const createDisease = tryCatch(async (req, res, next) => {
     const { name , symp, desc } = req.body;
-    if(!name || !symp || !desc ) return next(new ErrorHandler("Insufficient input",404));
+    if( !name || !symp || !desc ) return next(new ErrorHandler("Insufficient input",404));
 
     const reqData = {
         disname : name,
@@ -24,7 +30,7 @@ const createDisease = tryCatch(async (req, res, next) => {
         disdesc : desc
     }
 
-    const disease = await Disease.create({reqData});
+    const disease = await Disease.create(reqData);
     return res.status(201).json({ message: 'Disease created successfully', disease });
 });
 

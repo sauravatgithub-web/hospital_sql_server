@@ -6,9 +6,9 @@ import {
     updateDisease } from '../controllers/diseaseController.js'
 
 const router = express.Router();
-router.get('/allDisease', getAllDisease);
+router.get('/all', getAllDisease);
 router.get('/thisDisease/:name', getThisDisease);
-router.post('/createDisease', createDisease);
-router.put('/updateDisease', updateDisease);
+router.post('/new', createDisease);
+router.put('/update', updateDisease);
 
 export default router;
