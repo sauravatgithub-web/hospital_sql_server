@@ -3,12 +3,13 @@ import {
     getAllDoctor, 
     getThisDoctor, 
     createDoctor,
-    updateDoctor } from '../controllers/doctorController.js'
+    updateDoctor 
+} from '../controllers/doctorController.js'
 
 const router = express.Router();
-router.get('/allDoctor', getAllDoctor);
+router.get('/all', getAllDoctor);
 router.get('/thisDoctor/:name', getThisDoctor);
-router.post('/createDoctor', createDoctor);
-router.put('/updateDoctor', updateDoctor);
+router.post('/new', createDoctor);
+router.put('/update', updateDoctor);
 
 export default router;

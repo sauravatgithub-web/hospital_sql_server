@@ -3,8 +3,23 @@ import { tryCatch } from '../middlewares/error.js';
 import { ErrorHandler } from '../utils/utility.js';
 
 const getAllDoctor = tryCatch(async(req, res) => {
-    const allDoctor = await Doctor.find();
-    return res.status(200).json({ success: true, data: allDoctor });
+    const allDoctors = await Doctor.find();
+    const modifiedDoctors = allDoctors.map(doctor => ({
+        _id: doctor._id,
+        name: doctor.d_name,
+        addr: doctor.daddr,
+        spec: doctor.dspec,
+        inTime: doctor.inTime,
+        outTime: doctor.outTime,
+        phoneNumber: doctor.phoneNumber,
+        email: doctor.d_email,
+        userName: doctor.d_userName,
+        gender: doctor.gender,
+        qualification: doctor.qualification,
+        room: doctor.room,
+        DOJ: doctor.DOJ,
+    }));    
+    return res.status(200).json({ success: true, data: modifiedDoctors });
 });
 
 const getThisDoctor = tryCatch(async(req, res, next) => {
@@ -16,18 +31,21 @@ const getThisDoctor = tryCatch(async(req, res, next) => {
 
 const createDoctor = tryCatch(async(req,res,next) => {
     const  {
-        name, addr, spec, inTime, outTime, phoneNumber, email, gender, qualification, room, password
-    } = req.body
+        name, addr, spec, inTime, outTime, phoneNumber, email, gender, qualification, room
+    } = req.body;
 
-    if(!name || !addr || !phoneNumber || !email || !spec || !inTime || !outTime || !password) 
-        return next(new ErrorHandler("Insufficient input",404));
+    if(!name || !addr || !phoneNumber || !email || !spec || !inTime || !outTime) 
+        return next(new ErrorHandler("Insufficient input", 404));
+
+    const password = "password";
 
     const reqData = {
         d_name : name, 
         daddr : addr, dspec : spec, 
         inTime, outTime, phoneNumber, 
         d_email : email, 
-        gender, qualification, room, password
+        gender, qualification,
+        password: password
     }
     await Doctor.create(reqData);
     return res.status(200).json({ success: true });

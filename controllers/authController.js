@@ -5,8 +5,10 @@ import { ErrorHandler, sendEmail } from "../utils/utility.js";
 import Doctor from "../models/doctorModel.js";
 import Nurse from "../models/nurseModel.js";
 import Hs from "../models/hsModel.js";
+import Hospital_Staff from "../models/hsModel.js";
 
 const emailTokens = {};
+let userRole;
 
 const sendOTP = async (email, message, next) => {
     const otp = Math.floor(10000 + Math.random() * 90000).toString();
@@ -66,6 +68,8 @@ const login = tryCatch(async (req, res, next) => {
     if(!email || !password || !role) {
         return next(new ErrorHandler("Please fill all the fields", 404));
     }
+    userRole = role;
+    console.log(userRole);
     
     let user;
     if (role === "Doctor") user = await Doctor.findOne({ d_email : email }).select("+password");
@@ -108,10 +112,16 @@ const updateUserName = tryCatch(async (req, res) => {
 });
 
 const getMyProfile = tryCatch(async (req, res) => {
-    let user = await Doctor.findById(req.user);
+    console.log(req.user);
+    console.log(userRole);
+    let user;
+    if(userRole === "Doctor") user = await Doctor.findById(req.user);
+    else if(userRole === "Nurse") user = await Nurse.findById(req.user);
+    else user = await Hospital_Staff.findById(req.user);
+    console.log(user);
     return res.status(200).json({
         success: true,
-        user,
+		user,
     });
 });
 

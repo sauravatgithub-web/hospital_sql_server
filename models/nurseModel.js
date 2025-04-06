@@ -24,8 +24,8 @@ const nurseSchema = new mongoose.Schema({
     type : String,
     unique : true,
     default : function(){
-      const namePart = this.hname.toLowerCase().split(' ');
-      const emailPart = this.h_email.toLowerCase().split('@')[0];
+      const namePart = this.n_name.toLowerCase().split(' ');
+      const emailPart = this.n_email.toLowerCase().split('@')[0];
       return `${namePart.join('_')}_${emailPart}`;
     }
   },

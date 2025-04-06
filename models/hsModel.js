@@ -29,6 +29,11 @@ const hsSchema = new mongoose.Schema({
       return `${namePart.join('_')}_${emailPart}`;
     }
   },
+  role: {
+    type: String,
+    enum: ["FDO", "DEO"],
+    default: "DEO",
+  },
   password: {
     type: String,
     required: [true, 'Please provide a password'],

@@ -3,8 +3,17 @@ import { tryCatch } from '../middlewares/error.js';
 import { ErrorHandler } from '../utils/utility.js';
 
 const getAllNurse = tryCatch(async(req, res) => {
-    const allNurse = await Nurse.find();
-    return res.status(200).json({ success: true, data: allNurse });
+    const allNurses = await Nurse.find();
+    const modifiedNurses = allNurses.map(nurse => ({
+        _id: nurse._id,
+        name: nurse.n_name,
+        addr: nurse.n_addr,
+        phoneNumber: nurse.n_phoneNumber,
+        email: nurse.n_email,
+        userName: nurse.n_userName,
+        gender: nurse.gender,
+    }));   
+    return res.status(200).json({ success: true, data: modifiedNurses });
 });
 
 const getThisNurse = tryCatch(async(req, res, next) => {
@@ -16,18 +25,20 @@ const getThisNurse = tryCatch(async(req, res, next) => {
 
 const createNurse = tryCatch(async(req,res,next) => {
     const  {
-        name, addr, phoneNumber, email, gender, password, shift
+        name, addr, phoneNumber, email, gender, shift
     } = req.body
 
-    if(!name || !addr || !phoneNumber || !email || !shift || !gender || !password) 
+    if(!name || !addr || !phoneNumber || !email || !shift || !gender) 
         return next(new ErrorHandler("Insufficient input",404));
+
+    const password = "password";
 
     const reqData = {
         n_name : name, 
         n_addr : addr,
         n_phoneNumber : phoneNumber, 
         n_email : email, 
-        gender, password, shift
+        gender, password: password, shift
     }
     await Nurse.create(reqData);
     return res.status(200).json({ success: true });

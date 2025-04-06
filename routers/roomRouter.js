@@ -6,9 +6,9 @@ import {
     updateRoom } from '../controllers/roomController.js'
 
 const router = express.Router();
-router.get('/allRoom', getAllRoom);
+router.get('/all', getAllRoom);
 router.get('/thisRoom/:name', getThisRoom);
-router.post('/createRoom', createRoom);
-router.put('/updateRoom', updateRoom);
+router.post('/create', createRoom);
+router.put('/update', updateRoom);
 
 export default router;
