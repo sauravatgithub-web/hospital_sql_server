@@ -19,6 +19,25 @@ const getAllVacantDocRooms = tryCatch(async (req, res) => {
   return res.status(200).json({ success: true, data: allRooms });
 });
 
+const getAllVacantRooms = tryCatch(async (req, res) => {
+  // GET /api/rooms?type=Consultation&type=Emergency
+
+  const { type } = req.query;
+  if (!type) {
+    return res.status(400).json({ success: false, message: "Room type is required" });
+  }
+
+  if (!Array.isArray(type)) type = [type]; 
+
+  const allRooms = await Room.find({
+    type: { $in: type },
+    vacancy: { $gt: 0 }
+  });
+
+  return res.status(200).json({ success: true, data: allRooms });
+});
+
+
 const createRoom = tryCatch(async (req, res, next) => {
   const { name, type, capacity, isAC } = req.body;
   if (!name || !type || !capacity || !isAC) return next(new ErrorHandler("Insufficient input", 400));
@@ -46,5 +65,4 @@ const updateRoom = tryCatch(async (req, res, next) => {
 });
 
 
-
-export { getAllRoom, getThisRoom, getAllVacantDocRooms, createRoom, updateRoom }
+export { getAllRoom, getThisRoom, getAllVacantDocRooms, getAllVacantRooms, createRoom, updateRoom }

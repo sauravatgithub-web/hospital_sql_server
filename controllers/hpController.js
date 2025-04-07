@@ -46,6 +46,7 @@ const createHospitalProfessional = tryCatch(async (req, res, next) => {
       gender,
       uni,
       degree,
+      supervisedBy
     };
   
     await Hospital_Professional.create(reqData);

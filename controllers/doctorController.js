@@ -3,8 +3,25 @@ import Room from '../models/roomModel.js';
 import { tryCatch } from '../middlewares/error.js';
 import { ErrorHandler } from '../utils/utility.js';
 
-const getAllDoctor = tryCatch(async(req, res) => {
-    const allDoctors = await Doctor.find();
+const getAllDoctor = tryCatch(async (req, res) => {
+    const { time, spec } = req.query;
+    let query = {};
+
+    if (spec) {
+        query.dspec = spec;
+    }
+
+    let allDoctors = await Doctor.find(query);
+
+    if (time) {
+        const inputTime = parseInt(time); //assuming time integer like 900 for 9:00 AM, 1330 for 1:30 PM
+        allDoctors = allDoctors.filter(doctor => {
+            const inT = parseInt(doctor.inTime);
+            const outT = parseInt(doctor.outTime);
+            return inT <= inputTime && inputTime <= outT;
+        });
+    }
+
     const modifiedDoctors = allDoctors.map(doctor => ({
         _id: doctor._id,
         name: doctor.d_name,
@@ -19,7 +36,8 @@ const getAllDoctor = tryCatch(async(req, res) => {
         qualification: doctor.qualification,
         room: doctor.room,
         DOJ: doctor.DOJ,
-    }));    
+    }));
+
     return res.status(200).json({ success: true, data: modifiedDoctors });
 });
 
@@ -48,7 +66,14 @@ const createDoctor = tryCatch(async(req,res,next) => {
         gender, qualification,
         password: password, room
     }
+
+    const roomData = await Room.findById(room);
+    if (!roomData || roomData.vacancy <= 0) return next(new ErrorHandler("Room is full", 400));
+
     await Doctor.create(reqData);
+    roomData.vacancy -= 1;
+    await roomData.save();
+
     return res.status(200).json({ success: true });
 });
 

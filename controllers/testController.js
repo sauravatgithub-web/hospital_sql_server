@@ -1,4 +1,5 @@
 import Test from '../models/testModel.js';
+import Room from '../models/roomModel.js';
 import { tryCatch } from '../middlewares/error.js';
 import { ErrorHandler } from '../utils/utility.js';
 
@@ -51,7 +52,13 @@ const createTest = tryCatch(async (req, res, next) => {
     tequip: equip,
     room, doctor, nurse
   }
+  const roomData = await Room.findById(room);
+  if (!roomData || roomData.vacancy <= 0) return next(new ErrorHandler("Room is full", 400));
+
   const newTest = await Test.create(reqData);
+  roomData.vacancy -= 1;
+  await roomData.save();
+
   return res.status(200).json({ success: true, message: "Test created", test: newTest });
 });
 
