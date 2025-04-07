@@ -2,22 +2,22 @@ import Test from '../models/testModel.js';
 import { tryCatch } from '../middlewares/error.js';
 import { ErrorHandler } from '../utils/utility.js';
 
-const getAllTest = tryCatch(async (req, res) => {
-  const tests = await Test.find()
-    .populate("room")
-    .populate("doctor")
-    .populate("nurse");
+// const getAllTest = tryCatch(async (req, res) => {
+//   const tests = await Test.find()
+//     .populate("room")
+//     .populate("doctor")
+//     .populate("nurse");
 
-  const formattedTests = tests.map(test => ({
-    id: test._id,
-    name: test.tname,
-    equipment: test.tequip,
-    room: test.room,
-    doctors: test.doctor,
-    nurses: test.nurse
-  }));
+//   const formattedTests = tests.map(test => ({
+//     id: test._id,
+//     name: test.tname,
+//     equipment: test.tequip,
+//     room: test.room,
+//     doctors: test.doctor,
+//     nurses: test.nurse
+//   }));
 
-  return res.status(200).json({ success: true, tests: formattedTests });
+//   return res.status(200).json({ success: true, tests: formattedTests });
 const getAllTest = tryCatch(async (req, res) => {
   const allTest = await Test.find();
   const modifiedTests = allTest.map(test => ({

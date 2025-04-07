@@ -18,21 +18,6 @@ const getAllHospitalProfessional = tryCatch(async(req, res) => {
     appointments: hp.appointments
   }));
   return res.status(200).json({ success: true, products: modifiedHp });
-    const allHp = await Hospital_Professional.find();
-    console.log(allHp);
-    const modifiedHps = allHp.map(hp => ({
-      _id: hp._id,
-      name: hp.h_name,
-      addr: hp.haddr,
-      phoneNumber: hp.h_phoneNumber,
-      email: hp.h_email,
-      userName: hp.h_userName,
-      gender: hp.gender,
-      uni: hp.uni,
-      degree: hp.degree,
-      supervisedBy: hp.supervisedBy,
-    }))
-    return res.status(200).json({ success: true, data: modifiedHps });
 });
 
 const getThisHospitalProfessional = tryCatch(async(req, res, next) => {
