@@ -5,9 +5,12 @@ const appointmentSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
+  dischargeTime: {
+    type: Date,
+  },
   status: {
     type: String,
-    enum: ['Scheduled', 'Completed', 'Cancelled'],
+    enum: ['Scheduled', 'Completed', 'Cancelled', 'InProgress'],
     default: 'Scheduled',
   },
   patient: { type: Types.ObjectId, ref: "Patient" },

@@ -80,8 +80,8 @@ const login = tryCatch(async (req, res, next) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return next(new ErrorHandler("Invalid credentials", 401));
 
-    const name = (role === "Doctor") ? user.d_name : role === "Nurse" ? user.n_name : user.s_name;
-    sendToken(res, user, 200, `Welcome back, ${name}`);
+    const modifiedUser = generalizeUser(user, userRole);
+    sendToken(res, modifiedUser, 200, `Welcome back, ${modifiedUser.name}`);
 });
 
 const logOut = tryCatch(async (req, res) => {
@@ -116,10 +116,11 @@ const getMyProfile = tryCatch(async (req, res) => {
     if(userRole === "Doctor") user = await Doctor.findById(req.user);
     else if(userRole === "Nurse") user = await Nurse.findById(req.user);
     else user = await Hospital_Staff.findById(req.user);
-    console.log(user);
+    
+    const modifiedUser = generalizeUser(user, userRole);
     return res.status(200).json({
         success: true,
-		user,
+		user: modifiedUser,
     });
 });
 
@@ -137,6 +138,45 @@ const setNewPassword = tryCatch(async (req, res, next) => {
     await user.save();
     return res.status(200).json({ success: true, user: user, message: "Password has been updated." });
 });
+
+const generalizeUser = (( user, userRole ) => {
+    let roleData = {};
+
+    if (userRole === "Doctor") {
+        roleData = {
+            name: user.d_name,
+            email: user.d_email,
+            addr: user.daddr,
+            phoneNumber: user.phoneNumber,
+            userName: user.d_userName,
+        };
+    } 
+    else if (userRole === "Nurse") {
+        roleData = {
+            name: user.n_name,
+            email: user.n_email,
+            addr: user.n_addr,
+            phoneNumber: user.n_phoneNumber,
+            userName: user.n_userName,
+        };
+    } 
+    else {
+        roleData = {
+            name: user.s_name,
+            email: user.s_email,
+            addr: user.s_addr,
+            phoneNumber: user.s_phoneNumber,
+            userName: user.s_userName,
+        };
+    }
+
+    const modifiedUser = {
+        ...user._doc,
+        ...roleData,
+    };
+
+    return modifiedUser;
+})
 
 export {
     emailVerification,

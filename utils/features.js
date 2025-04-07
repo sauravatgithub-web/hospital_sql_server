@@ -19,7 +19,7 @@ const sendToken = (res, user, code, message) => {
     const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
     return res.status(code).cookie('h_token', token, cookieOption).json({
         success: true,
-        user,
+        user: user,
         message,
         role: user.role
     })

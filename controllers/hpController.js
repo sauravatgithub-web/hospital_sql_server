@@ -4,7 +4,7 @@ import { ErrorHandler } from '../utils/utility.js';
 
 const getAllHospitalProfessional = tryCatch(async(req, res) => {
   const allHp = await Hospital_Professional.find();
-  modifiedHp = allHp.map(hp=>({
+  const modifiedHp = allHp.map(hp=>({
     _id : hp.id,
     name: hp.h_name,
     addr: hp.haddr,
@@ -17,7 +17,8 @@ const getAllHospitalProfessional = tryCatch(async(req, res) => {
     supervisedBy: hp.supervisedBy,
     appointments: hp.appointments
   }));
-  return res.status(200).json({ success: true, products: modifiedHp });
+  console.log(modifiedHp);
+  return res.status(200).json({ success: true, data: modifiedHp });
 });
 
 const getThisHospitalProfessional = tryCatch(async(req, res, next) => {

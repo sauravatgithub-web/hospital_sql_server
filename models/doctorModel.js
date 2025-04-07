@@ -63,6 +63,15 @@ const doctorSchema = new mongoose.Schema({
   }],
 });
 
+doctorSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'room',
+    select: 'name' // only get the 'name' field of the room
+  });
+  this.populate('hps').populate('appointments'); // optional: keep others fully populated
+  next();
+});
+
 doctorSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next();  
   this.password = await hash(this.password, 10);
