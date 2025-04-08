@@ -48,8 +48,8 @@ const updateDisease = tryCatch(async (req, res, next) => {
 });
 
 const deleteDisease = tryCatch(async(req, res, next) => {
-    const { name } = req.params;
-    const disease = await Disease.find({ name });
+    const { id } = req.body;
+    const disease = await Disease.findById(id);
     if(!disease) return next(new ErrorHandler("Disease not found",404));
     disease.active = false;
     await disease.save();

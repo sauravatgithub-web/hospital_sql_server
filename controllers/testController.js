@@ -58,8 +58,8 @@ const updateTest = tryCatch(async (req, res, next) => {
 });
 
 const deleteTest = tryCatch(async(req, res, next) => {
-  const { name } = req.params;
-  const test = await Test.find({ name });
+  const { id } = req.body;
+  const test = await Test.findById(id);
   if(!test) return next(new ErrorHandler("Test not found",404));
   test.active = false;
   await test.save();

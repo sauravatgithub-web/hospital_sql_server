@@ -108,12 +108,12 @@ const updateDoctor = tryCatch(async (req, res, next) => {
 });
 
 const deleteDoctor = tryCatch(async(req, res, next) => {
-    const { name } = req.params;
-    const doctor = await Doctor.find({ name });
-    if(!doctor) return next(new ErrorHandler("doctor not found",404));
+    const { id } = req.body;
+    const doctor = await Doctor.findById(id);
+    if(!doctor) return next(new ErrorHandler("Doctor not found",404));
     doctor.active = false;
     await doctor.save();
-    return res.status(200).json({message : 'doctor deleted successfully'});
+    return res.status(200).json({message : 'Doctor deleted successfully'});
 });
 
 const getAppointments = tryCatch(async (req, res, next) => {

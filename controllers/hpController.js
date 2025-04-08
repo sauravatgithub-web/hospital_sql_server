@@ -69,8 +69,8 @@ const updateHospitalProfessional = tryCatch(async (req, res, next) => {
 });
 
 const deleteHospitalProfessional = tryCatch(async(req, res, next) => {
-  const { name } = req.params;
-  const hp = await Hospital_Professional.find({ name });
+  const { id } = req.body;
+  const hp = await Hospital_Professional.findById(id);
   if(!hp) return next(new ErrorHandler("Hospital Professional not found",404));
   hp.active = false;
   await hp.save();

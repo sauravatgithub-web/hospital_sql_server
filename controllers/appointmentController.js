@@ -42,7 +42,7 @@ const updateAppointment = tryCatch(async (req, res, next) => {
 });
 
 const deleteAppointment = tryCatch(async(req, res, next) => {
-    const { id } = req.params;
+    const { id } = req.body;
     const appointment = await Appointment.findById(id);
     if(!appointment) return next(new ErrorHandler("Appointment not found",404));
     appointment.active = false;

@@ -77,8 +77,8 @@ const updatePatient = tryCatch(async (req, res, next) => {
 });
 
 const deletePatient = tryCatch(async(req, res, next) => {
-  const { name } = req.params;
-  const patient = await Patient.find({ name });
+  const { id } = req.body;
+  const patient = await Patient.findById(id);
   if(!patient) return next(new ErrorHandler("Patient not found",404));
   patient.active = false;
   await patient.save();

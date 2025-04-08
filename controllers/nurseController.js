@@ -75,8 +75,8 @@ const updateNurse = tryCatch(async(req, res, next) => {
 });
 
 const deleteNurse = tryCatch(async(req, res, next) => {
-    const { name } = req.params;
-    const nurse = await Nurse.find({ name });
+    const { id } = req.body;
+    const nurse = await Nurse.findById(id);
     if(!nurse) return next(new ErrorHandler("Nurse not found",404));
     nurse.active = false;
     await nurse.save();

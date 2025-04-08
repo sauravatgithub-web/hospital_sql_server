@@ -45,8 +45,8 @@ const updateDrug = tryCatch(async (req, res, next) => {
 });
 
 const deleteDrug = tryCatch(async(req, res, next) => {
-  const { name } = req.params;
-  const drug = await Drug.find({ name });
+  const { id } = req.body;
+  const drug = await Drug.findById(id);
   if(!drug) return next(new ErrorHandler("Drug not found",404));
   drug.active = false;
   await drug.save();

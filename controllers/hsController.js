@@ -82,8 +82,8 @@ const updateHospitalStaff = tryCatch(async (req, res, next) => {
 });
 
 const deleteHospitalStaff = tryCatch(async(req, res, next) => {
-  const { name } = req.params;
-  const hs = await Hospital_Staff.find({ name });
+  const { id } = req.body;
+  const hs = await Hospital_Staff.findById(id);
   if(!hs) return next(new ErrorHandler("Hospital staff not found",404));
   hs.active = false;
   await hs.save();

@@ -66,8 +66,8 @@ const updateRoom = tryCatch(async (req, res, next) => {
 });
 
 const deleteRoom = tryCatch(async(req, res, next) => {
-  const { name } = req.params;
-  const room = await Room.find({ name });
+  const { id } = req.body;
+  const room = await Room.findById(id);
   if(!room) return next(new ErrorHandler("Room not found",404));
   room.active = false;
   await room.save();

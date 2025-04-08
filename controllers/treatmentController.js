@@ -46,8 +46,8 @@ const updateTreatment = tryCatch(async (req, res, next) => {
 });
 
 const deleteTreatment = tryCatch(async(req, res, next) => {
-  const { name } = req.params;
-  const treatment = await Treatment.find({ name });
+  const { id } = req.body;
+  const treatment = await Treatment.findById(id);
   if(!treatment) return next(new ErrorHandler("Treatment not found",404));
   treatment.active = false;
   await treatment.save();
