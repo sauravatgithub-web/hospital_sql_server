@@ -15,6 +15,10 @@ const roomSchema = new mongoose.Schema({
       return this.capacity;
     }
   },
+  active : {
+    type : Boolean,
+    default : true
+  },
   appointment: [{type: Types.ObjectId, ref: "Appointment" }],
   tests: [{ type: Types.ObjectId, ref: "Test" }],
   doctor: { type: Types.ObjectId, ref: "Doctor" },

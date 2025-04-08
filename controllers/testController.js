@@ -4,7 +4,7 @@ import { tryCatch } from '../middlewares/error.js';
 import { ErrorHandler } from '../utils/utility.js';
 
 const getAllTest = tryCatch(async (req, res) => {
-  const allTest = await Test.find();
+  const allTest = await Test.find({active : true});
   const modifiedTests = allTest.map(test => ({
     _id: test._id,
     name: test.tname,
@@ -19,7 +19,7 @@ const getAllTest = tryCatch(async (req, res) => {
 
 const getThisTest = tryCatch(async (req, res, next) => {
   const name = req.params.name;
-  const test = await Test.find({ tname: name });
+  const test = await Test.find({ tname: name, active : true });
   if (!test) return next(new ErrorHandler("Incorrect test name", 404));
   return res.status(200).json({ success: true, test: test });
 });
@@ -58,7 +58,12 @@ const updateTest = tryCatch(async (req, res, next) => {
 });
 
 const deleteTest = tryCatch(async(req, res, next) => {
-
+  const { name } = req.params;
+  const test = await Test.find({ name });
+  if(!test) return next(new ErrorHandler("Test not found",404));
+  test.active = false;
+  await test.save();
+  return res.status(200).json({message : 'Test deleted successfully'});
 });
 
 export { getAllTest, getThisTest, createTest, updateTest, deleteTest }

@@ -47,6 +47,10 @@ const hpSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please mention your latest degree'],
   },
+  active : {
+    type : Boolean,
+    default : true
+  },
   supervisedBy: [{
     type: Types.ObjectId,
     ref: "Doctor"

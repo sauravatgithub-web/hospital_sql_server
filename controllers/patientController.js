@@ -3,7 +3,7 @@ import { tryCatch } from '../middlewares/error.js';
 import { ErrorHandler } from '../utils/utility.js';
 
 const getAllPatient = tryCatch(async (req, res) => {
-  const allPatient = await Patient.find();
+  const allPatient = await Patient.find({active : true});
   const modifiedPatients = allPatient.map(patient => ({
     _id: patient._id,
     name: patient.pname,
@@ -20,7 +20,7 @@ const getAllPatient = tryCatch(async (req, res) => {
 
 const getThisPatient = tryCatch(async (req, res, next) => {
   const name = req.params.name;
-  const patient = await Patient.find({ pname: name });
+  const patient = await Patient.find({ pname: name, active : true });
   if (!patient) return next(new ErrorHandler("Incorrect patient name", 404));
   return res.status(200).json({ success: true, patient: patient });
 });
@@ -77,7 +77,12 @@ const updatePatient = tryCatch(async (req, res, next) => {
 });
 
 const deletePatient = tryCatch(async(req, res, next) => {
-
+  const { name } = req.params;
+  const patient = await Patient.find({ name });
+  if(!patient) return next(new ErrorHandler("Patient not found",404));
+  patient.active = false;
+  await patient.save();
+  return res.status(200).json({message : 'Patient deleted successfully'});
 });
 
 export { getAllPatient, getThisPatient, createPatient, updatePatient, deletePatient }

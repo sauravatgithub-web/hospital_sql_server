@@ -3,7 +3,7 @@ import { tryCatch } from '../middlewares/error.js';
 import { ErrorHandler } from '../utils/utility.js';
 
 const getAllNurse = tryCatch(async(req, res) => {
-    const allNurses = await Nurse.find();
+    const allNurses = await Nurse.find({active : true});
     const modifiedNurses = allNurses.map(nurse => ({
         _id: nurse._id,
         name: nurse.n_name,
@@ -20,7 +20,7 @@ const getAllNurse = tryCatch(async(req, res) => {
 
 const getThisNurse = tryCatch(async(req, res, next) => {
     const name = req.params.name;
-    const nurse = await Nurse.find({n_name : name});
+    const nurse = await Nurse.find({n_name : name, active : true});
     if(!nurse) return next(new ErrorHandler("Incorrect nurse name", 404));
     return res.status(200).json({ success: true, nusre : nurse });
 });
@@ -75,7 +75,12 @@ const updateNurse = tryCatch(async(req, res, next) => {
 });
 
 const deleteNurse = tryCatch(async(req, res, next) => {
-
+    const { name } = req.params;
+    const nurse = await Nurse.find({ name });
+    if(!nurse) return next(new ErrorHandler("Nurse not found",404));
+    nurse.active = false;
+    await nurse.save();
+    return res.status(200).json({message : 'Nurse deleted successfully'});
 });
 
 export { getAllNurse, getThisNurse, createNurse, updateNurse, deleteNurse }

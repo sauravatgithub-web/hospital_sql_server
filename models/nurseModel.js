@@ -51,6 +51,10 @@ const nurseSchema = new mongoose.Schema({
     enum: ['admin', 'Doctor', 'Nurse', 'Deo', 'Fdo'],
     default: 'Nurse'
   },
+  active : {
+    type : Boolean,
+    default : true
+  },
   tests: [{
     type: Types.ObjectId,
     ref: "Test",

@@ -52,6 +52,10 @@ const patientSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please mention your latest degree'],
   },
+  active : {
+    type : Boolean,
+    default : true
+  },
   appointments: [{ type: Types.ObjectId, ref: "Appointment" }]
 });
 

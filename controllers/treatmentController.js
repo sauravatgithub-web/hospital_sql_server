@@ -3,7 +3,7 @@ import { tryCatch } from '../middlewares/error.js';
 import { ErrorHandler } from '../utils/utility.js';
 
 const getAllTreatment = tryCatch(async (req, res) => {
-  const allTreatment = await Treatment.find();
+  const allTreatment = await Treatment.find({active : true});
   const modifiedTreatment = allTreatment.map(treatment => ({
     _id: treatment._id,
     name: treatment.trname,
@@ -15,7 +15,7 @@ const getAllTreatment = tryCatch(async (req, res) => {
 
 const getThisTreatment = tryCatch(async (req, res, next) => {
   const name = req.params.name;
-  const treatment = await Treatment.find({ trname: name });
+  const treatment = await Treatment.find({ trname: name,active : true });
   if (!treatment) return next(new ErrorHandler("Incorrect test name", 404));
   return res.status(200).json({ success: true, treatment: treatment });
 });
@@ -46,7 +46,12 @@ const updateTreatment = tryCatch(async (req, res, next) => {
 });
 
 const deleteTreatment = tryCatch(async(req, res, next) => {
-
+  const { name } = req.params;
+  const treatment = await Treatment.find({ name });
+  if(!treatment) return next(new ErrorHandler("Treatment not found",404));
+  treatment.active = false;
+  await treatment.save();
+  return res.status(200).json({message : 'Treatment deleted successfully'});
 });
 
 export { getAllTreatment, getThisTreatment, createTreatment, updateTreatment, deleteTreatment }

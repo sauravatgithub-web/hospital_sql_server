@@ -3,7 +3,7 @@ import { tryCatch } from '../middlewares/error.js';
 import { ErrorHandler } from '../utils/utility.js';
 
 const getAllDrug = tryCatch(async (req, res) => {
-  const allDrugs = await Drug.find();
+  const allDrugs = await Drug.find({active : true});
   const modifiedDrugs = allDrugs.map(drug => ({
     _id: drug._id,
     name: drug.dgname,
@@ -14,7 +14,7 @@ const getAllDrug = tryCatch(async (req, res) => {
 
 const getThisDrug = tryCatch(async (req, res, next) => {
   const name = req.params.name;
-  const drug = await Drug.find({ dgname: name });
+  const drug = await Drug.find({ dgname: name, active : true });
   if (!drug) return next(new ErrorHandler("Incorrect drug name", 404));
   return res.status(200).json({ success: true, drug: drug });
 });
@@ -45,7 +45,12 @@ const updateDrug = tryCatch(async (req, res, next) => {
 });
 
 const deleteDrug = tryCatch(async(req, res, next) => {
-
+  const { name } = req.params;
+  const drug = await Drug.find({ name });
+  if(!drug) return next(new ErrorHandler("Drug not found",404));
+  drug.active = false;
+  await drug.save();
+  return res.status(200).json({message : 'Drug deleted successfully'});
 });
 
 export { getAllDrug, getThisDrug, createDrug, updateDrug, deleteDrug }

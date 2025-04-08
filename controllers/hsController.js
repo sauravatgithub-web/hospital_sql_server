@@ -3,7 +3,7 @@ import { tryCatch } from '../middlewares/error.js';
 import { ErrorHandler } from '../utils/utility.js';
 
 const getAllHospitalStaff = tryCatch(async (req, res) => {
-  const allStaff = await Hospital_Staff.find();
+  const allStaff = await Hospital_Staff.find({active : true});
   const modifiedStaff = allStaff.map(staff => ({
     _id: staff.id,
     name: staff.s_name,
@@ -24,7 +24,7 @@ const getAllHospitalStaff = tryCatch(async (req, res) => {
 
 const getThisHospitalStaff = tryCatch(async (req, res, next) => {
   const name = req.params.name;
-  const hs = await Hospital_Staff.find({ s_name: name });
+  const hs = await Hospital_Staff.find({ s_name: name, active : true });
   if (!hs) return next(new ErrorHandler("Incorrect Hospital Staff name", 404));
   return res.status(200).json({ success: true, hs: hs });
 });
@@ -82,7 +82,12 @@ const updateHospitalStaff = tryCatch(async (req, res, next) => {
 });
 
 const deleteHospitalStaff = tryCatch(async(req, res, next) => {
-
+  const { name } = req.params;
+  const hs = await Hospital_Staff.find({ name });
+  if(!hs) return next(new ErrorHandler("Hospital staff not found",404));
+  hs.active = false;
+  await hs.save();
+  return res.status(200).json({message : 'Hospital staff deleted successfully'});
 });
 
 export { getAllHospitalStaff, getThisHospitalStaff, createHospitalStaff, updateHospitalStaff, deleteHospitalStaff }

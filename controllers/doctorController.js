@@ -1,12 +1,13 @@
 import Doctor from '../models/doctorModel.js';
 import Room from '../models/roomModel.js';
+import Drug from '../models/doctorModel.js';
 import { tryCatch } from '../middlewares/error.js';
 import { ErrorHandler } from '../utils/utility.js';
 import Appointment from '../models/appointmentModel.js';
 
 const getAllDoctor = tryCatch(async (req, res) => {
     const { time, spec } = req.query;
-    let query = {};
+    let query = { active : true};
 
     if (spec) {
         query.dspec = spec;
@@ -44,7 +45,7 @@ const getAllDoctor = tryCatch(async (req, res) => {
 
 const getThisDoctor = tryCatch(async (req, res, next) => {
     const name = req.params.name;
-    const doctor = await Doctor.find({ d_name: name });
+    const doctor = await Doctor.find({ d_name: name, active : true });
     if (!doctor) return next(new ErrorHandler("Incorrect doctor name", 404));
     return res.status(200).json({ success: true, doctor: doctor });
 });
@@ -106,8 +107,13 @@ const updateDoctor = tryCatch(async (req, res, next) => {
     return res.status(200).json({ message: 'Doctor updated successfully', doctor });
 });
 
-const deleteDrug = tryCatch(async(req, res, next) => {
-
+const deleteDoctor = tryCatch(async(req, res, next) => {
+    const { name } = req.params;
+    const doctor = await Doctor.find({ name });
+    if(!doctor) return next(new ErrorHandler("doctor not found",404));
+    doctor.active = false;
+    await doctor.save();
+    return res.status(200).json({message : 'doctor deleted successfully'});
 });
 
 const getAppointments = tryCatch(async (req, res, next) => {
@@ -140,4 +146,4 @@ const getAppointments = tryCatch(async (req, res, next) => {
     return res.status(200).json({ success: true, appointments });
 });
 
-export { getAllDoctor, getThisDoctor, createDoctor, updateDoctor, deleteDrug, getAppointments }
+export { getAllDoctor, getThisDoctor, createDoctor, updateDoctor, deleteDoctor, getAppointments }

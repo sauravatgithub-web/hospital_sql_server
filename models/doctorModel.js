@@ -52,6 +52,10 @@ const doctorSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
+  active : {
+    type : Boolean,
+    default : true
+  },
   room: { type: Types.ObjectId, ref: "Room" },
   hps: [{
     type: Types.ObjectId,

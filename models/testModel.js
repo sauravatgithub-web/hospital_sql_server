@@ -3,6 +3,10 @@ import mongoose, { Types } from 'mongoose';
 const testSchema = new mongoose.Schema({
   tname : {type : String},
   tequip : {type : String},
+  active : {
+    type : Boolean,
+    default : true
+  },
   room: { type: Types.ObjectId, ref: "Room" },
   doctor: { type: Types.ObjectId, ref: "Doctor" },
   nurse: { type: Types.ObjectId, ref: "Nurse" },

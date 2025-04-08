@@ -4,6 +4,10 @@ const diseaseSchema = new mongoose.Schema({
   disname : {type : String},
   dissymp : {type : String},
   disdesc : {type : String},
+  active : {
+    type : Boolean,
+    default : true
+  },
   appointments: [{ type: Types.ObjectId, ref: "Appointment" }],
   treatment: [{ type: Types.ObjectId, ref: "Treatment" }],
 });

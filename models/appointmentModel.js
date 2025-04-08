@@ -13,6 +13,10 @@ const appointmentSchema = new mongoose.Schema({
     enum: ['Scheduled', 'Completed', 'Cancelled', 'InProgress'],
     default: 'Scheduled',
   },
+  active : {
+    type : Boolean,
+    default : true
+  },
   patient: { type: Types.ObjectId, ref: "Patient" },
   doctor: { type: Types.ObjectId, ref: "Doctor" },
   nurse: [{ type: Types.ObjectId, ref: "Nurse" }],

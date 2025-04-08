@@ -3,7 +3,7 @@ import { tryCatch } from '../middlewares/error.js';
 import { ErrorHandler } from '../utils/utility.js';
 
 const getAllDisease = tryCatch(async (req, res) => {
-    const allDiseases = await Disease.find();
+    const allDiseases = await Disease.find({active : true});
     const modifiedDiseases = allDiseases.map(disease => ({
         _id: disease._id,
         name: disease.disname,
@@ -15,7 +15,7 @@ const getAllDisease = tryCatch(async (req, res) => {
 
 const getThisDisease = tryCatch(async (req, res, next) => {
     const name = req.params.name;
-    const disease = await Disease.find({ disname: name });
+    const disease = await Disease.find({ disname: name, active : true });
     if (!disease) return next(new ErrorHandler("Incorrect disease name", 404));
     return res.status(200).json({ success: true, disease: disease });
 });
@@ -47,8 +47,13 @@ const updateDisease = tryCatch(async (req, res, next) => {
     return res.status(200).json({ message: 'Disease updated successfully', disease });
 });
 
-const deleteTreatment = tryCatch(async(req, res, next) => {
-
+const deleteDisease = tryCatch(async(req, res, next) => {
+    const { name } = req.params;
+    const disease = await Disease.find({ name });
+    if(!disease) return next(new ErrorHandler("Disease not found",404));
+    disease.active = false;
+    await disease.save();
+    return res.status(200).json({message : 'Disease deleted successfully'});
 });
 
 export { getAllDisease, getThisDisease, createDisease, updateDisease, deleteDisease };

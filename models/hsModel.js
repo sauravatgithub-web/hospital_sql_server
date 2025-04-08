@@ -55,6 +55,10 @@ const hsSchema = new mongoose.Schema({
   shift: {
     type: String,
   },
+  active : {
+    type : Boolean,
+    default : true
+  },
   appointments: [{ 
       type: Types.ObjectId, 
       ref: "Appointment"
