@@ -66,7 +66,7 @@ const doctorSchema = new mongoose.Schema({
 doctorSchema.pre(/^find/, function (next) {
   this.populate({
     path: 'room',
-    select: 'name' // only get the 'name' field of the room
+    select: 'name -_id' // only get the 'name' field of the room
   });
   this.populate('hps').populate('appointments'); // optional: keep others fully populated
   next();

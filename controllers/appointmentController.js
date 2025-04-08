@@ -41,4 +41,32 @@ const updateAppointment = tryCatch(async (req, res, next) => {
     return res.status(200).json({ message: 'Appointment updated successfully' });
 });
 
-export {getAllAppointment,getThisAppointment, createAppointment, updateAppointment };
+const getCurrentAppointments = tryCatch(async (req, res, next) => {
+    const { entity, _id } = req.query;
+
+    const appointmentData = await Appointment.find({ [entity]: _id, status: "InProgress" })
+        .select('assignedRoom patient disease doctor nurse hps')
+        .populate([
+            { path: 'patient',      select: 'pname page gender guardian_name guardian_phoneNo' },
+            { path: 'disease',      select: 'disname' },
+            { path: 'doctor',       select: 'd_name phoneNumber' },
+            { path: 'nurse'  ,      select: 'n_name shift n_phoneNumber'},
+            { path: 'hps'    ,      select: 'h_name h_phoneNumber'},
+            { path: 'assignedRoom', select: 'name'}
+        ]);
+    if(!appointmentData) return next(new ErrorHandler("Check for errors", 404));
+
+    const appointments = appointmentData.map(appointment => ({
+        _id: appointment._id,
+        patient: appointment.patient,
+        disease: appointment.disease.map(dis => dis.disname),
+        room: appointment.assignedRoom.name,
+        doctor: appointment.doctor,
+        nurse: appointment.nurse,
+        hps: appointment.hps
+    }));
+
+    return res.status(200).json({ success: true, appointments });
+});
+
+export { getAllAppointment,getThisAppointment, createAppointment, updateAppointment, getCurrentAppointments };

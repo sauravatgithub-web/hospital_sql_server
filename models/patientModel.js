@@ -7,6 +7,9 @@ const patientSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please tell us your name!']
   },
+  page: {
+    type: Number,
+  },
   paddr: { type: String },
   p_phoneNumber: {
     type: String,
