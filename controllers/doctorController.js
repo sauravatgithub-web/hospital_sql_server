@@ -106,6 +106,10 @@ const updateDoctor = tryCatch(async (req, res, next) => {
     return res.status(200).json({ message: 'Doctor updated successfully', doctor });
 });
 
+const deleteDrug = tryCatch(async(req, res, next) => {
+
+});
+
 const getAppointments = tryCatch(async (req, res, next) => {
     const { _id } = req.query;
 
@@ -136,4 +140,4 @@ const getAppointments = tryCatch(async (req, res, next) => {
     return res.status(200).json({ success: true, appointments });
 });
 
-export { getAllDoctor, getThisDoctor, createDoctor, updateDoctor, getAppointments }
+export { getAllDoctor, getThisDoctor, createDoctor, updateDoctor, deleteDrug, getAppointments }

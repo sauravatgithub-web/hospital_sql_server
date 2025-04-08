@@ -64,5 +64,8 @@ const updateRoom = tryCatch(async (req, res, next) => {
   return res.status(200).json({ success: true, message: "Room updated", room: updatedRoom });
 });
 
+const deleteRoom = tryCatch(async(req, res, next) => {
 
-export { getAllRoom, getThisRoom, getAllVacantDocRooms, getAllVacantRooms, createRoom, updateRoom }
+});
+
+export { getAllRoom, getThisRoom, getAllVacantDocRooms, getAllVacantRooms, createRoom, updateRoom, deleteRoom }

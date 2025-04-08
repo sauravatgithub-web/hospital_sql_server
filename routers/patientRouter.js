@@ -3,7 +3,8 @@ import {
     getAllPatient, 
     getThisPatient, 
     createPatient,
-    updatePatient 
+    updatePatient,
+    deletePatient 
 } from '../controllers/patientController.js'
 
 const router = express.Router();
@@ -11,5 +12,6 @@ router.get('/all', getAllPatient);
 router.get('/thisPatient/:name', getThisPatient);
 router.post('/new', createPatient);
 router.put('/update', updatePatient);
+router.delete('/delete', deletePatient);
 
 export default router;

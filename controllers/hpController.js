@@ -1,11 +1,11 @@
-import Hospital_Professional  from '../models/hpModel.js';
+import Hospital_Professional from '../models/hpModel.js';
 import { tryCatch } from '../middlewares/error.js';
 import { ErrorHandler } from '../utils/utility.js';
 
-const getAllHospitalProfessional = tryCatch(async(req, res) => {
+const getAllHospitalProfessional = tryCatch(async (req, res) => {
   const allHp = await Hospital_Professional.find();
-  const modifiedHp = allHp.map(hp=>({
-    _id : hp.id,
+  const modifiedHp = allHp.map(hp => ({
+    _id: hp.id,
     name: hp.h_name,
     addr: hp.haddr,
     phoneNumber: hp.h_phoneNumber,
@@ -21,52 +21,61 @@ const getAllHospitalProfessional = tryCatch(async(req, res) => {
   return res.status(200).json({ success: true, data: modifiedHp });
 });
 
-const getThisHospitalProfessional = tryCatch(async(req, res, next) => {
-    const name = req.params.name;
-    const user = await Hospital_Professional.find({h_name : name});
-    if(!user) return next(new ErrorHandler("Incorrect user name", 404));
-    return res.status(200).json({ success: true, user: user });
+const getThisHospitalProfessional = tryCatch(async (req, res, next) => {
+  const name = req.params.name;
+  const user = await Hospital_Professional.find({ h_name: name });
+  if (!user) return next(new ErrorHandler("Incorrect user name", 404));
+  return res.status(200).json({ success: true, user: user });
 });
 
 const createHospitalProfessional = tryCatch(async (req, res, next) => {
-    const {
-      name, addr, phoneNumber, email, gender, uni, degree, supervisedBy
-    } = req.body;
-  
-    if (!name || !addr || !phoneNumber || !email || !uni || !degree)
-      return next(new ErrorHandler("Insufficient input", 404));
+  const {
+    name, addr, phoneNumber, email, gender, uni, degree, supervisedBy
+  } = req.body;
 
-    const password = "password";
-  
-    const reqData = {
-      h_name: name,
-      haddr: addr,
-      h_phoneNumber: phoneNumber,
-      h_email: email,
-      password: password,
-      gender,
-      uni,
-      degree,
-      supervisedBy
-    };
-  
-    await Hospital_Professional.create(reqData);
-    return res.status(200).json({ success: true });
-  });
-  
+  if (!name || !addr || !phoneNumber || !email || !uni || !degree)
+    return next(new ErrorHandler("Insufficient input", 404));
+
+  const password = "password";
+
+  const reqData = {
+    h_name: name,
+    haddr: addr,
+    h_phoneNumber: phoneNumber,
+    h_email: email,
+    password: password,
+    gender,
+    uni,
+    degree,
+    supervisedBy
+  };
+
+  await Hospital_Professional.create(reqData);
+  return res.status(200).json({ success: true });
+});
+
 
 const updateHospitalProfessional = tryCatch(async (req, res, next) => {
-    const { id } = req.params;
-    const updateFields = req.body;
-  
-    const updatedHP = await Hospital_Professional.findByIdAndUpdate(id, updateFields, { new: true });
-  
-    if (!updatedHP) {
-        return next(new ErrorHandler("Hospital Professional not found",404));
-    }
-  
-    return res.status(200).json({ message: 'Hospital Professional updated successfully', hospitalProfessional: updatedHP });
-  });
+  const { id } = req.params;
+  const updateFields = req.body;
 
-export {getAllHospitalProfessional, getThisHospitalProfessional, createHospitalProfessional, updateHospitalProfessional }
-  
+  const updatedHP = await Hospital_Professional.findByIdAndUpdate(id, updateFields, { new: true });
+
+  if (!updatedHP) {
+    return next(new ErrorHandler("Hospital Professional not found", 404));
+  }
+
+  return res.status(200).json({ message: 'Hospital Professional updated successfully', hospitalProfessional: updatedHP });
+});
+
+const deleteHospitalProfessional = tryCatch(async(req, res, next) => {
+
+});
+
+export { 
+  getAllHospitalProfessional, 
+  getThisHospitalProfessional, 
+  createHospitalProfessional, 
+  updateHospitalProfessional,
+  deleteHospitalProfessional
+}

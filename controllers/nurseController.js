@@ -74,5 +74,8 @@ const updateNurse = tryCatch(async(req, res, next) => {
     return res.status(200).json({ message: 'Nurse updated successfully', nurse });
 });
 
+const deleteNurse = tryCatch(async(req, res, next) => {
 
-export { getAllNurse, getThisNurse, createNurse, updateNurse }
+});
+
+export { getAllNurse, getThisNurse, createNurse, updateNurse, deleteNurse }

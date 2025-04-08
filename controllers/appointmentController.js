@@ -41,6 +41,10 @@ const updateAppointment = tryCatch(async (req, res, next) => {
     return res.status(200).json({ message: 'Appointment updated successfully' });
 });
 
+const deleteAppointment = tryCatch(async(req, res, next) => {
+
+});
+
 const getCurrentAppointments = tryCatch(async (req, res, next) => {
     const { entity, _id } = req.query;
 
@@ -69,4 +73,11 @@ const getCurrentAppointments = tryCatch(async (req, res, next) => {
     return res.status(200).json({ success: true, appointments });
 });
 
-export { getAllAppointment,getThisAppointment, createAppointment, updateAppointment, getCurrentAppointments };
+export { 
+    getAllAppointment,
+    getThisAppointment, 
+    createAppointment, 
+    updateAppointment, 
+    deleteAppointment,
+    getCurrentAppointments 
+};

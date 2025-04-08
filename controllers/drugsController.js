@@ -44,4 +44,8 @@ const updateDrug = tryCatch(async (req, res, next) => {
   return res.status(200).json({ message: 'Drug updated successfully', drug });
 });
 
-export { getAllDrug, getThisDrug, createDrug, updateDrug }
+const deleteDrug = tryCatch(async(req, res, next) => {
+
+});
+
+export { getAllDrug, getThisDrug, createDrug, updateDrug, deleteDrug }
