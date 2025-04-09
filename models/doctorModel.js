@@ -23,10 +23,10 @@ const doctorSchema = new mongoose.Schema({
     lowercase: true,
     validate: [validator.isEmail, 'Please provide a valid email'],
   },
-  d_userName :{
-    type : String,
-    unique : true,
-    default : function() {
+  d_userName: {
+    type: String,
+    unique: true,
+    default: function () {
       const namePart = this.d_name.toLowerCase().split(' ');
       const emailPart = this.d_email.toLowerCase().split('@')[0];
       return `${namePart.join('_')}_${emailPart}`;
@@ -52,32 +52,40 @@ const doctorSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
-  active : {
-    type : Boolean,
-    default : true
+  active: {
+    type: Boolean,
+    default: true
   },
   room: { type: Types.ObjectId, ref: "Room" },
   hps: [{
     type: Types.ObjectId,
     ref: "Hospital_Professional"
   }],
-  appointments: [{ 
-    type: Types.ObjectId, 
+  appointments: [{
+    type: Types.ObjectId,
     ref: "Appointment"
   }],
+  tests: [{ type: Types.ObjectId, ref: "Test" }]
 });
 
 doctorSchema.pre(/^find/, function (next) {
   this.populate({
     path: 'room',
-    select: 'name -_id' // only get the 'name' field of the room
+    select: 'name -_id'
   });
-  this.populate('hps').populate('appointments'); // optional: keep others fully populated
+  this.populate('hps').populate('appointments');
+  this.populate({
+    path: 'tests',
+    populate: {
+      path: 'room',
+      select: 'name' 
+    }
+  }); 
   next();
 });
 
-doctorSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) return next();  
+doctorSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next();
   this.password = await hash(this.password, 10);
 });
 

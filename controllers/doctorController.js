@@ -6,23 +6,7 @@ import { ErrorHandler } from '../utils/utility.js';
 import Appointment from '../models/appointmentModel.js';
 
 const getAllDoctor = tryCatch(async (req, res) => {
-    const { time, spec } = req.query;
-    let query = { active : true};
-
-    if (spec) {
-        query.dspec = spec;
-    }
-
-    let allDoctors = await Doctor.find(query);
-
-    if (time) {
-        const inputTime = parseInt(time); //assuming time integer like 900 for 9:00 AM, 1330 for 1:30 PM
-        allDoctors = allDoctors.filter(doctor => {
-            const inT = parseInt(doctor.inTime);
-            const outT = parseInt(doctor.outTime);
-            return inT <= inputTime && inputTime <= outT;
-        });
-    }
+    const allDoctors = await Doctor.find({ active: true });
 
     const modifiedDoctors = allDoctors.map(doctor => ({
         _id: doctor._id,
@@ -131,15 +115,16 @@ const getAppointments = tryCatch(async (req, res, next) => {
             { path: 'patient', select: 'pname page gender' },
             { path: 'disease', select: 'disname' }
         ]);
+    console.log(appointmentData);
 
     const appointments = appointmentData.map(appointment => ({
         _id: appointment._id,
         time: appointment.time,
+        name: appointment.patient.pname,
+        age: appointment.patient.page,
         dischargeTime: appointment.dischargeTime,
         status: appointment.status,
-        name: appointment.patient.pname,
-        gender: appointment.patient.gender,
-        age: appointment.patient.page, 
+        patient: appointment.patient,
         disease: appointment.disease.map(dis => dis.disname)
     }));
 

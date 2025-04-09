@@ -69,7 +69,6 @@ const login = tryCatch(async (req, res, next) => {
         return next(new ErrorHandler("Please fill all the fields", 404));
     }
     userRole = role;
-    console.log(userRole);
     
     let user;
     if (role === "Doctor") user = await Doctor.findOne({ d_email : email }).select("+password");

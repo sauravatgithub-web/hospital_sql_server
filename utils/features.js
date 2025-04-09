@@ -10,9 +10,12 @@ const cookieOption = {
 
 const connectDB = (uri) => {
     mongoose
-        .connect(uri, { dbname: "Hospital" })
-        .then((data) => console.log(`Connected to MongoDB database: ${data}`))
-        .catch((err) => { throw err })
+        .connect(uri, { dbName: "Hospital" })
+        .then(() => console.log(`✅ Connected to MongoDB database: Hospital`))
+        .catch((err) => {
+            console.error("❌ MongoDB connection failed:", err);
+            process.exit(1); 
+        })
 };
 
 const sendToken = (res, user, code, message) => {

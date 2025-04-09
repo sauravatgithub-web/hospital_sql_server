@@ -4,12 +4,18 @@ import {
     getThisHospitalStaff, 
     createHospitalStaff,
     updateHospitalStaff,
-    deleteHospitalStaff 
+    deleteHospitalStaff,
+    getCurrentAppointments, 
+    getAllCurrentDoctors,
+    getAllCurrentNurses
 } from '../controllers/hsController.js'
 
 const router = express.Router();
 router.get('/all', getAllHospitalStaff);
 router.get('/thisHospitalStaff/:name', getThisHospitalStaff);
+router.get('/currentDoctors', getAllCurrentDoctors);
+router.get('/currentNurses', getAllCurrentNurses);
+router.get('/currentAppointments', getCurrentAppointments);
 router.post('/new', createHospitalStaff);
 router.put('/update', updateHospitalStaff);
 router.delete('/delete', deleteHospitalStaff);

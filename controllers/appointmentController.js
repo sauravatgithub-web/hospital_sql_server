@@ -67,6 +67,8 @@ const getCurrentAppointments = tryCatch(async (req, res, next) => {
 
     const appointments = appointmentData.map(appointment => ({
         _id: appointment._id,
+        name: appointment.patient.pname,
+        age: appointment.patient.page,
         patient: appointment.patient,
         disease: appointment.disease.map(dis => dis.disname),
         room: appointment.assignedRoom.name,
