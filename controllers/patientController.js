@@ -25,6 +25,18 @@ const getThisPatient = tryCatch(async (req, res, next) => {
   return res.status(200).json({ success: true, patient: patient });
 });
 
+const getPatientByNumber = tryCatch(async (req, res, next) => {
+  const number = req.params.phoneNo;
+  const patientData = await Patient.findOne({ p_phoneNumber: number });
+  if(!patientData) return next(new ErrorHandler("No match found", 404));
+
+  const patient = {
+    ...patientData._doc,
+    name: patientData.pname
+  }
+  return res.status(200).json({ success: true, patient: patient });
+})
+
 const createPatient = tryCatch(async (req, res, next) => {
   const {
     name, addr, phoneNumber,
@@ -85,4 +97,4 @@ const deletePatient = tryCatch(async(req, res, next) => {
   return res.status(200).json({message : 'Patient deleted successfully'});
 });
 
-export { getAllPatient, getThisPatient, createPatient, updatePatient, deletePatient }
+export { getAllPatient, getThisPatient, getPatientByNumber, createPatient, updatePatient, deletePatient }

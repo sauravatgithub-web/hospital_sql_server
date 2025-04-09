@@ -4,11 +4,13 @@ import {
     getThisPatient, 
     createPatient,
     updatePatient,
-    deletePatient 
+    deletePatient, 
+    getPatientByNumber
 } from '../controllers/patientController.js'
 
 const router = express.Router();
 router.get('/all', getAllPatient);
+router.get('/:phoneNo', getPatientByNumber);
 router.get('/thisPatient/:name', getThisPatient);
 router.post('/new', createPatient);
 router.put('/update', updatePatient);
