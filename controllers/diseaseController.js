@@ -17,7 +17,7 @@ const getThisDisease = tryCatch(async (req, res, next) => {
 const createDisease = tryCatch(async (req, res, next) => {
     const { name, symp, desc } = req.body;
     if (!name || !symp || !desc) return next(new ErrorHandler("Insufficient input", 404));
-    const disease = await Disease.create(reqData);
+    const disease = await Disease.create(req.body);
     return res.status(201).json({ message: 'Disease created successfully', disease });
 });
 

@@ -79,8 +79,7 @@ const login = tryCatch(async (req, res, next) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return next(new ErrorHandler("Invalid credentials", 401));
 
-    const modifiedUser = generalizeUser(user, userRole);
-    sendToken(res, modifiedUser, 200, `Welcome back, ${modifiedUser.name}`);
+    sendToken(res, user, 200, `Welcome back, ${user.name}`);
 });
 
 const logOut = tryCatch(async (req, res) => {

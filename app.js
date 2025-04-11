@@ -19,7 +19,6 @@ import nurseRoute        from './routers/nurseRouter.js';
 import patientRoute      from './routers/patientRouter.js';
 import roomRoute         from './routers/roomRouter.js';
 import testRoute         from './routers/testRouter.js';
-import treatmentRoute    from './routers/treatmentRouter.js';
 
 const corsOptions = {
     origin: ['http://localhost:3000'],
@@ -63,7 +62,6 @@ app.use('/api/v1/nurse', nurseRoute);
 app.use('/api/v1/patient', patientRoute);
 app.use('/api/v1/room', roomRoute);
 app.use('/api/v1/test', testRoute);
-app.use('/api/v1/treatment', treatmentRoute);
 
 app.get('/', (req, res) => {
     res.send('Welcome to MySQL project');

@@ -7,7 +7,7 @@ import Nurse from '../models/nurseModel.js';
 
 const getAllHospitalStaff = tryCatch(async (req, res) => {
   const allStaff = await Hospital_Staff.find({ active: true });
-  return res.status(200).json({ success: true, hospitalStaff: allStaff });
+  return res.status(200).json({ success: true, data: allStaff });
 });
 
 const getThisHospitalStaff = tryCatch(async (req, res, next) => {
@@ -19,27 +19,32 @@ const getThisHospitalStaff = tryCatch(async (req, res, next) => {
 
 const createHospitalStaff = tryCatch(async (req, res, next) => {
   const {
-    name, addr, phoneNumber, email, password, gender, department, designation, shift, role
+    name, addr, phoneNumber, email, gender, department, designation, shift, role
   } = req.body;
+  console.log(req.body);
 
-  if (!name || !addr || !phoneNumber || !email || !password || !department || !designation)
+  if (!name || !addr || !phoneNumber || !email || !department || !designation)
     return next(new ErrorHandler("Insufficient input", 404));
 
-  await Hospital_Staff.create({name, addr, phoneNumber, email, password, gender, department, designation, shift, role});
+  await Hospital_Staff.create({
+    name, addr, phoneNumber, email, password: "password", 
+    gender, department, designation, shift, role
+  });
   return res.status(200).json({ success: true });
 });
 
 const updateHospitalStaff = tryCatch(async (req, res, next) => {
-  const { id } = req.params;
+  const { id } = req.body;
+  delete req.body._id;
+  console.log(req.body);
+
   const updatedStaff = await Hospital_Staff.findByIdAndUpdate(
     id,
     req.body,
     { new: true, runValidators: true }
   );
 
-  if (!updatedStaff) {
-    return next(new ErrorHandler("Hospital staff not found", 404));
-  }
+  if(!updatedStaff) return next(new ErrorHandler("Hospital staff not found", 404));
   return res.status(200).json({ success: true, message: 'Hospital staff updated successfully', staff: updatedStaff });
 });
 

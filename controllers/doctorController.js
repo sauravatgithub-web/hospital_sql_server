@@ -47,7 +47,7 @@ const updateDoctor = tryCatch(async (req, res, next) => {
     if(!doctor) return next(new ErrorHandler("Doctor not found", 404));
 
     Object.keys(req.body).forEach(key => {
-        if (req.body[key] !== null && req.body[key] !== undefined) {
+        if (key !== id && req.body[key] !== null && req.body[key] !== undefined) {
             doctor[key] = req.body[key];
         }
     });

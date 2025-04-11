@@ -16,28 +16,28 @@ const getThisHospitalProfessional = tryCatch(async (req, res, next) => {
 
 const createHospitalProfessional = tryCatch(async (req, res, next) => {
   const {
-    name, addr, phoneNumber, email, gender, uni, degree, supervisedBy
+    name, addr, phoneNumber, email, gender, uni, degree, doctor
   } = req.body;
 
   if (!name || !addr || !phoneNumber || !email || !uni || !degree)
     return next(new ErrorHandler("Insufficient input", 404));
 
   const password = "password";
-  await Hospital_Professional.create({name, addr, phoneNumber, email, gender, uni, degree, supervisedBy, password});
+  await Hospital_Professional.create({
+    name, addr, phoneNumber, email, gender, uni, degree, supervisedBy: doctor, password
+  });
   return res.status(200).json({ success: true });
 });
 
 
 const updateHospitalProfessional = tryCatch(async (req, res, next) => {
-  const { id } = req.params;
+  const { id } = req.body;
   const updateFields = req.body;
+  delete updateFields._id;
 
   const updatedHP = await Hospital_Professional.findByIdAndUpdate(id, updateFields, { new: true });
 
-  if (!updatedHP) {
-    return next(new ErrorHandler("Hospital Professional not found", 404));
-  }
-
+  if(!updatedHP) return next(new ErrorHandler("Hospital Professional not found", 404));
   return res.status(200).json({ message: 'Hospital Professional updated successfully', hospitalProfessional: updatedHP });
 });
 

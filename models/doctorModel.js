@@ -71,7 +71,7 @@ const doctorSchema = new mongoose.Schema({
 doctorSchema.pre(/^find/, function (next) {
   this.populate({
     path: 'room',
-    select: 'name -_id'
+    select: 'name _id'
   });
   this.populate('hps').populate('appointments');
   this.populate({

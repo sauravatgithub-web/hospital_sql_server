@@ -31,7 +31,7 @@ const hsSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ["FDO", "DEO"],
+    enum: ["FDO", "DEO", "Others"],
     default: "DEO",
   },
   password: {
