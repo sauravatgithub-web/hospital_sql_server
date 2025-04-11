@@ -12,7 +12,7 @@ const getAllDoctor = tryCatch(async (req, res) => {
 
 const getThisDoctor = tryCatch(async (req, res, next) => {
     const name = req.params.name;
-    const doctor = await Doctor.find({ name: name, active : true });
+    const doctor = await Doctor.find({ name: name, active: true });
     if (!doctor) return next(new ErrorHandler("Incorrect doctor name", 404));
     return res.status(200).json({ success: true, doctor: doctor });
 });
@@ -22,7 +22,7 @@ const createDoctor = tryCatch(async (req, res, next) => {
         name, addr, spec, inTime, outTime, phoneNumber, email, gender, qualification, room
     } = req.body;
 
-    if(!name || !addr || !phoneNumber || !email || !spec || !inTime || !outTime || !gender || !qualification || !room)
+    if (!name || !addr || !phoneNumber || !email || !spec || !inTime || !outTime || !gender || !qualification || !room)
         return next(new ErrorHandler("Insufficient input", 404));
 
     const password = "password";
@@ -44,7 +44,7 @@ const createDoctor = tryCatch(async (req, res, next) => {
 const updateDoctor = tryCatch(async (req, res, next) => {
     const { id } = req.body;
     const doctor = await Doctor.findById(id);
-    if(!doctor) return next(new ErrorHandler("Doctor not found", 404));
+    if (!doctor) return next(new ErrorHandler("Doctor not found", 404));
 
     Object.keys(req.body).forEach(key => {
         if (key !== id && req.body[key] !== null && req.body[key] !== undefined) {
@@ -56,13 +56,13 @@ const updateDoctor = tryCatch(async (req, res, next) => {
     return res.status(200).json({ message: 'Doctor updated successfully', doctor });
 });
 
-const deleteDoctor = tryCatch(async(req, res, next) => {
+const deleteDoctor = tryCatch(async (req, res, next) => {
     const { id } = req.body;
     const doctor = await Doctor.findById(id);
-    if(!doctor) return next(new ErrorHandler("Doctor not found", 404));
+    if (!doctor) return next(new ErrorHandler("Doctor not found", 404));
     doctor.active = false;
     await doctor.save();
-    return res.status(200).json({message : 'Doctor deleted successfully'});
+    return res.status(200).json({ message: 'Doctor deleted successfully' });
 });
 
 const getAppointments = tryCatch(async (req, res, next) => {
@@ -80,7 +80,11 @@ const getAppointments = tryCatch(async (req, res, next) => {
             { path: 'disease', select: 'name' }
         ]);
 
-    const appointments = appointmentData.map(appointment => ({
+    if (appointmentData.length === 0) {
+        return res.status(200).json({ success: true, message: "No appointments found", appointments: [] });
+    }
+
+    const appointments = appointmentData?.map(appointment => ({
         _id: appointment._id,
         time: appointment.time,
         name: appointment.patient.name,

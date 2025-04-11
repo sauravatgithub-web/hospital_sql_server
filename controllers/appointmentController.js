@@ -64,14 +64,14 @@ const getCurrentAppointments = tryCatch(async (req, res, next) => {
     const { entity, _id } = req.query;
 
     const appointments = await Appointment.find({ [entity]: _id, status: "InProgress" })
-        .select('assignedRoom patient disease doctor nurse hps')
+        .select('room patient disease doctor nurse hps')
         .populate([
-            { path: 'patient', select: 'pname page gender guardian_name guardian_phoneNo' },
-            { path: 'disease', select: 'disname' },
-            { path: 'doctor', select: 'd_name phoneNumber' },
-            { path: 'nurse', select: 'n_name shift n_phoneNumber' },
-            { path: 'hps', select: 'h_name h_phoneNumber' },
-            { path: 'assignedRoom', select: 'name' }
+            { path: 'patient', select: 'name age gender gname gPhoneNo' },
+            { path: 'disease', select: 'name' },
+            { path: 'doctor', select: 'name phoneNumber' },
+            { path: 'nurse', select: 'name shift phoneNumber' },
+            { path: 'hps', select: 'name phoneNumber' },
+            { path: 'room', select: 'name' }
         ]);
     if (!appointments) return next(new ErrorHandler("Check for errors", 404));
 
