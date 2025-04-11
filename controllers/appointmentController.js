@@ -18,7 +18,7 @@ const getThisAppointment = tryCatch(async (req, res, next) => {
             { path: 'tests' },
             { path: 'hps', select: 'name phoneNumber' },
             { path: 'disease', select: 'name' },
-            { path: 'room', select: 'name' },
+            { path: 'room', select: 'name bed' },
             { path: 'drugs', select: 'drug name' },
             { path: 'drugs.drug'}
         ]);
