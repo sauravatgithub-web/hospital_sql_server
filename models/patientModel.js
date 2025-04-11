@@ -42,11 +42,11 @@ const patientSchema = new mongoose.Schema({
     type: String,
     enum: ['Male', 'Female'],
   },
-  guardian_name: {
+  gname: {
     type: String,
     required: [true, "Please enter university name"],
   },
-  guardian_phoneNo: {
+  gPhoneNo: {
     type: String,
     required: [true, 'Please mention your latest degree'],
   },

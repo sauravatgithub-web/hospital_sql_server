@@ -3,25 +3,13 @@ import { tryCatch } from '../middlewares/error.js';
 import { ErrorHandler } from '../utils/utility.js';
 
 const getAllPatient = tryCatch(async (req, res) => {
-  const allPatient = await Patient.find({active : true});
-  const modifiedPatients = allPatient.map(patient => ({
-    _id: patient._id,
-    name: patient.pname,
-    gender: patient.gender,
-    phoneNumber: patient.p_phoneNumber,
-    gname: patient.guardian_name,
-    gPhoneNumber: patient.guardian_phoneNo,
-    addr: patient.paddr,
-    age: patient.page,
-    userName: patient.p_userName
-  }))
-  return res.status(200).json({ success: true, data: modifiedPatients });
+  const allPatients = await Patient.find({active : true});
+  return res.status(200).json({ success: true, data: allPatients });
 });
-
 
 const getThisPatient = tryCatch(async (req, res, next) => {
   const name = req.params.name;
-  const patient = await Patient.find({ pname: name, active : true });
+  const patient = await Patient.findOne({ pname: name, active : true });
   if (!patient) return next(new ErrorHandler("Incorrect patient name", 404));
   return res.status(200).json({ success: true, patient: patient });
 });
@@ -33,67 +21,29 @@ const getPatientByNumber = tryCatch(async (req, res, next) => {
     select: '_id time dischargeTime status'
   });
   if(!patientData) return next(new ErrorHandler("No match found", 404));
-
-  const patient = {
-    _id: patientData._id,
-    name: patientData.pname,
-    addr: patientData.paddr,
-    phoneNumber: patientData.p_phoneNumber,
-    email: patientData.p_email,
-    appointments: patientData.appointments,
-    gender: patientData.gender,
-    age: patientData.page,
-    userName: patientData.p_userName,
-    gname: patientData.guardian_name,
-    gPhoneNumber: patientData.guardian_phoneNo
-  }
-  return res.status(200).json({ success: true, patient: patient });
+  return res.status(200).json({ success: true, patient: patientData });
 })
 
 const createPatient = tryCatch(async (req, res, next) => {
   const {
     name, addr, phoneNumber, email,
-    gender, guardian_name, guardian_phoneNo, age, role
+    gender, gname, gPhoneNo, age, role
   } = req.body;
 
-  if (!name || !phoneNumber || !guardian_name || !guardian_phoneNo || !email)
+  if (!name || !phoneNumber || !gname || !gPhoneNo || !email)
     return next(new ErrorHandler("Insufficient input", 404));
 
   const password = "password";
 
-  const reqData = {
-    pname: name,
-    paddr: addr,
-    p_phoneNumber: phoneNumber,
-    password: password,
-    p_email: email,
-    page: age,
-    gender,
-    guardian_name,
-    guardian_phoneNo
-  };
-
-  await Patient.create(reqData);
+  await Patient.create({name, addr, phoneNumber, email,
+    gender, gname, gPhoneNo, age, role, password});
 
   if(role === "FDO") {
     const patient = await Patient.findOne({ p_email: email }).populate({
       path: 'appointments',
       select: '_id time dischargeTime status'
     });
-    const modifiedPatient = {
-      _id: patient._id,
-      name: patient.pname,
-      addr: patient.paddr,
-      phoneNumber: patient.p_phoneNumber,
-      email: patient.p_email,
-      appointments: patient.appointments,
-      gender: patient.gender,
-      age: patient.page,
-      userName: patient.p_userName,
-      gname: patient.guardian_name,
-      gPhoneNumber: patient.guardian_phoneNo
-    }
-    return res.status(200).json({ success: true, message: "Patient created", patient: modifiedPatient });
+    return res.status(200).json({ success: true, message: "Patient created", patient: patient });
   }
   
   return res.status(200).json({ success: true, message: "Patient created" });
@@ -101,52 +51,28 @@ const createPatient = tryCatch(async (req, res, next) => {
 
 const updatePatient = tryCatch(async (req, res, next) => {
   const { id, role } = req.body;
-  const updateFields = req.body;
 
-  const fieldMap = {
-    name: 'pname',
-    addr: 'paddr',
-    phoneNumber: 'p_phoneNumber',
-    age: 'page'
-  };
+  const updatedPatient = await Patient.findByIdAndUpdate(
+    id,
+    req.body, 
+    { new: true, runValidators: true }
+  );
 
-  const patient = await Patient.findById(id);
-  if (!patient) {
+  if (!updatedPatient) {
     return next(new ErrorHandler("Patient not found", 404));
   }
 
-  Object.keys(updateFields).forEach(key => {
-    const mappedKey = fieldMap[key] || key;
-    if (updateFields[key] !== null && updateFields[key] !== undefined) {
-      patient[mappedKey] = updateFields[key];
-    }
-  });
-
-  await patient.save();
-
-  if(role === "FDO") {
-    const patient = await Patient.findById(id).populate({
+  if (role === "FDO") {
+    const populatedPatient = await Patient.findById(id).populate({
       path: 'appointments',
       select: '_id time dischargeTime status'
     });
-    const modifiedPatient = {
-      _id: patient._id,
-      name: patient.pname,
-      addr: patient.paddr,
-      phoneNumber: patient.p_phoneNumber,
-      email: patient.p_email,
-      appointments: patient.appointments,
-      gender: patient.gender,
-      age: patient.page,
-      userName: patient.p_userName,
-      gname: patient.guardian_name,
-      gPhoneNumber: patient.guardian_phoneNo
-    }
-    return res.status(200).json({ success: true, message: "Patient updated", patient: modifiedPatient });
+    return res.status(200).json({ success: true, message: "Patient updated", patient: populatedPatient });
   }
 
-  return res.status(200).json({ message: 'Patient updated successfully', patient });
+  return res.status(200).json({ success: true, message: 'Patient updated successfully', patient: updatedPatient });
 });
+
 
 const deletePatient = tryCatch(async(req, res, next) => {
   const { id } = req.body;

@@ -4,26 +4,12 @@ import { ErrorHandler } from '../utils/utility.js';
 
 const getAllHospitalProfessional = tryCatch(async (req, res) => {
   const allHp = await Hospital_Professional.find({active : true});
-  const modifiedHp = allHp.map(hp => ({
-    _id: hp.id,
-    name: hp.h_name,
-    addr: hp.haddr,
-    phoneNumber: hp.h_phoneNumber,
-    email: hp.h_email,
-    userName: hp.h_userName,
-    gender: hp.gender,
-    uni: hp.uni,
-    degree: hp.degree,
-    supervisedBy: hp.supervisedBy,
-    appointments: hp.appointments
-  }));
-  console.log(modifiedHp);
-  return res.status(200).json({ success: true, data: modifiedHp });
+  return res.status(200).json({ success: true, data: allHp });
 });
 
 const getThisHospitalProfessional = tryCatch(async (req, res, next) => {
   const name = req.params.name;
-  const user = await Hospital_Professional.find({ h_name: name, active : true });
+  const user = await Hospital_Professional.find({ name, active : true });
   if (!user) return next(new ErrorHandler("Incorrect user name", 404));
   return res.status(200).json({ success: true, user: user });
 });
@@ -37,20 +23,7 @@ const createHospitalProfessional = tryCatch(async (req, res, next) => {
     return next(new ErrorHandler("Insufficient input", 404));
 
   const password = "password";
-
-  const reqData = {
-    h_name: name,
-    haddr: addr,
-    h_phoneNumber: phoneNumber,
-    h_email: email,
-    password: password,
-    gender,
-    uni,
-    degree,
-    supervisedBy
-  };
-
-  await Hospital_Professional.create(reqData);
+  await Hospital_Professional.create({name, addr, phoneNumber, email, gender, uni, degree, supervisedBy, password});
   return res.status(200).json({ success: true });
 });
 
