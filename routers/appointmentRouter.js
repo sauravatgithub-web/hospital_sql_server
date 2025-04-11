@@ -10,7 +10,7 @@ import {
 
 const router = express.Router();
 router.get('/all', getAllAppointment);
-router.get('/thisAppointment/:id', getThisAppointment);
+router.get('/:id', getThisAppointment);
 router.post('/new', createAppointment);
 router.put('/update', updateAppointment);
 router.delete('/delete', deleteAppointment);

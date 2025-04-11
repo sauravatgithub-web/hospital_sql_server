@@ -12,6 +12,7 @@ const getAllPatient = tryCatch(async (req, res) => {
     gname: patient.guardian_name,
     gPhoneNumber: patient.guardian_phoneNo,
     addr: patient.paddr,
+    age: patient.page,
     userName: patient.p_userName
   }))
   return res.status(200).json({ success: true, data: modifiedPatients });
@@ -43,8 +44,8 @@ const getPatientByNumber = tryCatch(async (req, res, next) => {
     gender: patientData.gender,
     age: patientData.page,
     userName: patientData.p_userName,
-    guardian_name: patientData.guardian_name,
-    guardian_phoneNo: patientData.guardian_phoneNo
+    gname: patientData.guardian_name,
+    gPhoneNumber: patientData.guardian_phoneNo
   }
   return res.status(200).json({ success: true, patient: patient });
 })
@@ -52,7 +53,7 @@ const getPatientByNumber = tryCatch(async (req, res, next) => {
 const createPatient = tryCatch(async (req, res, next) => {
   const {
     name, addr, phoneNumber, email,
-    gender, guardian_name, guardian_phoneNo, role
+    gender, guardian_name, guardian_phoneNo, age, role
   } = req.body;
 
   if (!name || !phoneNumber || !guardian_name || !guardian_phoneNo || !email)
@@ -66,6 +67,7 @@ const createPatient = tryCatch(async (req, res, next) => {
     p_phoneNumber: phoneNumber,
     password: password,
     p_email: email,
+    page: age,
     gender,
     guardian_name,
     guardian_phoneNo
@@ -88,8 +90,8 @@ const createPatient = tryCatch(async (req, res, next) => {
       gender: patient.gender,
       age: patient.page,
       userName: patient.p_userName,
-      guardian_name: patient.guardian_name,
-      guardian_phoneNo: patient.guardian_phoneNo
+      gname: patient.guardian_name,
+      gPhoneNumber: patient.guardian_phoneNo
     }
     return res.status(200).json({ success: true, message: "Patient created", patient: modifiedPatient });
   }
@@ -98,13 +100,14 @@ const createPatient = tryCatch(async (req, res, next) => {
 });
 
 const updatePatient = tryCatch(async (req, res, next) => {
-  const { id } = req.body;
+  const { id, role } = req.body;
   const updateFields = req.body;
 
   const fieldMap = {
     name: 'pname',
     addr: 'paddr',
-    phoneNumber: 'p_phoneNumber'
+    phoneNumber: 'p_phoneNumber',
+    age: 'page'
   };
 
   const patient = await Patient.findById(id);
@@ -120,6 +123,28 @@ const updatePatient = tryCatch(async (req, res, next) => {
   });
 
   await patient.save();
+
+  if(role === "FDO") {
+    const patient = await Patient.findById(id).populate({
+      path: 'appointments',
+      select: '_id time dischargeTime status'
+    });
+    const modifiedPatient = {
+      _id: patient._id,
+      name: patient.pname,
+      addr: patient.paddr,
+      phoneNumber: patient.p_phoneNumber,
+      email: patient.p_email,
+      appointments: patient.appointments,
+      gender: patient.gender,
+      age: patient.page,
+      userName: patient.p_userName,
+      gname: patient.guardian_name,
+      gPhoneNumber: patient.guardian_phoneNo
+    }
+    return res.status(200).json({ success: true, message: "Patient updated", patient: modifiedPatient });
+  }
+
   return res.status(200).json({ message: 'Patient updated successfully', patient });
 });
 
