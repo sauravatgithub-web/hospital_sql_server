@@ -1,9 +1,9 @@
 import mongoose, { Types } from 'mongoose';
 
 const diseaseSchema = new mongoose.Schema({
-  disname : {type : String},
-  dissymp : {type : String},
-  disdesc : {type : String},
+  name : {type : String},
+  symp : {type : String},
+  desc : {type : String},
   active : {
     type : Boolean,
     default : true

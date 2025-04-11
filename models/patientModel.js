@@ -3,35 +3,33 @@ import mongoose, { Types } from 'mongoose';
 import validator from 'validator';
 
 const patientSchema = new mongoose.Schema({
-  pname: {
+  name: {
     type: String,
     required: [true, 'Please tell us your name!']
   },
-  page: {
+  age: {
     type: Number,
   },
-  paddr: { type: String },
-  p_phoneNumber: {
+  addr: { type: String },
+  phoneNumber: {
     type: String,
     required: [true, "Please provide a phone number"],
     unique: true,
   },
-  p_email:{
+  email:{
     type: String,
     required: [true, 'Please provide your email'],
     unique: true,
     lowercase: true,
     validate: [validator.isEmail, 'Please provide a valid email'],
   },
-  p_userName :{
+  userName :{
     type : String,
     unique : true,
     default : function(){
-      // const namePart = this.pname.toLowerCase().split(' ');
-      // const emailPart = this.p_email.toLowerCase().split('@')[0];
-      // return `${namePart.join('_')}_${emailPart}`;
-      const namePart = this.pname.toLowerCase().split(' ');
-      return `${namePart}`;
+      const namePart = this.name.toLowerCase().split(' ');
+      const emailPart = this.email.toLowerCase().split('@')[0];
+      return `${namePart.join('_')}_${emailPart}`;
     }
   },
   password: {

@@ -1,8 +1,8 @@
 import mongoose, { Types } from 'mongoose';
 
 const drugSchema = new mongoose.Schema({
-  dgname : {type : String},
-  dgcomposition : {type : String},
+  name : {type : String},
+  composition : {type : String},
   active : {
     type : Boolean,
     default : true

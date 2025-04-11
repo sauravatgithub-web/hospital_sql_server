@@ -3,12 +3,12 @@ import mongoose, { Types } from 'mongoose';
 import validator from 'validator';
 
 const doctorSchema = new mongoose.Schema({
-  d_name: {
+  name: {
     type: String,
     required: [true, 'Please tell us your name!']
   },
-  daddr: { type: String },
-  dspec: { type: String },
+  addr: { type: String },
+  spec: { type: String },
   inTime: { type: String },
   outTime: { type: String },
   phoneNumber: {
@@ -16,19 +16,19 @@ const doctorSchema = new mongoose.Schema({
     required: [true, "Please provide a phone number"],
     unique: true,
   },
-  d_email: {
+  email: {
     type: String,
     required: [true, 'Please provide your email'],
     unique: true,
     lowercase: true,
     validate: [validator.isEmail, 'Please provide a valid email'],
   },
-  d_userName: {
+  userName: {
     type: String,
     unique: true,
     default: function () {
-      const namePart = this.d_name.toLowerCase().split(' ');
-      const emailPart = this.d_email.toLowerCase().split('@')[0];
+      const namePart = this.name.toLowerCase().split(' ');
+      const emailPart = this.email.toLowerCase().split('@')[0];
       return `${namePart.join('_')}_${emailPart}`;
     }
   },

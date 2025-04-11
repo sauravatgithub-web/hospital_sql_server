@@ -3,29 +3,29 @@ import mongoose, { Types } from 'mongoose';
 import validator from 'validator';
 
 const nurseSchema = new mongoose.Schema({
-  n_name: {
+  name: {
     type: String,
     required: [true, 'Please tell us your name!']
   },
-  n_email: {
+  email: {
       type: String,
       required: [true, 'Please provide your email'],
       unique: true,
       lowercase: true,
       validate: [validator.isEmail, 'Please provide a valid email'],
     },
-  n_addr: { type: String },
-  n_phoneNumber: {
+  addr: { type: String },
+  phoneNumber: {
     type: String,
     required: [true, "Please provide a phone number"],
     unique: true,
   },
-  n_userName :{
+  userName :{
     type : String,
     unique : true,
     default : function(){
-      const namePart = this.n_name.toLowerCase().split(' ');
-      const emailPart = this.n_email.toLowerCase().split('@')[0];
+      const namePart = this.name.toLowerCase().split(' ');
+      const emailPart = this.email.toLowerCase().split('@')[0];
       return `${namePart.join('_')}_${emailPart}`;
     }
   },

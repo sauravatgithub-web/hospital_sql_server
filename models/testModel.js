@@ -1,8 +1,8 @@
 import mongoose, { Types } from 'mongoose';
 
 const testSchema = new mongoose.Schema({
-  tname : {type : String},
-  tequip : {type : String},
+  name : {type : String},
+  equip : {type : String},
   active : {
     type : Boolean,
     default : true

@@ -24,11 +24,17 @@ const appointmentSchema = new mongoose.Schema({
     remarkTime: { type: Date, default: Date.now },
     remarkMsg: { type: String }
   }],
-  tests: [{ type: Types.ObjectId, ref: "Test" }],
+  tests: [{ 
+    test : {
+      type: Types.ObjectId, 
+      ref: "Test" 
+    },
+    remark : {type : String}
+  }],
   hps: [{ type: Types.ObjectId, ref: "Hospital_Professional" }],
   hs: [{ type: Types.ObjectId, ref: "Hospital_Staff" }],
   disease: [{ type: Types.ObjectId, ref: "Disease" }],
-  assignedRoom: { type: Types.ObjectId, ref: "Room" },
+  room: { type: Types.ObjectId, ref: "Room" },
   drugs: [{
     drug: { 
       type: Types.ObjectId, 

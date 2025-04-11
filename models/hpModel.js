@@ -3,29 +3,29 @@ import mongoose, { Types } from 'mongoose';
 import validator from 'validator';
 
 const hpSchema = new mongoose.Schema({
-  h_name: {
+  name: {
     type: String,
     required: [true, 'Please tell us your name!']
   },
-  haddr: { type: String },
-  h_phoneNumber: {
+  addr: { type: String },
+  phoneNumber: {
     type: String,
     required: [true, "Please provide a phone number"],
     unique: true,
   },
-  h_email: {
+  email: {
     type: String,
     required: [true, 'Please provide your email'],
     unique: true,
     lowercase: true,
     validate: [validator.isEmail, 'Please provide a valid email'],
   },
-  h_userName :{
+  userName :{
     type : String,
     unique : true,
     default : function(){
-      const namePart = this.h_name.toLowerCase().split(' ');
-      const emailPart = this.h_email.toLowerCase().split('@')[0];
+      const namePart = this.name.toLowerCase().split(' ');
+      const emailPart = this.email.toLowerCase().split('@')[0];
       return `${namePart.join('_')}_${emailPart}`;
     }
   },
