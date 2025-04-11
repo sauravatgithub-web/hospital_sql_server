@@ -28,9 +28,9 @@ const emailVerification = tryCatch(async (req, res, next) => {
 	if (!email) return next(new ErrorHandler("Please fill your email", 404));
 
     let user;
-    if(role === "Doctor") user = await Doctor.findOne({ d_email : email });
-    else if (role === "Nurse") user = await Nurse.findOne({n_email : email});
-    else user = await Nurse.findOne({ s_email : email});
+    if(role === "Doctor") user = await Doctor.findOne({ email : email });
+    else if (role === "Nurse") user = await Nurse.findOne({email : email});
+    else user = await Nurse.findOne({ email : email});
 
     if (!user) return next(new ErrorHandler("User do not exists", 404));
 
@@ -47,9 +47,9 @@ const confirmOTP = tryCatch(async (req, res, next) => {
 	if (!email || !otp) return next(new ErrorHandler("Please fill all fields", 404));
 
     let user;
-	if(role === "Doctor") user = await Doctor.findOne({ d_email : email });
-    else if (role === "Nurse") user = await Nurse.findOne({n_email : email});
-    else user = await Hs.findOne({ s_email : email});
+	if(role === "Doctor") user = await Doctor.findOne({ email : email });
+    else if (role === "Nurse") user = await Nurse.findOne({ email : email});
+    else user = await Hs.findOne({ email : email});
 
 	const sharedOTP = emailTokens[email];
 
@@ -71,9 +71,9 @@ const login = tryCatch(async (req, res, next) => {
     userRole = role;
     
     let user;
-    if (role === "Doctor") user = await Doctor.findOne({ d_email : email }).select("+password");
-    else if (role === "Nurse") user = await Nurse.findOne({ n_email : email }).select("+password");
-    else user = await Hs.findOne({ s_email : email }).select("+password");
+    if (role === "Doctor") user = await Doctor.findOne({ email : email }).select("+password");
+    else if (role === "Nurse") user = await Nurse.findOne({ email : email }).select("+password");
+    else user = await Hs.findOne({ email : email }).select("+password");
 
     if (!user) return next(new ErrorHandler("Invalid credentials", 404));
     const isMatch = await bcrypt.compare(password, user.password);
@@ -102,9 +102,9 @@ const updateUserName = tryCatch(async (req, res) => {
 
     if (!user) return next(new ErrorHandler("User not found", 404));
 
-    if (role === "Doctor") user.d_name = newUserName;
-    else if (role === "Nurse") user.n_name = newUserName;
-    else user.s_name = newUserName;
+    if (role === "Doctor") user.name = newUserName;
+    else if (role === "Nurse") user.name = newUserName;
+    else user.name = newUserName;
 
     await user.save();
     return res.status(200).json({ success: true });
@@ -116,10 +116,9 @@ const getMyProfile = tryCatch(async (req, res) => {
     else if(userRole === "Nurse") user = await Nurse.findById(req.user);
     else user = await Hospital_Staff.findById(req.user);
     
-    const modifiedUser = generalizeUser(user, userRole);
     return res.status(200).json({
         success: true,
-		user: modifiedUser,
+		user: user,
     });
 });
 
@@ -128,54 +127,15 @@ const setNewPassword = tryCatch(async (req, res, next) => {
     if (!email || !password) return next(new ErrorHandler("Please fill all the fields", 404));
 
     let user;
-    if(role === "Doctor") user = await Doctor.findOne({ d_email: email });
-    else if(role === "Nurse") user = await Nurse.findOne({ n_email: email });
-    else user = await Hs.findOne({ s_email: email });
+    if(role === "Doctor") user = await Doctor.findOne({ email: email });
+    else if(role === "Nurse") user = await Nurse.findOne({ email: email });
+    else user = await Hs.findOne({ email: email });
     if (!user) return next(new ErrorHandler("User do not exists", 404));
 
     user.password = password;
     await user.save();
     return res.status(200).json({ success: true, user: user, message: "Password has been updated." });
 });
-
-const generalizeUser = (( user, userRole ) => {
-    let roleData = {};
-
-    if (userRole === "Doctor") {
-        roleData = {
-            name: user.d_name,
-            email: user.d_email,
-            addr: user.daddr,
-            phoneNumber: user.phoneNumber,
-            userName: user.d_userName,
-        };
-    } 
-    else if (userRole === "Nurse") {
-        roleData = {
-            name: user.n_name,
-            email: user.n_email,
-            addr: user.n_addr,
-            phoneNumber: user.n_phoneNumber,
-            userName: user.n_userName,
-        };
-    } 
-    else {
-        roleData = {
-            name: user.s_name,
-            email: user.s_email,
-            addr: user.s_addr,
-            phoneNumber: user.s_phoneNumber,
-            userName: user.s_userName,
-        };
-    }
-
-    const modifiedUser = {
-        ...user._doc,
-        ...roleData,
-    };
-
-    return modifiedUser;
-})
 
 export {
     emailVerification,
