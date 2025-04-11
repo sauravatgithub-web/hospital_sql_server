@@ -19,9 +19,23 @@ const roomSchema = new mongoose.Schema({
     type : Boolean,
     default : true
   },
+  bed: [{
+    name: { type: String, required: true },
+    isOccupied: { type: Boolean, default: false }
+  }],
   appointment: [{type: Types.ObjectId, ref: "Appointment" }],
   tests: [{ type: Types.ObjectId, ref: "Test" }],
   doctor: { type: Types.ObjectId, ref: "Doctor" },
+});
+
+roomSchema.pre('save', function (next) {
+  if (!this.bed || this.bed.length === 0) {
+    this.bed = Array.from({ length: this.capacity }, (_, i) => ({
+      name: `Bed-${i + 1}`,
+      isOccupied: false
+    }));
+  }
+  next();
 });
 
 const Room= mongoose.model('Room', roomSchema);
