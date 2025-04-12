@@ -50,6 +50,7 @@ const updateAppointment = tryCatch(async (req, res, next) => {
     const { id } = req.body;
     const updateFields = req.body;
     delete updateFields.id;
+    console.log(req.body);
 
     await Appointment.findByIdAndUpdate(id, updateFields, { new: true });
     return res.status(200).json({ message: 'Appointment updated successfully' });
