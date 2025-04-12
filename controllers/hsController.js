@@ -27,7 +27,7 @@ const createHospitalStaff = tryCatch(async (req, res, next) => {
     return next(new ErrorHandler("Insufficient input", 404));
 
   await Hospital_Staff.create({
-    name, addr, phoneNumber, email, password: "password", 
+    name, addr, phoneNumber, email, password: "password",
     gender, department, designation, shift, role
   });
   return res.status(200).json({ success: true });
@@ -44,7 +44,7 @@ const updateHospitalStaff = tryCatch(async (req, res, next) => {
     { new: true, runValidators: true }
   );
 
-  if(!updatedStaff) return next(new ErrorHandler("Hospital staff not found", 404));
+  if (!updatedStaff) return next(new ErrorHandler("Hospital staff not found", 404));
   return res.status(200).json({ success: true, message: 'Hospital staff updated successfully', staff: updatedStaff });
 });
 
@@ -83,21 +83,28 @@ const getAllCurrentNurses = tryCatch(async (req, res, next) => {
 
 const getCurrentAppointments = tryCatch(async (req, res, next) => {
   const appointmentData = await Appointment.find({ status: { $in: ["InProgress", "Scheduled"] } })
-    .select('time dischargeTime status room patient disease doctor nurse hps')
+    .select('time dischargeTime status room patient disease doctor nurse hps tests')
     .populate([
       {
         path: 'patient',
         select: 'name gender age phoneNumber gname gPhoneNo appointments addr email userName',
         populate: {
-          path: 'appointments', 
-          select: 'status time' 
+          path: 'appointments',
+          select: 'status time'
         }
       },
       { path: 'disease', select: 'name' },
       { path: 'doctor', select: 'name phoneNumber' },
       { path: 'nurse', select: 'name shift phoneNumber' },
       { path: 'hps', select: 'name phoneNumber' },
-      { path: 'room', select: 'name' }
+      { path: 'room', select: 'name bed' },
+      {
+        path: 'tests', select: 'test remarks',
+        populate: {
+          path: 'test',
+          select: 'name doctor nurse room'
+        }
+      },
     ]);
   if (!appointmentData) return next(new ErrorHandler("Check for errors", 404));
 

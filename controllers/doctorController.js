@@ -74,10 +74,28 @@ const getAppointments = tryCatch(async (req, res, next) => {
         doctor: _id,
         status: { $in: ['Scheduled', 'Completed'] }
     })
-        .select('time dischargeTime status patient disease')
+        .select('time dischargeTime status room patient disease doctor nurse hps tests')
         .populate([
-            { path: 'patient', select: 'name age gender' },
-            { path: 'disease', select: 'name' }
+            {
+                path: 'patient',
+                select: 'name gender age phoneNumber gname gPhoneNo appointments addr email userName',
+                populate: {
+                    path: 'appointments',
+                    select: 'status time'
+                }
+            },
+            { path: 'disease', select: 'name' },
+            { path: 'doctor', select: 'name phoneNumber' },
+            { path: 'nurse', select: 'name shift phoneNumber' },
+            { path: 'hps', select: 'name phoneNumber' },
+            { path: 'room', select: 'name bed' },
+            {
+                path: 'tests', select: 'test remarks',
+                populate: {
+                    path: 'test',
+                    select: 'name'
+                }
+            },
         ]);
 
     if (appointmentData.length === 0) {

@@ -65,6 +65,18 @@ const nurseSchema = new mongoose.Schema({
   }],
 });
 
+nurseSchema.pre(/^find/, function (next) {
+  this.populate('appointments');
+  this.populate({
+    path: 'tests',
+    populate: {
+      path: 'room',
+      select: 'name' 
+    }
+  }); 
+  next();
+});
+
 nurseSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next();  
   this.password = await hash(this.password, 10);

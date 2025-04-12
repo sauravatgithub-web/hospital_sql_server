@@ -22,6 +22,8 @@ const appointmentSchema = new mongoose.Schema({
   nurse: [{ type: Types.ObjectId, ref: "Nurse" }],
   remarks: [{
     remarkTime: { type: Date, default: Date.now },
+    remarkUser: { type: String },
+    remarkUserRole: { type: String },
     remarkMsg: { type: String }
   }],
   tests: [{ 
@@ -35,6 +37,7 @@ const appointmentSchema = new mongoose.Schema({
   hs: [{ type: Types.ObjectId, ref: "Hospital_Staff" }],
   disease: [{ type: Types.ObjectId, ref: "Disease" }],
   room: { type: Types.ObjectId, ref: "Room" },
+  bed: { type: Number },
   drugs: [{
     drug: { 
       type: Types.ObjectId, 
