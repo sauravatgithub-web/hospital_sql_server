@@ -1,4 +1,6 @@
 import Appointment from '../models/appointmentModel.js';
+import Doctor from '../models/doctorModel.js';
+import Patient from '../models/patientModel.js';
 import { tryCatch } from '../middlewares/error.js';
 import { ErrorHandler } from '../utils/utility.js';
 
@@ -24,28 +26,30 @@ const getThisAppointment = tryCatch(async (req, res, next) => {
         ]);
 
     if(!appointment) return next(new ErrorHandler("Incorrect appointment id", 404));
-    return res.status(200).json({ success: true, appointment: apptObj });
+    return res.status(200).json({ success: true, appointment });
 });
 
 
 const createAppointment = tryCatch(async (req, res, next) => {
-    const { patient, doctor } = req.body;
+    const { time, patient, doctor } = req.body;
     if (!patient || !doctor) return next(new ErrorHandler("Insufficient input", 404));
 
-    const appointment = await Appointment.create({
-        patient,
-        doctor
-    });
+    const appointment = await Appointment.create({ time, patient, doctor });
+    const doctorData = await Doctor.findById({ _id: doctor });
+    doctorData.appointments.push(appointment._id);
+    const patientData = await Patient.findById({ _id: patient });
+    patientData.appointments.push(appointment._id);
+
+    await doctorData.save();
+    await patientData.save();
 
     return res.status(201).json({ message: 'Appointment created successfully', appointment });
 });
 
 const updateAppointment = tryCatch(async (req, res, next) => {
-    const { id } = req.params;
+    const { id } = req.body;
     const updateFields = req.body;
-
-    const appointment = await Appointment.findById(id);
-    if(!appointment) return next(new ErrorHandler("Appointment not found", 404));
+    delete updateFields.id;
 
     await Appointment.findByIdAndUpdate(id, updateFields, { new: true });
     return res.status(200).json({ message: 'Appointment updated successfully' });

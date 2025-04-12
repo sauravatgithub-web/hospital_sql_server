@@ -16,7 +16,7 @@ const getThisPatient = tryCatch(async (req, res, next) => {
 
 const getPatientByNumber = tryCatch(async (req, res, next) => {
   const number = req.params.phoneNo;
-  const patientData = await Patient.findOne({ p_phoneNumber: number }).populate({
+  const patientData = await Patient.findOne({ phoneNumber: number }).populate({
     path: 'appointments',
     select: '_id time dischargeTime status'
   });
@@ -39,7 +39,7 @@ const createPatient = tryCatch(async (req, res, next) => {
     gender, gname, gPhoneNo, age, role, password});
 
   if(role === "FDO") {
-    const patient = await Patient.findOne({ p_email: email }).populate({
+    const patient = await Patient.findOne({ email: email }).populate({
       path: 'appointments',
       select: '_id time dischargeTime status'
     });
@@ -51,6 +51,7 @@ const createPatient = tryCatch(async (req, res, next) => {
 
 const updatePatient = tryCatch(async (req, res, next) => {
   const { id, role } = req.body;
+  delete req.body.id;
 
   const updatedPatient = await Patient.findByIdAndUpdate(
     id,
@@ -58,11 +59,9 @@ const updatePatient = tryCatch(async (req, res, next) => {
     { new: true, runValidators: true }
   );
 
-  if (!updatedPatient) {
-    return next(new ErrorHandler("Patient not found", 404));
-  }
+  if(!updatedPatient) return next(new ErrorHandler("Patient not found", 404));
 
-  if (role === "FDO") {
+  if(role === "FDO") {
     const populatedPatient = await Patient.findById(id).populate({
       path: 'appointments',
       select: '_id time dischargeTime status'

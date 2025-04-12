@@ -85,7 +85,14 @@ const getCurrentAppointments = tryCatch(async (req, res, next) => {
   const appointmentData = await Appointment.find({ status: { $in: ["InProgress", "Scheduled"] } })
     .select('time dischargeTime status room patient disease doctor nurse hps')
     .populate([
-      { path: 'patient', select: 'name age gender gname gPhoneNo' },
+      {
+        path: 'patient',
+        select: 'name gender age phoneNumber gname gPhoneNo appointments addr email userName',
+        populate: {
+          path: 'appointments', 
+          select: 'status time' 
+        }
+      },
       { path: 'disease', select: 'name' },
       { path: 'doctor', select: 'name phoneNumber' },
       { path: 'nurse', select: 'name shift phoneNumber' },
@@ -104,7 +111,9 @@ const getCurrentAppointments = tryCatch(async (req, res, next) => {
     room: appointment.room,
     doctor: appointment.doctor,
     nurse: appointment.nurse,
-    hps: appointment.hps
+    hps: appointment.hps,
+    time: appointment.time,
+    dischargeTime: appointment.dischargeTime
   }));
 
   return res.status(200).json({ success: true, appointments });
