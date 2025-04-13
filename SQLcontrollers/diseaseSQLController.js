@@ -22,18 +22,18 @@ const getThisDisease = tryCatch(async (req, res, next) => {
 });
 
 const createDisease = tryCatch(async (req, res, next) => {
-  const { name, symp, description } = req.body;
-  if (!name || !symp || !description) {
+  const { name, symp, desc } = req.body;
+  if (!name || !symp || !desc) {
     return next(new ErrorHandler("Insufficient input", 400));
   }
 
-  const result = await createDiseaseQuery(name, symp, description);
+  const result = await createDiseaseQuery(name, symp, desc);
   return res.status(201).json({ message: 'Disease created successfully', disease: result.rows[0] });
 });
 
 const updateDisease = tryCatch(async (req, res, next) => {
-  const { id, name, symp, description } = req.body;
-  const result = await updateDiseaseQuery(id, name, symp, description);
+  const { id, name, symp, desc } = req.body;
+  const result = await updateDiseaseQuery(id, name, symp, desc);
   
   if (result.rows.length === 0) {
     return next(new ErrorHandler("Disease not found", 404));

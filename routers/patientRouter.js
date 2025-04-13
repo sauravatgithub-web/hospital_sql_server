@@ -8,6 +8,15 @@ import {
     getPatientByNumber
 } from '../controllers/patientController.js'
 
+// import {
+//     getAllPatient, 
+//     getThisPatient, 
+//     createPatient,
+//     updatePatient,
+//     deletePatient, 
+//     getPatientByNumber
+// } from '../SQLcontrollers/patientSQLController.js'
+
 const router = express.Router();
 router.get('/all', getAllPatient);
 router.get('/:phoneNo', getPatientByNumber);

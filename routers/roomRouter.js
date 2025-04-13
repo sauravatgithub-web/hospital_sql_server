@@ -1,4 +1,13 @@
 import express from 'express'
+// import {
+//     getAllRoom, 
+//     getThisRoom, 
+//     getAllVacantRooms,
+//     createRoom,
+//     updateRoom,
+//     deleteRoom 
+// } from '../controllers/roomController.js'
+
 import {
     getAllRoom, 
     getThisRoom, 
@@ -6,7 +15,7 @@ import {
     createRoom,
     updateRoom,
     deleteRoom 
-} from '../controllers/roomController.js'
+} from '../SQLcontrollers/roomSQLController.js'
 
 const router = express.Router();
 router.get('/all', getAllRoom);

@@ -15,8 +15,8 @@ const createHospitalStaffQuery = async (staff) => {
     } = staff;
     
     const userName  = (()=> {
-      const namePart = this.name.toLowerCase().split(' ');
-      const emailPart = this.email.toLowerCase().split('@')[0];
+      const namePart = name.toLowerCase().split(' ');
+      const emailPart = email.toLowerCase().split('@')[0];
       return `${namePart.join('_')}_${emailPart}`;
     })();
   
