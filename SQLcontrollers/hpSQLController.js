@@ -3,11 +3,10 @@ import {
   getOneHospitalProfessionalQuery,
   createHospitalProfessionalQuery,
   insertDoctorHpRelationQuery,
-  deleteDoctorHpRelationQuery,
   updateHospitalProfessionalQuery,
   getUpdatedHospitalProfessionalQuery,
   deleteHospitalProfessionalQuery
-} from '../queries/hospitalProfessional.query.js';
+} from '../queries/hpQuery.js';
 
 import { tryCatch } from '../middlewares/error.js';
 import { ErrorHandler } from '../utils/utility.js';

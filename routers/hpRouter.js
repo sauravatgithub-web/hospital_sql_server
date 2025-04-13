@@ -1,11 +1,19 @@
 import express from 'express'
+// import {
+//     getAllHospitalProfessional, 
+//     getThisHospitalProfessional, 
+//     createHospitalProfessional,
+//     updateHospitalProfessional,
+//     deleteHospitalProfessional
+// } from '../controllers/hpController.js'
+
 import {
     getAllHospitalProfessional, 
     getThisHospitalProfessional, 
     createHospitalProfessional,
     updateHospitalProfessional,
     deleteHospitalProfessional
-} from '../controllers/hpController.js'
+} from '../SQLcontrollers/hpSQLController.js'
 
 const router = express.Router();
 router.get('/all', getAllHospitalProfessional);
