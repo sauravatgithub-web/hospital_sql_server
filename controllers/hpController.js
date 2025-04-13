@@ -4,7 +4,10 @@ import { tryCatch } from '../middlewares/error.js';
 import { ErrorHandler } from '../utils/utility.js';
 
 const getAllHospitalProfessional = tryCatch(async (req, res) => {
-  const allHp = await Hospital_Professional.find({ active: true });
+  const allHp = await Hospital_Professional.find({ active: true }).populate({
+    path: 'supervisedBy',
+    select: 'name'
+  });
   return res.status(200).json({ success: true, data: allHp });
 });
 

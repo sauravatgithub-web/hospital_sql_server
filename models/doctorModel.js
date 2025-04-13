@@ -68,7 +68,7 @@ const doctorSchema = new mongoose.Schema({
   tests: [{ type: Types.ObjectId, ref: "Test" }]
 });
 
-doctorSchema.pre(/^find/, function (next) {
+doctorSchema.pre(/^find/, async function (next) {
   this.populate({
     path: 'room',
     select: 'name _id'
@@ -84,8 +84,8 @@ doctorSchema.pre(/^find/, function (next) {
   next();
 });
 
-doctorSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next();
+doctorSchema.pre('save', async function(next) {
+  if (!this.isModified('password')) return next();  
   this.password = await hash(this.password, 10);
 });
 
