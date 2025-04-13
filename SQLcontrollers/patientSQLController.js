@@ -4,8 +4,8 @@ import {
   getPatientByNumberQuery,
   createPatientQuery,
   updatePatientQuery,
-  getPatientByEmailWithAppointments,
-  getPatientByIdWithAppointments,
+  getPatientByEmailQueryWithAppointments,
+  getPatientByIdQueryWithAppointments,
   deletePatientQuery
 } from '../queries/patientQuery.js';
 import { tryCatch } from '../middlewares/error.js';
@@ -56,7 +56,7 @@ const createPatient = tryCatch(async (req, res, next) => {
   await createPatientQuery(name, addr, phoneNumber, email, gender, gname, gPhoneNo, age);
 
   if (role === "FDO") {
-    const result = await getPatientByEmailWithAppointments(email);
+    const result = await getPatientByEmailQueryWithAppointments(email);
     const patient = {
       ...result.rows[0],
       appointments: result.rows
@@ -81,7 +81,7 @@ const updatePatient = tryCatch(async (req, res, next) => {
   if (!updated) return next(new ErrorHandler("Patient not found", 404));
 
   if (role === "FDO") {
-    const result = await getPatientByIdWithAppointments(id);
+    const result = await getPatientByIdQueryWithAppointments(id);
     const patient = {
       ...result.rows[0],
       appointments: result.rows
