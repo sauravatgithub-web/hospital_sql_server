@@ -69,6 +69,8 @@ const login = tryCatch(async (req, res, next) => {
     if(!email || !password || !role) {
         return next(new ErrorHandler("Please fill all the fields", 404));
     }
+    userRole = role;
+    console.log("ueviwuqhrq");
     
     let user;
     if (role === "Doctor") {
@@ -81,11 +83,11 @@ const login = tryCatch(async (req, res, next) => {
         user = await Hs.findOne({ email : email, role: userRole }).select("+password");
     }
     else return next(new ErrorHandler("Invalid credentials", 404));
+    console.log("dnrvuqrq");
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return next(new ErrorHandler("Invalid credentials", 401));
 
-    userRole = role;
     sendToken(res, user, 200, `Welcome back, ${user.name}`);
 });
 
