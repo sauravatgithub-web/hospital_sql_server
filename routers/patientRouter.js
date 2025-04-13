@@ -1,13 +1,4 @@
 import express from 'express'
-import {
-    getAllPatient, 
-    getThisPatient, 
-    createPatient,
-    updatePatient,
-    deletePatient, 
-    getPatientByNumber
-} from '../controllers/patientController.js'
-
 // import {
 //     getAllPatient, 
 //     getThisPatient, 
@@ -15,7 +6,16 @@ import {
 //     updatePatient,
 //     deletePatient, 
 //     getPatientByNumber
-// } from '../SQLcontrollers/patientSQLController.js'
+// } from '../controllers/patientController.js'
+
+import {
+    getAllPatient, 
+    getThisPatient, 
+    createPatient,
+    updatePatient,
+    deletePatient, 
+    getPatientByNumber
+} from '../SQLcontrollers/patientSQLController.js'
 
 const router = express.Router();
 router.get('/all', getAllPatient);

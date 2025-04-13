@@ -7,9 +7,9 @@ const getAllDoctorsQuery = async (req, res, next) => {
         d.name AS doctor_name,
         d.addr,
         d.spec,
-        d.intime,
-        d.outtime,
-        d.phonenumber,
+        d."inTime",
+        d."outTime",
+        d."phoneNumber",
         d.email,
         d.username,
         d.gender,
@@ -32,7 +32,7 @@ const getAllDoctorsQuery = async (req, res, next) => {
         t.name AS test_name,
         r2._id AS test_room_id,
         r2.name AS test_room_name
-      FROM "Doctor" d
+      FROM doctor d
       LEFT JOIN Room r ON d.room_id = r._id
       LEFT JOIN Doctor_HPS dh ON d._id = dh.doctor_id
       LEFT JOIN Hospital_Professional h ON dh.hps_id = h._id
@@ -146,7 +146,7 @@ const getDoctorByIdQuery = async (req, res, next) => {
         t.name AS test_name,
         r2._id AS test_room_id,
         r2.name AS test_room_name
-      FROM "Doctor" d
+      FROM doctor d
       LEFT JOIN Room r ON d.room_id = r._id
       LEFT JOIN Doctor_HPS dh ON d._id = dh.doctor_id
       LEFT JOIN Hospital_Professional h ON dh.hps_id = h._id
@@ -243,7 +243,7 @@ const createDoctorQuery = async (doctor) => {
   } = doctor;
 
   return await client.query(`
-      INSERT INTO "Doctor" (name, addr, spec, inTime, outTime, phoneNumber, email, gender, qualification, room, password)
+      INSERT INTO doctor (name, addr, spec, inTime, outTime, phoneNumber, email, gender, qualification, room, password)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
       RETURNING *;
     `, [name, addr, spec, inTime, outTime, phoneNumber, email, gender, qualification, room, password]);
@@ -255,7 +255,7 @@ const updateDoctorQuery = async (id, updates) => {
 
   const setClause = fields.map((field, i) => `${field} = $${i + 2}`).join(", ");
   return await client.query(`
-      UPDATE "Doctor"
+      UPDATE doctor
       SET ${setClause}
       WHERE _id = $1
       RETURNING *;
@@ -264,7 +264,7 @@ const updateDoctorQuery = async (id, updates) => {
 
 const deleteDoctorQuery = async (id) => {
   return await client.query(`
-      UPDATE "Doctor"
+      UPDATE doctor
       SET active = FALSE
       WHERE _id = $1;
     `, [id]);
@@ -292,7 +292,7 @@ const getDocAppointment = async (id) => {
           -- Disease fields from the junction table
           dis._id AS disease_id,
           dis.name AS disease_name
-        FROM "Appointment" a
+        FROM appointment a
         LEFT JOIN Patient p ON a.patient_id = p._id
         LEFT JOIN Appointment_Disease ad ON a._id = ad.appointment_id
         LEFT JOIN Disease dis ON ad.disease_id = dis._id

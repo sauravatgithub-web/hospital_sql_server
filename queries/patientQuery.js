@@ -54,30 +54,37 @@ const getPatientByIdQueryWithAppointments = async (id) => {
 };
 
 const updatePatientQuery = async (id, fields) => {
-  const keys = Object.keys(fields);
-  if (keys.length === 0) return false;
+  // List of actual columns in the Patient table
+  const validColumns = [
+    'name', 'age', 'addr', '"phoneNumber"', 'email',
+    '"userName"', 'gender', 'gname', '"gPhoneNo"', 'active'
+  ];
 
-  const updates = keys.map((key, i) => `${key} = $${i + 1}`).join(', ');
-  const values = [...Object.values(fields), id];
+  // Filter out fields that are not valid columns
+  const entries = Object.entries(fields).filter(([key]) => validColumns.includes(key));
 
-  const result = await db.query(`
-      UPDATE Patient SET ${updates} WHERE _id = $${keys.length + 1}
-    `, values);
+  if (entries.length === 0) return false;
+
+  const updates = entries.map(([key], i) => `${key} = $${i + 1}`).join(', ');
+  const values = entries.map(([, value]) => value);
+  values.push(id); // Add ID as the last parameter
+
+  const result = await client.query(
+    `UPDATE Patient SET ${updates} WHERE _id = $${entries.length + 1}`,
+    values
+  );
 
   return result.rowCount > 0;
 };
 
-const createPatientQuery = async ({
-  name,
-  gender,
-  age,
-  phoneNumber,
-  gname,
-  gPhoneNo,
-  addr,
-  email,
-  userName
-}) => {
+
+const createPatientQuery = async (name, addr, phoneNumber, email, gender, gname, gPhoneNo, age) => {
+  const userName  = (()=> {
+    const namePart = name.toLowerCase().split(' ');
+    const emailPart = email.toLowerCase().split('@')[0];
+    return `${namePart.join('_')}_${emailPart}`;
+  })();
+
   const query = `
     INSERT INTO Patient (
       name, gender, age, "phoneNumber", gname, "gPhoneNo",
