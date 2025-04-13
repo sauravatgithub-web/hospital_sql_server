@@ -78,8 +78,7 @@ const login = tryCatch(async (req, res, next) => {
     const user = await getUserByEmail(email, role);
     if (!user) return next(new ErrorHandler("Invalid credentials", 404));
     
-    // const isMatch = await bcrypt.compare(password, user.password);
-    const isMatch = (password === user.password);
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return next(new ErrorHandler("Invalid credentials", 401));
     
     userRole = role;
