@@ -1,7 +1,8 @@
 import client from "../db.js";
 
 const getAllDoctorsQuery = async (req, res, next) => {
-  const result = await client.query(`
+  try {
+    const result = await client.query(`
       SELECT 
         d._id AS doctor_id,
         d.name AS doctor_name,
@@ -17,17 +18,13 @@ const getAllDoctorsQuery = async (req, res, next) => {
         d.qualification,
         d.doj,
         d.active,
-        -- Room data
         r._id AS room_id,
         r.name AS room_name,
-        -- Hospital Professionals (HPS)
         h._id AS hps_id,
         h.name AS hps_name,
-        -- Appointments
         a._id AS appt_id,
         a.time AS appt_time,
         a.status AS appt_status,
-        -- Tests data and associated Room for test
         t._id AS test_id,
         t.name AS test_name,
         r2._id AS test_room_id,
@@ -46,195 +43,177 @@ const getAllDoctorsQuery = async (req, res, next) => {
       WHERE d.active = TRUE;
     `);
 
-  // Use a map to group doctor rows.
-  const doctorMap = new Map();
+    const doctorMap = new Map();
 
-  result.rows.forEach(row => {
-    const doctorId = row.doctor_id;
-    if (!doctorMap.has(doctorId)) {
-      // Build the base doctor object with room info.
-      doctorMap.set(doctorId, {
-        _id: doctorId,
-        name: row.doctor_name,
-        addr: row.addr,
-        spec: row.spec,
-        inTime: row.intime,
-        outTime: row.outtime,
-        phoneNumber: row.phonenumber,
-        email: row.email,
-        userName: row.username,
-        gender: row.gender,
-        role: row.role,
-        qualification: row.qualification,
-        DOJ: row.doj,
-        active: row.active,
-        room: row.room_id ? {
-          _id: row.room_id,
-          name: row.room_name
-        } : null,
-        hps: [],
-        appointments: [],
-        tests: []
-      });
-    }
-    const doctor = doctorMap.get(doctorId);
+    result.rows.forEach(row => {
+      const doctorId = row.doctor_id;
+      if (!doctorMap.has(doctorId)) {
+        doctorMap.set(doctorId, {
+          _id: doctorId,
+          name: row.doctor_name,
+          addr: row.addr,
+          spec: row.spec,
+          inTime: row.inTime,
+          outTime: row.outTime,
+          phoneNumber: row.phoneNumber,
+          email: row.email,
+          userName: row.username,
+          gender: row.gender,
+          role: row.role,
+          qualification: row.qualification,
+          DOJ: row.doj,
+          active: row.active,
+          room: row.room_id ? { _id: row.room_id, name: row.room_name } : null,
+          hps: [],
+          appointments: [],
+          tests: []
+        });
+      }
 
-    // Add hospital professionals if not already added.
-    if (row.hps_id && !doctor.hps.some(h => h._id === row.hps_id)) {
-      doctor.hps.push({
-        _id: row.hps_id,
-        name: row.hps_name
-      });
-    }
-    // Add appointments if not already added.
-    if (row.appt_id && !doctor.appointments.some(a => a._id === row.appt_id)) {
-      doctor.appointments.push({
-        _id: row.appt_id,
-        time: row.appt_time,
-        status: row.appt_status
-      });
-    }
-    // Add tests if not already added.
-    if (row.test_id && !doctor.tests.some(t => t._id === row.test_id)) {
-      doctor.tests.push({
-        _id: row.test_id,
-        name: row.test_name,
-        room: row.test_room_id ? {
-          _id: row.test_room_id,
-          name: row.test_room_name
-        } : null
-      });
-    }
-  });
+      const doctor = doctorMap.get(doctorId);
 
-  const populatedDoctors = Array.from(doctorMap.values());
-  return populatedDoctors;
+      if (row.hps_id && !doctor.hps.some(h => h._id === row.hps_id)) {
+        doctor.hps.push({ _id: row.hps_id, name: row.hps_name });
+      }
+
+      if (row.appt_id && !doctor.appointments.some(a => a._id === row.appt_id)) {
+        doctor.appointments.push({
+          _id: row.appt_id,
+          time: row.appt_time,
+          status: row.appt_status
+        });
+      }
+
+      if (row.test_id && !doctor.tests.some(t => t._id === row.test_id)) {
+        doctor.tests.push({
+          _id: row.test_id,
+          name: row.test_name,
+          room: row.test_room_id ? { _id: row.test_room_id, name: row.test_room_name } : null
+        });
+      }
+    });
+
+    const populatedDoctors = Array.from(doctorMap.values());
+    return res.status(200).json({ success: true, data: populatedDoctors });
+  } catch (error) {
+    return next(error);
+  }
 };
-
-
 
 const getDoctorByIdQuery = async (req, res, next) => {
   const id = req.params.id;
 
-  const result = await client.query(
-    `SELECT 
-    d._id AS doctor_id,
-    d.name AS doctor_name,
-    d.addr,
-    d.spec,
-    d."inTime",
-    d."outTime",
-    d."phoneNumber",
-    d.email,
-    d.username,
-    d.gender,
-    d.role,
-    d.qualification,
-    d.doj,
-    d.active,
-    -- Room data (via sits_at)
-    r._id AS room_id,
-    r.name AS room_name,
-    -- Hospital Professionals (HPS)
-    h._id AS hps_id,
-    h.name AS hps_name,
-    -- Appointments
-    a._id AS appt_id,
-    a.time AS appt_time,
-    a.status AS appt_status,
-    -- Tests and associated Room for test
-    t._id AS test_id,
-    t.name AS test_name,
-    r2._id AS test_room_id,
-    r2.name AS test_room_name
-    FROM doctor d
-    LEFT JOIN sits_at sit ON sit.did = d._id
-    LEFT JOIN room r ON sit.rid = r._id
-    LEFT JOIN supervises dh ON d._id = dh.did
-    LEFT JOIN hospital_professional h ON dh.hid = h._id
-    LEFT JOIN treats tr ON d._id = tr.did
-    LEFT JOIN appointment a ON tr.aid = a._id
-    LEFT JOIN doctortests dt ON d._id = dt.did
-    LEFT JOIN test t ON dt.tid = t._id
-    LEFT JOIN testroom troom ON troom.tid = t._id
-    LEFT JOIN room r2 ON troom.rid = r2._id
-    WHERE d.active = TRUE AND d._id = $1;`, [id]
-  );
+  try {
+    const result = await client.query(`
+      SELECT 
+        d._id AS doctor_id,
+        d.name AS doctor_name,
+        d.addr,
+        d.spec,
+        d."inTime",
+        d."outTime",
+        d."phoneNumber",
+        d.email,
+        d.username,
+        d.gender,
+        d.role,
+        d.qualification,
+        d.doj,
+        d.active,
+        -- Room data (via sits_at)
+        r._id AS room_id,
+        r.name AS room_name,
+        -- Hospital Professionals (HPS)
+        h._id AS hps_id,
+        h.name AS hps_name,
+        -- Appointments
+        a._id AS appt_id,
+        a.time AS appt_time,
+        a.status AS appt_status,
+        -- Tests and associated Room for test
+        t._id AS test_id,
+        t.name AS test_name,
+        r2._id AS test_room_id,
+        r2.name AS test_room_name
+      FROM doctor d
+      LEFT JOIN sits_at sit ON sit.did = d._id
+      LEFT JOIN room r ON sit.rid = r._id
+      LEFT JOIN supervises dh ON d._id = dh.did
+      LEFT JOIN hospital_professional h ON dh.hid = h._id
+      LEFT JOIN treats tr ON d._id = tr.did
+      LEFT JOIN appointment a ON tr.aid = a._id
+      LEFT JOIN doctortests dt ON d._id = dt.did
+      LEFT JOIN test t ON dt.tid = t._id
+      LEFT JOIN testroom troom ON troom.tid = t._id
+      LEFT JOIN room r2 ON troom.rid = r2._id
+      WHERE d.active = TRUE AND d._id = $1;`, [id]
+    );
 
-  if (result.rows.length === 0) {
-    return next(new ErrorHandler("Doctor not found", 404));
+    if (result.rows.length === 0) {
+      return next(new ErrorHandler("Doctor not found", 404));
+    }
+
+    // Use a map to consolidate rows for the single doctor.
+    const doctorMap = new Map();
+
+    result.rows.forEach(row => {
+      const doctorId = row.doctor_id;
+      if (!doctorMap.has(doctorId)) {
+        doctorMap.set(doctorId, {
+          _id: doctorId,
+          name: row.doctor_name,
+          addr: row.addr,
+          spec: row.spec,
+          inTime: row.inTime,
+          outTime: row.outTime,
+          phoneNumber: row.phoneNumber,
+          email: row.email,
+          userName: row.username,
+          gender: row.gender,
+          role: row.role,
+          qualification: row.qualification,
+          DOJ: row.doj,
+          active: row.active,
+          room: row.room_id ? { _id: row.room_id, name: row.room_name } : null,
+          hps: [],
+          appointments: [],
+          tests: []
+        });
+      }
+
+      const doctor = doctorMap.get(doctorId);
+
+      // Add Hospital Professionals if not already added.
+      if (row.hps_id && !doctor.hps.some(h => h._id === row.hps_id)) {
+        doctor.hps.push({ _id: row.hps_id, name: row.hps_name });
+      }
+
+      // Add Appointments if not already added.
+      if (row.appt_id && !doctor.appointments.some(a => a._id === row.appt_id)) {
+        doctor.appointments.push({
+          _id: row.appt_id,
+          time: row.appt_time,
+          status: row.appt_status
+        });
+      }
+
+      // Add Tests if not already added.
+      if (row.test_id && !doctor.tests.some(t => t._id === row.test_id)) {
+        doctor.tests.push({
+          _id: row.test_id,
+          name: row.test_name,
+          room: row.test_room_id ? { _id: row.test_room_id, name: row.test_room_name } : null
+        });
+      }
+    });
+
+    // Since we're fetching a single doctor, get the first (and only) entry from the map.
+    const populatedDoctor = Array.from(doctorMap.values())[0];
+    return res.status(200).json({ success: true, data: populatedDoctor });
+  } catch (error) {
+    return next(error);
   }
-
-  // Use a map to consolidate rows for the single doctor.
-  const doctorMap = new Map();
-
-  result.rows.forEach(row => {
-    const doctorId = row.doctor_id;
-    if (!doctorMap.has(doctorId)) {
-      // Build the base doctor object including room info.
-      doctorMap.set(doctorId, {
-        _id: doctorId,
-        name: row.doctor_name,
-        addr: row.addr,
-        spec: row.spec,
-        inTime: row.intime,
-        outTime: row.outtime,
-        phoneNumber: row.phonenumber,
-        email: row.email,
-        userName: row.username,
-        gender: row.gender,
-        role: row.role,
-        qualification: row.qualification,
-        DOJ: row.doj,
-        active: row.active,
-        room: row.room_id ? {
-          _id: row.room_id,
-          name: row.room_name
-        } : null,
-        hps: [],
-        appointments: [],
-        tests: []
-      });
-    }
-
-    const doctor = doctorMap.get(doctorId);
-
-    // Add Hospital Professionals if not already added.
-    if (row.hps_id && !doctor.hps.some(h => h._id === row.hps_id)) {
-      doctor.hps.push({
-        _id: row.hps_id,
-        name: row.hps_name
-      });
-    }
-
-    // Add Appointments if not already added.
-    if (row.appt_id && !doctor.appointments.some(a => a._id === row.appt_id)) {
-      doctor.appointments.push({
-        _id: row.appt_id,
-        time: row.appt_time,
-        status: row.appt_status
-      });
-    }
-
-    // Add Tests if not already added.
-    if (row.test_id && !doctor.tests.some(t => t._id === row.test_id)) {
-      doctor.tests.push({
-        _id: row.test_id,
-        name: row.test_name,
-        room: row.test_room_id ? {
-          _id: row.test_room_id,
-          name: row.test_room_name
-        } : null
-      });
-    }
-  });
-
-  // Since we're fetching a single doctor, get the first (and only) entry from the map.
-  const populatedDoctor = Array.from(doctorMap.values())[0];
-  return populatedDoctor;
 };
-
-
 
 const createDoctorQuery = async (doctor) => {
   const {
@@ -243,12 +222,24 @@ const createDoctorQuery = async (doctor) => {
     room, password
   } = doctor;
 
-  return await client.query(`
-      INSERT INTO doctor (name, addr, spec, inTime, outTime, phoneNumber, email, gender, qualification, room, password)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-      RETURNING *;
-    `, [name, addr, spec, inTime, outTime, phoneNumber, email, gender, qualification, room, password]);
+  // Step 1: Insert doctor
+  const result = await client.query(`
+    INSERT INTO doctor (name, addr, spec, inTime, outTime, phoneNumber, email, gender, qualification, password)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+    RETURNING *;
+  `, [name, addr, spec, inTime, outTime, phoneNumber, email, gender, qualification, password]);
+
+  const insertedDoctor = result.rows[0];
+
+  // Step 2: Insert into sits_at table to associate room
+  await client.query(`
+    INSERT INTO sits_at (did, rid)
+    VALUES ($1, $2);
+  `, [insertedDoctor._id, room]);
+
+  return insertedDoctor;
 };
+
 
 const updateDoctorQuery = async (id, updates) => {
   const fields = Object.keys(updates);
