@@ -19,7 +19,6 @@ const getThisTest = tryCatch(async (req, res, next) => {
 
 const createTest = tryCatch(async (req, res, next) => {
   const { name, equip, room, doctor, nurse } = req.body;
-
   if (!name || !equip) return next(new ErrorHandler("Insufficient input", 400));
 
   const roomData = await Room.findById(room);
@@ -46,9 +45,41 @@ const createTest = tryCatch(async (req, res, next) => {
 
 const updateTest = tryCatch(async (req, res, next) => {
   const { id } = req.body;
-  const updateFields = req.body;
+  const updatedFields = req.body;
 
-  const updatedTest = await Test.findByIdAndUpdate(id, updateFields, { new: true });
+  const test = await Test.findById(id);
+
+  if(test.doctor !== updatedFields.doctor) {
+    const oldDoctor = await Doctor.findById(test.doctor);
+    oldDoctor.tests.filter(test => test !== id);
+    await oldDoctor.save();
+
+    const newDoctor = await Doctor.findById(updatedFields.doctor);
+    newDoctor.tests.push(id);
+    await newDoctor.save();
+  }
+
+  if(test.nurse !== updatedFields.nurse) {
+    const oldNurse = await Nurse.findById(test.nurse);
+    oldNurse.tests.filter(test => test !== id);
+    await oldNurse.save();
+
+    const newNurse = await Nurse.findById(updatedFields.nurse);
+    newNurse.tests.push(id);
+    await newNurse.save();
+  }
+
+  if(test.room !== updatedFields.room) {
+    const oldRoom = await Room.findById(test.room);
+    oldRoom.tests.filter(test => test !== id);
+    await oldRoom.save();
+
+    const newRoom = await Room.findById(updatedFields.room);
+    newRoom.tests.push(id);
+    await newRoom.save();
+  }
+
+  const updatedTest = await Test.findByIdAndUpdate(id, updatedFields, { new: true });
   if (!updatedTest) return next(new ErrorHandler("Test not found", 404));
 
   return res.status(200).json({ success: true, message: "Test updated", test: updatedTest });
@@ -63,4 +94,10 @@ const deleteTest = tryCatch(async(req, res, next) => {
   return res.status(200).json({success: true, message : 'Test deleted successfully'});
 });
 
-export { getAllTest, getThisTest, createTest, updateTest, deleteTest }
+export { 
+  getAllTest, 
+  getThisTest, 
+  createTest, 
+  updateTest, 
+  deleteTest 
+}

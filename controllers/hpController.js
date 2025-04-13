@@ -47,10 +47,22 @@ const updateHospitalProfessional = tryCatch(async (req, res, next) => {
 
   const hp = await Hospital_Professional.findById(id);
   await Promise.all(
+    hp.supervisedBy.map(async (doctor) => {
+      if(!updatedFields.supervisedBy.includes(doctor)) {
+        const doctorData = await Doctor.findById({ _id: doctor });
+        if (doctorData) {
+          doctorData.hps.filter((hp) => hp !== id);
+          await doctorData.save();
+        }
+      }
+    })
+  );
+
+  await Promise.all(
     updatedFields.supervisedBy.map(async (doctor) => {
       const doctorData = await Doctor.findById({ _id: doctor });
-      if (doctorData) {
-        doctorData.hps.push(hp._id);
+      if(!doctorData.hps.includes(id)) {
+        doctorData.hps.push(id);
         await doctorData.save();
       }
     })
@@ -58,21 +70,6 @@ const updateHospitalProfessional = tryCatch(async (req, res, next) => {
 
   const updatedHP = await Hospital_Professional.findByIdAndUpdate(id, updatedFields, { new: true });
   if (!updatedHP) return next(new ErrorHandler("Hospital Professional not found", 404));
-
-  await Promise.all(
-    Object.entries(supervisedBy).map(async ([doctorId, shouldAdd]) => {
-      const doctorData = await Doctor.findById({ _id: doctorId });
-      if(shouldAdd === 1) {
-        if (!doctorData.hps.includes(hp._id)) {
-          doctorData.hps.push(hp._id);
-        }
-      }
-      else {
-        doctorData.hps = doctorData.hps.filter(id => id.toString() !== hp._id.toString());
-      }
-      await doctorData.save();
-    })
-  );
 
   return res.status(200).json({ message: 'Hospital Professional updated successfully', hospitalProfessional: updatedHP });
 });

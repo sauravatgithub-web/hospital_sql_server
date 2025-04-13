@@ -8,8 +8,8 @@ const getAllDisease = tryCatch(async (req, res) => {
 });
 
 const getThisDisease = tryCatch(async (req, res, next) => {
-    const name = req.params.name;
-    const disease = await Disease.find({ name: name, active : true });
+    const id = req.params.id;
+    const disease = await Disease.find({ _id: id, active : true });
     if (!disease) return next(new ErrorHandler("Incorrect disease name", 404));
     return res.status(200).json({ success: true, disease: disease });
 });
@@ -37,4 +37,10 @@ const deleteDisease = tryCatch(async(req, res, next) => {
     return res.status(200).json({message : 'Disease deleted successfully'});
 });
 
-export { getAllDisease, getThisDisease, createDisease, updateDisease, deleteDisease };
+export { 
+    getAllDisease, 
+    getThisDisease, 
+    createDisease, 
+    updateDisease, 
+    deleteDisease 
+};
