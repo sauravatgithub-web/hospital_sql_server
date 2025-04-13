@@ -1,114 +1,95 @@
-import Appointment from '../models/appointmentModel.js';
-import Doctor from '../models/doctorModel.js';
-import Patient from '../models/patientModel.js';
-import { tryCatch } from '../middlewares/error.js';
+import { 
+    getAllAppointmentsQuery, 
+    getAppointmentByIdQuery, 
+    createAppointmentQuery, 
+    updateAppointmentQuery, 
+    deleteAppointmentQuery, 
+    getCurrentAppointmentsQuery 
+} from '../queries/appointmentQuery.js';
 import { ErrorHandler } from '../utils/utility.js';
+import { tryCatch } from '../middlewares/error.js';
 
+// Controller for getting all active appointments
 const getAllAppointment = tryCatch(async (req, res) => {
-    const allAppointment = await Appointment.find({ active: true });
-    return res.status(200).json({ success: true, data: allAppointment });
+const allAppointments = await getAllAppointmentsQuery();
+return res.status(200).json({ success: true, data: allAppointments });
 });
 
+// Controller for getting a specific appointment by ID
 const getThisAppointment = tryCatch(async (req, res, next) => {
-    const id = req.params.id;
+const { id } = req.params;
+const appointment = await getAppointmentByIdQuery(id);
 
-    const appointment = await Appointment.findOne({ _id: id, active: true })
-        .populate([
-            { path: 'patient' },
-            { path: 'doctor', select: 'name spec phoneNumber room role' },
-            { path: 'nurse', select: 'name shift phoneNumber role' },
-            { path: 'hps', select: 'name phoneNumber' },
-            { path: 'disease', select: 'name' },
-            { path: 'room', select: 'name bed' },
-            { path: 'drugs', select: 'drug name' },
-            { path: 'drugs.drug' },
-            {
-                path: 'tests', select: 'test remark',
-                populate: {
-                    path: 'test',
-                    select: 'name doctor nurse room'
-                }
-            },
-        ]);
+if (!appointment || appointment.length === 0) {
+   return next(new ErrorHandler('Incorrect appointment id', 404));
+}
 
-    if (!appointment) return next(new ErrorHandler("Incorrect appointment id", 404));
-    return res.status(200).json({ success: true, appointment });
+return res.status(200).json({ success: true, appointment: appointment[0] });
 });
 
-
+// Controller for creating a new appointment
 const createAppointment = tryCatch(async (req, res, next) => {
-    const { time, patient, doctor } = req.body;
-    if (!patient || !doctor) return next(new ErrorHandler("Insufficient input", 404));
+const { time, dischargeTime, patient, doctor, room } = req.body;
 
-    const appointment = await Appointment.create({ time, patient, doctor });
-    const doctorData = await Doctor.findById({ _id: doctor });
-    doctorData.appointments.push(appointment._id);
-    const patientData = await Patient.findById({ _id: patient });
-    patientData.appointments.push(appointment._id);
+if (!patient || !doctor || !room) {
+   return next(new ErrorHandler("Insufficient input", 400));
+}
 
-    await doctorData.save();
-    await patientData.save();
+const appointmentId = await createAppointmentQuery(time, dischargeTime, patient, doctor, room);
 
-    return res.status(201).json({ message: 'Appointment created successfully', appointment });
+// Update doctor and patient with the appointment ID
+await client.query(`
+   UPDATE doctor SET appointments = array_append(appointments, $1) WHERE _id = $2;
+`, [appointmentId, doctor]);
+
+await client.query(`
+   UPDATE patient SET appointments = array_append(appointments, $1) WHERE _id = $2;
+`, [appointmentId, patient]);
+
+return res.status(201).json({ message: 'Appointment created successfully', appointment: { _id: appointmentId, time, dischargeTime } });
 });
 
+// Controller for updating an appointment
 const updateAppointment = tryCatch(async (req, res, next) => {
-    const { id } = req.body;
-    const updateFields = req.body;
-    delete updateFields.id;
+const { id, time, dischargeTime, status, doctor, nurse, room } = req.body;
+const updatedAppointment = await updateAppointmentQuery(time, dischargeTime, status, doctor, nurse, room, id);
 
-    await Appointment.findByIdAndUpdate(id, updateFields, { new: true });
+if (!updatedAppointment) {
+   return next(new ErrorHandler("Appointment not found", 404));
+}
 
-
-    return res.status(200).json({ message: 'Appointment updated successfully' });
+return res.status(200).json({ message: 'Appointment updated successfully', appointment: updatedAppointment });
 });
 
+// Controller for deleting an appointment (mark as inactive)
 const deleteAppointment = tryCatch(async (req, res, next) => {
-    const { id } = req.body;
-    const appointment = await Appointment.findById(id);
-    if (!appointment) return next(new ErrorHandler("Appointment not found", 404));
-    appointment.active = false;
-    await appointment.save();
-    return res.status(200).json({ message: 'Appointment deleted successfully' });
+const { id } = req.body;
+const deletedAppointment = await deleteAppointmentQuery(id);
+
+if (!deletedAppointment) {
+   return next(new ErrorHandler("Appointment not found", 404));
+}
+
+return res.status(200).json({ message: 'Appointment deleted successfully' });
 });
 
+// Controller for getting current appointments (InProgress)
 const getCurrentAppointments = tryCatch(async (req, res, next) => {
-    const { entity, _id } = req.query;
+const { entity, _id } = req.query;
+const currentAppointments = await getCurrentAppointmentsQuery(entity, _id);
 
-    const appointments = await Appointment.find({ [entity]: _id, status: "InProgress" })
-        .select('time dischargeTime status room patient disease doctor nurse hps tests')
-        .populate([
-            {
-                path: 'patient',
-                select: 'name gender age phoneNumber gname gPhoneNo appointments addr email userName',
-                populate: {
-                    path: 'appointments',
-                    select: 'status time'
-                }
-            },
-            { path: 'disease', select: 'name' },
-            { path: 'doctor', select: 'name phoneNumber' },
-            { path: 'nurse', select: 'name shift phoneNumber' },
-            { path: 'hps', select: 'name phoneNumber' },
-            { path: 'room', select: 'name bed' },
-            {
-                path: 'tests', select: 'test remarks',
-                populate: {
-                    path: 'test',
-                    select: 'name'
-                }
-            },
-        ]);
-    if (!appointments) return next(new ErrorHandler("Check for errors", 404));
+if (!currentAppointments || currentAppointments.length === 0) {
+   return next(new ErrorHandler("No appointments found", 404));
+}
 
-    return res.status(200).json({ success: true, appointments });
+return res.status(200).json({ success: true, appointments: currentAppointments });
 });
 
 export {
-    getAllAppointment,
-    getThisAppointment,
-    createAppointment,
-    updateAppointment,
-    deleteAppointment,
-    getCurrentAppointments
+getAllAppointment,
+getThisAppointment,
+createAppointment,
+updateAppointment,
+deleteAppointment,
+getCurrentAppointments
 };
