@@ -18,7 +18,8 @@ const sendOTP = async (email, message, next) => {
     try {
         await sendEmail(email, message, sharedToken);
         emailTokens[email] = { otp, expirationTime };
-    } catch (error) {
+    } 
+    catch (error) {
         next(new ErrorHandler("Failed to send OTP email", 500));
     }
 };
@@ -30,9 +31,8 @@ const emailVerification = tryCatch(async (req, res, next) => {
     let user;
     if(role === "Doctor") user = await Doctor.findOne({ email : email });
     else if (role === "Nurse") user = await Nurse.findOne({email : email});
-    else user = await Nurse.findOne({ email : email});
-
-    if (!user) return next(new ErrorHandler("User do not exists", 404));
+    else if(role === "FDO" || role === "DEO") user = await Hs.findOne({ email : email});
+    else return next(new ErrorHandler("Invalid credentials", 404));
 
 	sendOTP(email, "Email Verification", next);
 	res.status(200).json({
@@ -49,7 +49,8 @@ const confirmOTP = tryCatch(async (req, res, next) => {
     let user;
 	if(role === "Doctor") user = await Doctor.findOne({ email : email });
     else if (role === "Nurse") user = await Nurse.findOne({ email : email});
-    else user = await Hs.findOne({ email : email});
+    else if(role === "FDO" || role === "DEO") user = await Hs.findOne({ email : email});
+    else return next(new ErrorHandler("Invalid credentials", 404));
 
 	const sharedOTP = emailTokens[email];
 
@@ -71,11 +72,17 @@ const login = tryCatch(async (req, res, next) => {
     userRole = role;
     
     let user;
-    if (role === "Doctor") user = await Doctor.findOne({ email : email }).select("+password");
-    else if (role === "Nurse") user = await Nurse.findOne({ email : email }).select("+password");
-    else user = await Hs.findOne({ email : email }).select("+password");
+    if (role === "Doctor") {
+        user = await Doctor.findOne({ email : email }).select("+password");
+    }
+    else if (role === "Nurse") {
+        user = await Nurse.findOne({ email : email }).select("+password");
+    }
+    else if(role === "FDO" || role === "DEO") {
+        user = await Hs.findOne({ email : email, role: userRole }).select("+password");
+    }
+    else return next(new ErrorHandler("Invalid credentials", 404));
 
-    if (!user) return next(new ErrorHandler("Invalid credentials", 404));
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return next(new ErrorHandler("Invalid credentials", 401));
 
@@ -97,14 +104,10 @@ const updateUserName = tryCatch(async (req, res) => {
     let user;
     if (role === "Doctor") user = await Doctor.findById(req.user);
     else if (role === "Nurse") user = await Nurse.findById(req.user);
-    else user = await Hs.findById(req.user);
+    else if(role === "FDO" || role === "DEO") user = await Hs.findById(req.user);
+    else return next(new ErrorHandler("Invalid credentials", 404));
 
-    if (!user) return next(new ErrorHandler("User not found", 404));
-
-    if (role === "Doctor") user.name = newUserName;
-    else if (role === "Nurse") user.name = newUserName;
-    else user.name = newUserName;
-
+    user.userName = newUserName;
     await user.save();
     return res.status(200).json({ success: true });
 });
@@ -113,7 +116,7 @@ const getMyProfile = tryCatch(async (req, res) => {
     let user;
     if(userRole === "Doctor") user = await Doctor.findById(req.user);
     else if(userRole === "Nurse") user = await Nurse.findById(req.user);
-    else user = await Hospital_Staff.findById(req.user);
+    else if(userRole === "FDO" || userRole === "DEO") user = await Hospital_Staff.findById(req.user);
     
     return res.status(200).json({
         success: true,
@@ -128,8 +131,8 @@ const setNewPassword = tryCatch(async (req, res, next) => {
     let user;
     if(role === "Doctor") user = await Doctor.findOne({ email: email });
     else if(role === "Nurse") user = await Nurse.findOne({ email: email });
-    else user = await Hs.findOne({ email: email });
-    if (!user) return next(new ErrorHandler("User do not exists", 404));
+    else if(role === "FDO" || role === "DEO") user = await Hs.findOne({ email : email});
+    else return next(new ErrorHandler("Invalid credentials", 404));
 
     user.password = password;
     await user.save();

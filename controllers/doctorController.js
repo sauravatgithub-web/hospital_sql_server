@@ -11,9 +11,9 @@ const getAllDoctor = tryCatch(async (req, res) => {
 });
 
 const getThisDoctor = tryCatch(async (req, res, next) => {
-    const name = req.params.name;
-    const doctor = await Doctor.find({ name: name, active: true });
-    if (!doctor) return next(new ErrorHandler("Incorrect doctor name", 404));
+    const id = req.params.id;
+    const doctor = await Doctor.findOne({ _id: id, active: true });
+    if (!doctor) return next(new ErrorHandler("Invalid id", 404));
     return res.status(200).json({ success: true, doctor: doctor });
 });
 
@@ -116,4 +116,11 @@ const getAppointments = tryCatch(async (req, res, next) => {
     return res.status(200).json({ success: true, appointments });
 });
 
-export { getAllDoctor, getThisDoctor, createDoctor, updateDoctor, deleteDoctor, getAppointments }
+export { 
+    getAllDoctor, 
+    getThisDoctor, 
+    createDoctor, 
+    updateDoctor, 
+    deleteDoctor, 
+    getAppointments 
+}

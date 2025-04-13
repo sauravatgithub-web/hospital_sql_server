@@ -8,8 +8,8 @@ const getAllPatient = tryCatch(async (req, res) => {
 });
 
 const getThisPatient = tryCatch(async (req, res, next) => {
-  const name = req.params.name;
-  const patient = await Patient.findOne({ pname: name, active : true });
+  const id = req.params.id;
+  const patient = await Patient.findOne({ _id: id, active : true });
   if (!patient) return next(new ErrorHandler("Incorrect patient name", 404));
   return res.status(200).json({ success: true, patient: patient });
 });
@@ -25,18 +25,11 @@ const getPatientByNumber = tryCatch(async (req, res, next) => {
 })
 
 const createPatient = tryCatch(async (req, res, next) => {
-  const {
-    name, addr, phoneNumber, email,
-    gender, gname, gPhoneNo, age, role
-  } = req.body;
-
+  const { name, addr, phoneNumber, email, gender, gname, gPhoneNo, age, role } = req.body;
   if (!name || !phoneNumber || !gname || !gPhoneNo || !email)
     return next(new ErrorHandler("Insufficient input", 404));
 
-  const password = "password";
-
-  await Patient.create({name, addr, phoneNumber, email,
-    gender, gname, gPhoneNo, age, role, password});
+  await Patient.create({ ...req.body, password: 'password' });
 
   if(role === "FDO") {
     const patient = await Patient.findOne({ email: email }).populate({
@@ -82,4 +75,11 @@ const deletePatient = tryCatch(async(req, res, next) => {
   return res.status(200).json({message : 'Patient deleted successfully'});
 });
 
-export { getAllPatient, getThisPatient, getPatientByNumber, createPatient, updatePatient, deletePatient }
+export { 
+  getAllPatient, 
+  getThisPatient, 
+  getPatientByNumber, 
+  createPatient, 
+  updatePatient, 
+  deletePatient 
+}

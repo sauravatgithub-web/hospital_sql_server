@@ -11,8 +11,8 @@ const getAllTest = tryCatch(async (req, res) => {
 });
 
 const getThisTest = tryCatch(async (req, res, next) => {
-  const name = req.params.name;
-  const test = await Test.findOne({ name, active : true });
+  const id = req.params.id;
+  const test = await Test.findOne({ _id: id, active : true });
   if (!test) return next(new ErrorHandler("Incorrect test name", 404));
   return res.status(200).json({ success: true, test: test });
 });

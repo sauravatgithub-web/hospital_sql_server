@@ -12,7 +12,7 @@ import {
 
 const router = express.Router();
 router.get('/all', getAllHospitalStaff);
-router.get('/thisHospitalStaff/:name', getThisHospitalStaff);
+router.get('/this/:id', getThisHospitalStaff);
 router.get('/currentDoctors', getAllCurrentDoctors);
 router.get('/currentNurses', getAllCurrentNurses);
 router.get('/currentAppointments', getCurrentAppointments);

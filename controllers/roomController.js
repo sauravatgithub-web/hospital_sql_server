@@ -8,9 +8,9 @@ const getAllRoom = tryCatch(async (req, res) => {
 });
 
 const getThisRoom = tryCatch(async (req, res, next) => {
-  const name = req.params.name;
-  const room = await Room.find({ name, active : true });
-  if (!room) return next(new ErrorHandler("Incorrect room name", 404));
+  const id = req.params.id;
+  const room = await Room.findOne({ _id: id, active : true });
+  if (!room) return next(new ErrorHandler("Incorrect ID", 404));
   return res.status(200).json({ success: true, patient: patient });
 });
 
@@ -43,22 +43,16 @@ const createRoom = tryCatch(async (req, res, next) => {
   const { name, type, capacity, isAC } = req.body;
   if (!name || !type || !capacity || !isAC) return next(new ErrorHandler("Insufficient input", 400));
 
-  const newRoom = await Room.create({
-    name,
-    type,
-    capacity,
-    isAC
-  });
-
+  const newRoom = await Room.create(re.body);
   return res.status(200).json({ success: true, message: "Room created", room: newRoom });
 });
 
 const updateRoom = tryCatch(async (req, res, next) => {
   const { id } = req.body;
-  const updateFields = req.body;
+  const updatedFields = req.body;
+  delete updatedFields.id;
 
-  const updatedRoom = await Room.findByIdAndUpdate(id, updateFields, { new: true });
-
+  const updatedRoom = await Room.findByIdAndUpdate(id, updatedFields, { new: true });
   if (!updatedRoom)
     return next(new ErrorHandler("Room not found", 404));
 
@@ -74,4 +68,12 @@ const deleteRoom = tryCatch(async(req, res, next) => {
   return res.status(200).json({message : 'Room deleted successfully'});
 });
 
-export { getAllRoom, getThisRoom, getAllVacantDocRooms, getAllVacantRooms, createRoom, updateRoom, deleteRoom }
+export { 
+  getAllRoom,
+  getThisRoom, 
+  getAllVacantDocRooms, 
+  getAllVacantRooms, 
+  createRoom, 
+  updateRoom, 
+  deleteRoom 
+}

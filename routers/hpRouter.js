@@ -9,7 +9,7 @@ import {
 
 const router = express.Router();
 router.get('/all', getAllHospitalProfessional);
-router.get('/thisHospitalProfessional/:name', getThisHospitalProfessional);
+router.get('/this/:id', getThisHospitalProfessional);
 router.post('/new', createHospitalProfessional);
 router.put('/update', updateHospitalProfessional);
 router.delete('/delete', deleteHospitalProfessional);

@@ -18,25 +18,17 @@ const getThisHospitalStaff = tryCatch(async (req, res, next) => {
 });
 
 const createHospitalStaff = tryCatch(async (req, res, next) => {
-  const {
-    name, addr, phoneNumber, email, gender, department, designation, shift, role
-  } = req.body;
-  console.log(req.body);
-
+  const { name, addr, phoneNumber, email, gender, department, designation, shift, role } = req.body;
   if (!name || !addr || !phoneNumber || !email || !department || !designation)
     return next(new ErrorHandler("Insufficient input", 404));
 
-  await Hospital_Staff.create({
-    name, addr, phoneNumber, email, password: "password",
-    gender, department, designation, shift, role
-  });
+  await Hospital_Staff.create({ ...req.body, password: "password" });
   return res.status(200).json({ success: true });
 });
 
 const updateHospitalStaff = tryCatch(async (req, res, next) => {
   const { id } = req.body;
   delete req.body._id;
-  console.log(req.body);
 
   const updatedStaff = await Hospital_Staff.findByIdAndUpdate(
     id,

@@ -11,7 +11,7 @@ import {
 const router = express.Router();
 router.get('/all', getAllPatient);
 router.get('/:phoneNo', getPatientByNumber);
-router.get('/thisPatient/:name', getThisPatient);
+router.get('/this/:id', getThisPatient);
 router.post('/new', createPatient);
 router.put('/update', updatePatient);
 router.delete('/delete', deletePatient);

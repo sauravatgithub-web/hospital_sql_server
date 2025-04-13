@@ -10,7 +10,7 @@ import {
 
 const router = express.Router();
 router.get('/all', getAllRoom);
-router.get('/thisRoom/:name', getThisRoom);
+router.get('/this/:id', getThisRoom);
 router.get('/allVacantRooms', getAllVacantRooms);
 router.post('/new', createRoom);
 router.put('/update', updateRoom);
