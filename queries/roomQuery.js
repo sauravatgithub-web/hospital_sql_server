@@ -8,12 +8,45 @@ const getThisRoomQuery = async (id) => {
     return await client.query(`SELECT * FROM Room WHERE active = TRUE and id = $1 ;`, [id]);
 };
 
-const createRoomQuery = async (name, type,capacity, isAC) => {
-    return await client.query(
+const createRoomQuery = async (name, type, capacity, isAC) => {
+    try {
+      await client.query('BEGIN');
+  
+      // Step 1: Create room
+      const roomResult = await client.query(
         'INSERT INTO Room (name, type, capacity, "isAC", active, vacancy) VALUES ($1, $2, $3, $4, TRUE, $3) RETURNING *;',
         [name, type, capacity, isAC]
-    );
-};
+      );
+  
+      const room = roomResult.rows[0];
+  
+      // Step 2: Create beds
+      for (let i = 1; i <= capacity; i++) {
+        const bedName = `${room.name}-Bed-${i}`;
+  
+        // Insert bed
+        const bedResult = await client.query(
+          'INSERT INTO Bed (name, "isOccupied") VALUES ($1, FALSE) RETURNING *;',
+          [bedName]
+        );
+  
+        const bed = bedResult.rows[0];
+  
+        // Associate bed with room
+        await client.query(
+          'INSERT INTO roomhasbed (bid, rid) VALUES ($1, $2);',
+          [bed._id, room._id]
+        );
+      }
+  
+      await client.query('COMMIT');
+      return room;
+    } catch (err) {
+      await client.query('ROLLBACK');
+      throw err;
+    }
+  };
+  
 
 const updateRoomQuery = async (id, name, type, capacity, isAC) => {
     return await client.query(
