@@ -14,7 +14,7 @@ const sendOTP = async (email, message, next) => {
     const otp = Math.floor(10000 + Math.random() * 90000).toString();
     const expirationTime = new Date(Date.now() + 2 * 60 * 60 * 1000);
     const sharedToken = `${otp}`;
-    console.log(otp);
+    console.log("otp: ", otp);
     try {
         await sendEmail(email, message, sharedToken);
         emailTokens[email] = { otp, expirationTime };
@@ -32,7 +32,8 @@ const emailVerification = tryCatch(async (req, res, next) => {
     if(role === "Doctor") user = await Doctor.findOne({ email : email });
     else if (role === "Nurse") user = await Nurse.findOne({email : email});
     else if(role === "FDO" || role === "DEO") user = await Hs.findOne({ email : email});
-    else return next(new ErrorHandler("Invalid credentials", 404));
+    
+    if(!user) return next(new ErrorHandler("Invalid credentials", 404));
 
 	sendOTP(email, "Email Verification", next);
 	res.status(200).json({
@@ -50,7 +51,8 @@ const confirmOTP = tryCatch(async (req, res, next) => {
 	if(role === "Doctor") user = await Doctor.findOne({ email : email });
     else if (role === "Nurse") user = await Nurse.findOne({ email : email});
     else if(role === "FDO" || role === "DEO") user = await Hs.findOne({ email : email});
-    else return next(new ErrorHandler("Invalid credentials", 404));
+
+    if(!user) return next(new ErrorHandler("Invalid credentials", 404));
 
 	const sharedOTP = emailTokens[email];
 
@@ -69,8 +71,6 @@ const login = tryCatch(async (req, res, next) => {
     if(!email || !password || !role) {
         return next(new ErrorHandler("Please fill all the fields", 404));
     }
-    userRole = role;
-    console.log("ueviwuqhrq");
     
     let user;
     if (role === "Doctor") {
@@ -80,14 +80,15 @@ const login = tryCatch(async (req, res, next) => {
         user = await Nurse.findOne({ email : email }).select("+password");
     }
     else if(role === "FDO" || role === "DEO") {
-        user = await Hs.findOne({ email : email, role: userRole }).select("+password");
+        user = await Hs.findOne({ email : email, role: role }).select("+password");
     }
-    else return next(new ErrorHandler("Invalid credentials", 404));
-    console.log("dnrvuqrq");
+
+    if(!user) return next(new ErrorHandler("Invalid credentials", 404));
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return next(new ErrorHandler("Invalid credentials", 401));
 
+    userRole = role;
     sendToken(res, user, 200, `Welcome back, ${user.name}`);
 });
 
@@ -107,7 +108,8 @@ const updateUserName = tryCatch(async (req, res) => {
     if (role === "Doctor") user = await Doctor.findById(req.user);
     else if (role === "Nurse") user = await Nurse.findById(req.user);
     else if(role === "FDO" || role === "DEO") user = await Hs.findById(req.user);
-    else return next(new ErrorHandler("Invalid credentials", 404));
+    
+    if(!user) return next(new ErrorHandler("Invalid credentials", 404));
 
     user.userName = newUserName;
     await user.save();
@@ -134,7 +136,8 @@ const setNewPassword = tryCatch(async (req, res, next) => {
     if(role === "Doctor") user = await Doctor.findOne({ email: email });
     else if(role === "Nurse") user = await Nurse.findOne({ email: email });
     else if(role === "FDO" || role === "DEO") user = await Hs.findOne({ email : email});
-    else return next(new ErrorHandler("Invalid credentials", 404));
+    
+    if(!user) return next(new ErrorHandler("Invalid credentials", 404));
 
     user.password = password;
     await user.save();
