@@ -67,6 +67,43 @@ const updatePatientQuery = async (id, fields) => {
   return result.rowCount > 0;
 };
 
+const createPatientQuery = async ({
+  name,
+  gender,
+  age,
+  phoneNumber,
+  gname,
+  gPhoneNo,
+  addr,
+  email,
+  userName
+}) => {
+  const query = `
+    INSERT INTO Patient (
+      name, gender, age, "phoneNumber", gname, "gPhoneNo",
+      addr, email, "userName", active
+    ) VALUES (
+      $1, $2, $3, $4, $5, $6,
+      $7, $8, $9, TRUE
+    )
+    RETURNING *;
+  `;
+  const values = [
+    name,
+    gender,
+    age,
+    phoneNumber,
+    gname,
+    gPhoneNo,
+    addr,
+    email,
+    userName
+  ];
+
+  return await client.query(query, values);
+};
+
+
 
 const deletePatientQuery = async (id) => {
   return await client.query(
@@ -79,6 +116,7 @@ export {
   getAllPatientQuery,
   getThisPatientQuery,
   getPatientByNumberQuery,
+  createPatientQuery,
   deletePatientQuery,
   getPatientByEmailQueryWithAppointments,
   getPatientByIdQueryWithAppointments,
