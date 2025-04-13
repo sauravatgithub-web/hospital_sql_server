@@ -4,6 +4,8 @@ import {
   getPatientByNumberQuery,
   createPatientQuery,
   updatePatientQuery,
+  getPatientByEmailWithAppointments,
+  getPatientByIdWithAppointments,
   deletePatientQuery
 } from '../queries/patientQuery.js';
 import { tryCatch } from '../middlewares/error.js';
@@ -25,19 +27,78 @@ const getThisPatient = tryCatch(async (req, res, next) => {
 const getPatientByNumber = tryCatch(async (req, res, next) => {
   const number = req.params.phoneNo;
   const result = await getPatientByNumberQuery(number);
-  if (result.rows.length === 0) return next(new ErrorHandler("No match found", 404));
-  return res.status(200).json({ success: true, patient: result.rows[0] });
+
+  if (result.rows.length === 0) {
+    return next(new ErrorHandler("No match found", 404));
+  }
+
+  // Group appointments under patient
+  const patient = {
+    ...result.rows[0],
+    appointments: result.rows
+      .filter(r => r.appointment_id)
+      .map(r => ({
+        _id: r.appointment_id,
+        time: r.atime,
+        dischargeTime: r.dischargetime,
+        status: r.status
+      }))
+  };
+
+  return res.status(200).json({ success: true, patient });
 });
 
-// const getPatientByNumber = tryCatch(async (req, res, next) => {
-//   const number = req.params.phoneNo;
-//   const patientData = await Patient.findOne({ phoneNumber: number }).populate({
-//     path: 'appointments',
-//     select: '_id time dischargeTime status'
-//   });
-//   if(!patientData) return next(new ErrorHandler("No match found", 404));
-//   return res.status(200).json({ success: true, patient: patientData });
-// })
+const createPatient = tryCatch(async (req, res, next) => {
+  const { name, addr, phoneNumber, email, gender, gname, gPhoneNo, age, role } = req.body;
+  if (!name || !phoneNumber || !gname || !gPhoneNo || !email)
+    return next(new ErrorHandler("Insufficient input", 404));
+
+  await createPatientQuery(name, addr, phoneNumber, email, gender, gname, gPhoneNo, age);
+
+  if (role === "FDO") {
+    const result = await getPatientByEmailWithAppointments(email);
+    const patient = {
+      ...result.rows[0],
+      appointments: result.rows
+        .filter(r => r.appointment_id)
+        .map(r => ({
+          _id: r.appointment_id,
+          time: r.atime,
+          dischargeTime: r.dischargetime,
+          status: r.status
+        }))
+    };
+    return res.status(200).json({ success: true, message: "Patient created", patient });
+  }
+
+  return res.status(200).json({ success: true, message: "Patient created" });
+});
+
+const updatePatient = tryCatch(async (req, res, next) => {
+  const { id, role, ...fields } = req.body;
+  const updated = await updatePatientQuery(id, fields);
+
+  if (!updated) return next(new ErrorHandler("Patient not found", 404));
+
+  if (role === "FDO") {
+    const result = await getPatientByIdWithAppointments(id);
+    const patient = {
+      ...result.rows[0],
+      appointments: result.rows
+        .filter(r => r.appointment_id)
+        .map(r => ({
+          _id: r.appointment_id,
+          time: r.atime,
+          dischargeTime: r.dischargetime,
+          status: r.status
+        }))
+    };
+    return res.status(200).json({ success: true, message: "Patient updated", patient });
+  }
+
+  return res.status(200).json({ success: true, message: 'Patient updated successfully' });
+});
+
 
 // const createPatient = tryCatch(async (req, res, next) => {
 //   const { name, addr, phoneNumber, email, gender, gname, gPhoneNo, age, role } = req.body;
@@ -66,7 +127,7 @@ const getPatientByNumber = tryCatch(async (req, res, next) => {
 //     req.body, 
 //     { new: true, runValidators: true }
 //   );
-// 
+
 //   if(!updatedPatient) return next(new ErrorHandler("Patient not found", 404));
 
 //   if(role === "FDO") {

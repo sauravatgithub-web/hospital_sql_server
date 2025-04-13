@@ -29,4 +29,30 @@ const deleteRoomQuery = async (id) => {
     );
 };
 
-export {getAllRoomQuery , getThisRoomQuery , createRoomQuery, updateRoomQuery, deleteRoomQuery}
+const getAllVacantDocRoomsQuery = async () => {
+    return await client.query(`
+      SELECT * FROM Room 
+      WHERE type = 'Consultation' 
+        AND vacancy = 1 
+        AND active = TRUE;
+    `);
+  };
+  
+  const getAllVacantRoomsByTypeQuery = async (typeArray) => {
+    const placeholders = typeArray.map((_, i) => `$${i + 1}`).join(", ");
+    return await client.query(`
+      SELECT * FROM Room
+      WHERE type IN (${placeholders})
+        AND vacancy > 0
+        AND active = TRUE;
+    `, typeArray);
+  };
+
+export {getAllRoomQuery , 
+        getThisRoomQuery , 
+        createRoomQuery, 
+        updateRoomQuery, 
+        deleteRoomQuery, 
+        getAllVacantDocRoomsQuery,
+        getAllVacantRoomsByTypeQuery
+    }

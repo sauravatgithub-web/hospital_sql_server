@@ -3,7 +3,9 @@ import {
   getThisRoomQuery,
   createRoomQuery,
   updateRoomQuery,
-  deleteRoomQuery
+  deleteRoomQuery,
+  getAllVacantDocRoomsQuery,
+  getAllVacantRoomsByTypeQuery
 } from '../queries/roomQuery.js';
 import { tryCatch } from '../middlewares/error.js';
 import { ErrorHandler } from '../utils/utility.js';
@@ -56,5 +58,31 @@ const deleteRoom = tryCatch(async (req, res, next) => {
   return res.status(200).json({ message: 'Room deleted successfully' });
 });
 
+const getAllVacantDocRooms = tryCatch(async (req, res) => {
+  const result = await getAllVacantDocRoomsQuery();
+  return res.status(200).json({ success: true, data: result.rows });
+});
 
-export { getAllRoom, getThisRoom, createRoom, updateRoom, deleteRoom }
+const getAllVacantRooms = tryCatch(async (req, res) => {
+  const { type } = req.query;
+
+  if (!type) {
+    return res.status(400).json({ success: false, message: "Room type is required" });
+  }
+
+  const typeArray = Array.isArray(type) ? type : [type];
+  const result = await getAllVacantRoomsByTypeQuery(typeArray);
+
+  return res.status(200).json({ success: true, data: result.rows });
+});
+
+
+export { 
+  getAllRoom, 
+  getThisRoom, 
+  createRoom, 
+  updateRoom, 
+  deleteRoom ,
+  getAllVacantDocRooms,
+  getAllVacantRooms
+}
