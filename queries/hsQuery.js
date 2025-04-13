@@ -14,16 +14,16 @@ const createHospitalStaffQuery = async (staff) => {
       department, designation, shift, role, password
     } = staff;
     
-    const userName  = ()=> {
+    const userName  = (()=> {
       const namePart = this.name.toLowerCase().split(' ');
       const emailPart = this.email.toLowerCase().split('@')[0];
       return `${namePart.join('_')}_${emailPart}`;
-    }
+    })();
   
     return await client.query(`
       INSERT INTO Hospital_Staff (
-        name, addr, phoneNumber, email, gender,
-        department, designation, shift, role, password, active, userName
+        name, addr, "phoneNumber", email, gender,
+        department, designation, shift, role, password, active, "userName"
       ) VALUES (
         $1, $2, $3, $4, $5,
         $6, $7, $8, $9, $10, TRUE, $11
@@ -42,7 +42,7 @@ const createHospitalStaffQuery = async (staff) => {
       UPDATE Hospital_Staff SET
         name = $1,
         addr = $2,
-        phoneNumber = $3,
+        "phoneNumber" = $3,
         email = $4,
         gender = $5,
         department = $6,
@@ -121,10 +121,10 @@ const getAllCurrentAppointmentsQuery = async () => {
       n."userName", n."phoneNumber", 
       a._id AS appointment_id, a."status", a."time", a."dischargeTime",
       r._id AS room_id, r.name AS room_name, r.bed AS room_bed,
-      p._id AS patient_id, p.name AS patient_name, p.age, p.phoneNumber, p.gname, p.gPhoneNo, p.addr, p.email, p.userName,
+      p._id AS patient_id, p.name AS patient_name, p.age, p."phoneNumber", p.gname, p."gPhoneNo", p.addr, p.email, p."userName",
       dis._id AS disease_id, dis.name AS disease_name, 
-      doc._id AS doctor_id, doc.name AS doctor_name, doc.phoneNumber AS doctor_phoneNumber,
-      hp._id AS hp_id, hp.name AS hp_name, hp.phoneNumber AS hp_phoneNumber,
+      doc._id AS doctor_id, doc.name AS doctor_name, doc."phoneNumber" AS doctor_phoneNumber,
+      hp._id AS hp_id, hp.name AS hp_name, hp."phoneNumber" AS hp_phoneNumber,
       t._id AS test_id, t.name AS test_name, t.equip AS test_equip
     FROM Nurse n
     LEFT JOIN Appointment a ON n._id = a.nurse
