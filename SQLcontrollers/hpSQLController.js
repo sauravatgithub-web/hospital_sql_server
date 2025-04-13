@@ -1,18 +1,27 @@
-import Hospital_Professional from '../models/hpModel.js';
-import Doctor from '../models/doctorModel.js';
+import {
+  getAllHospitalProfessionalsQuery,
+  getOneHospitalProfessionalQuery,
+  createHospitalProfessionalQuery,
+  insertDoctorHpRelationQuery,
+  deleteDoctorHpRelationQuery,
+  updateHospitalProfessionalQuery,
+  getUpdatedHospitalProfessionalQuery,
+  deleteHospitalProfessionalQuery
+} from '../queries/hospitalProfessional.query.js';
+
 import { tryCatch } from '../middlewares/error.js';
 import { ErrorHandler } from '../utils/utility.js';
 
 const getAllHospitalProfessional = tryCatch(async (req, res) => {
-  const allHp = await Hospital_Professional.find({ active: true });
-  return res.status(200).json({ success: true, data: allHp });
+  const result = await getAllHospitalProfessionalsQuery();
+  res.status(200).json({ success: true, data: result.rows });
 });
 
 const getThisHospitalProfessional = tryCatch(async (req, res, next) => {
-  const id = req.params.id;
-  const user = await Hospital_Professional.find({ _id: id, active: true });
-  if (!user) return next(new ErrorHandler("Incorrect user name", 404));
-  return res.status(200).json({ success: true, user: user });
+  const result = await getOneHospitalProfessionalQuery(req.params.id);
+  if (result.rows.length === 0)
+    return next(new ErrorHandler("Incorrect user name", 404));
+  res.status(200).json({ success: true, user: result.rows[0] });
 });
 
 const createHospitalProfessional = tryCatch(async (req, res, next) => {
@@ -20,70 +29,45 @@ const createHospitalProfessional = tryCatch(async (req, res, next) => {
   if (!name || !addr || !phoneNumber || !email || !uni || !degree || !gender)
     return next(new ErrorHandler("Insufficient input", 404));
 
-  const password = "password";
-  const reqData = { ...req.body, password: password };
-  const hp = await Hospital_Professional.create(reqData);
+  const { rows } = await createHospitalProfessionalQuery({ name, addr, phoneNumber, email, gender, uni, degree });
+  const hpId = rows[0].id;
 
-  await Promise.all(
-    Object.entries(supervisedBy).map(async ([doctorId, shouldAdd]) => {
-      if (shouldAdd === 1) {
-        const doctorData = await Doctor.findById({ _id: doctorId });
-        if (doctorData) {
-          doctorData.hps.push(hp._id);
-          await doctorData.save();
-        }
-      }
-    })
-  );
+  for (const did of supervisedBy) {
+    await insertDoctorHpRelationQuery(did, hpId);
+  }
 
-  return res.status(200).json({ success: true });
+  res.status(200).json({ success: true });
 });
-
 
 const updateHospitalProfessional = tryCatch(async (req, res, next) => {
-  const { id } = req.body;
-  const updatedFields = req.body;
-  delete updatedFields._id;
+  const { id, supervisedBy, ...fieldsToUpdate } = req.body;
 
-  const hp = await Hospital_Professional.findById(id);
-  await Promise.all(
-    updatedFields.supervisedBy.map(async (doctor) => {
-      const doctorData = await Doctor.findById({ _id: doctor });
-      if (doctorData) {
-        doctorData.hps.push(hp._id);
-        await doctorData.save();
-      }
-    })
-  );
+  // 1. Update the HP record
+  await updateHospitalProfessionalQuery(id, fieldsToUpdate);
 
-  const updatedHP = await Hospital_Professional.findByIdAndUpdate(id, updatedFields, { new: true });
-  if (!updatedHP) return next(new ErrorHandler("Hospital Professional not found", 404));
+  // 2. Clear existing doctor-hp relations for this HP
+  await client.query('DELETE FROM Supervises WHERE hid = $1;', [id]);
 
-  await Promise.all(
-    Object.entries(supervisedBy).map(async ([doctorId, shouldAdd]) => {
-      const doctorData = await Doctor.findById({ _id: doctorId });
-      if(shouldAdd === 1) {
-        if (!doctorData.hps.includes(hp._id)) {
-          doctorData.hps.push(hp._id);
-        }
-      }
-      else {
-        doctorData.hps = doctorData.hps.filter(id => id.toString() !== hp._id.toString());
-      }
-      await doctorData.save();
-    })
-  );
+  // 3. Add new doctor-hp pairs
+  for (const doctorId of supervisedBy) {
+    await insertDoctorHpRelationQuery(doctorId, id);
+  }
 
-  return res.status(200).json({ message: 'Hospital Professional updated successfully', hospitalProfessional: updatedHP });
+  // 4. Fetch updated HP with populated supervisor info
+  const result = await getUpdatedHospitalProfessionalQuery(id);
+  res.status(200).json({
+    message: 'Updated successfully',
+    hospitalProfessional: result.rows[0]
+  });
 });
+
 
 const deleteHospitalProfessional = tryCatch(async (req, res, next) => {
   const { id } = req.body;
-  const hp = await Hospital_Professional.findById(id);
-  if (!hp) return next(new ErrorHandler("Hospital Professional not found", 404));
-  hp.active = false;
-  await hp.save();
-  return res.status(200).json({ message: 'Hospital Professional deleted successfully' });
+  const result = await deleteHospitalProfessionalQuery(id);
+  if (result.rows.length === 0)
+    return next(new ErrorHandler("Hospital Professional not found", 404));
+  res.status(200).json({ message: "Deleted successfully" });
 });
 
 export {
