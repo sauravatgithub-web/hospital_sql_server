@@ -43,7 +43,7 @@ const createRoom = tryCatch(async (req, res, next) => {
   const { name, type, capacity, isAC } = req.body;
   if (!name || !type || !capacity || !isAC) return next(new ErrorHandler("Insufficient input", 400));
 
-  const newRoom = await Room.create(re.body);
+  const newRoom = await Room.create(req.body);
   return res.status(200).json({ success: true, message: "Room created", room: newRoom });
 });
 
