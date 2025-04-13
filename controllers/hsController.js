@@ -1,4 +1,4 @@
-import Hospital_Staff from '../models/hsModel.js';
+  import Hospital_Staff from '../models/hsModel.js';
 import { tryCatch } from '../middlewares/error.js';
 import { ErrorHandler } from '../utils/utility.js';
 import Appointment from '../models/appointmentModel.js';

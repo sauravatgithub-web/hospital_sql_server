@@ -16,7 +16,7 @@ const getThisPatient = tryCatch(async (req, res, next) => {
 
 const getPatientByNumber = tryCatch(async (req, res, next) => {
   const number = req.params.phoneNo;
-  const patientData = await Patient.findOne({ phoneNumber: number }).populate({
+  const patientData = await Patient.find({ phoneNumber: number }).populate({
     path: 'appointments',
     select: '_id time dischargeTime status'
   });

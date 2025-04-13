@@ -14,7 +14,6 @@ const patientSchema = new mongoose.Schema({
   phoneNumber: {
     type: String,
     required: [true, "Please provide a phone number"],
-    unique: true,
   },
   email:{
     type: String,
