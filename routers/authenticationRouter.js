@@ -1,4 +1,14 @@
 import express from 'express'
+// import {
+//     emailVerification,
+//     confirmOTP,
+//     login,
+//     getMyProfile,
+//     setNewPassword,
+//     logOut,
+//     updateUserName
+// } from '../controllers/authController.js'
+
 import {
     emailVerification,
     confirmOTP,
@@ -7,7 +17,7 @@ import {
     setNewPassword,
     logOut,
     updateUserName
-} from '../controllers/authController.js'
+} from '../SQLcontrollers/authSQLController.js';
 import { isAuthenticated } from '../middlewares/auth.js';
 import { emailValidator, otpValidator, validate } from '../lib/validator.js';
 

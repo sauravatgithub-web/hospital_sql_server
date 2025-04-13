@@ -4,6 +4,8 @@ import http from 'http';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
+// require('./db');
+import './db.js';
 
 import { connectDB } from './utils/features.js';
 import { errorMiddleware } from './middlewares/error.js';
@@ -28,10 +30,10 @@ const corsOptions = {
 
 dotenv.config({ path: './.env' })
 
-const mongoURI = process.env.MONGO_URI;
+// const mongoURI = process.env.MONGO_URI;
 const port = process.env.PORT || 4173;
 
-connectDB(mongoURI);
+// connectDB(mongoURI);
 
 const app = express();
 const server = http.createServer(app);

@@ -1,11 +1,19 @@
 import express from 'express'
+// import {
+//     getAllDrug, 
+//     getThisDrug, 
+//     createDrug,
+//     updateDrug,
+//     deleteDrug 
+// } from '../controllers/drugsController.js'
+
 import {
     getAllDrug, 
     getThisDrug, 
     createDrug,
     updateDrug,
     deleteDrug 
-} from '../controllers/drugsController.js'
+} from '../SQLcontrollers/drugsSQLController.js'
 
 const router = express.Router();
 router.get('/all', getAllDrug);

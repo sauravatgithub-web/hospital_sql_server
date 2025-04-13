@@ -1,4 +1,15 @@
 import express from 'express'
+// import {
+//     getAllHospitalStaff, 
+//     getThisHospitalStaff, 
+//     createHospitalStaff,
+//     updateHospitalStaff,
+//     deleteHospitalStaff,
+//     getCurrentAppointments, 
+//     getAllCurrentDoctors,
+//     getAllCurrentNurses
+// } from '../controllers/hsController.js'
+
 import {
     getAllHospitalStaff, 
     getThisHospitalStaff, 
@@ -8,7 +19,7 @@ import {
     getCurrentAppointments, 
     getAllCurrentDoctors,
     getAllCurrentNurses
-} from '../controllers/hsController.js'
+} from '../SQLcontrollers/hsSQLController.js'
 
 const router = express.Router();
 router.get('/all', getAllHospitalStaff);
