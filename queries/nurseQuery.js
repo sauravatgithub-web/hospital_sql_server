@@ -1,6 +1,7 @@
 import client from "../db.js";
+import bcrypt from "bcrypt";
 
-// 1. Get all active nurses with appointments
+// 1. Get all active nurse with appointments
 const getAllNursesQuery = async () => {
     const result = await client.query(`
       SELECT 
@@ -9,10 +10,10 @@ const getAllNursesQuery = async () => {
         t.id AS test_id, t.name AS test_name, t.room_id,
         r.id AS room_id, r.name AS room_name
   
-      FROM Nurses n
-      LEFT JOIN Appointments a ON a.nurse_id = n.id
-      LEFT JOIN Tests t ON t.nurse_id = n.id
-      LEFT JOIN Rooms r ON t.room_id = r.id
+      FROM nurse n
+      LEFT JOIN appointment a ON a.nurse_id = n.id
+      LEFT JOIN test t ON t.nurse_id = n.id
+      LEFT JOIN room r ON t.room_id = r.id
   
       WHERE n.active = TRUE
     `);
@@ -27,10 +28,10 @@ const getNurseByIdQuery = async (id) => {
         t.id AS test_id, t.name AS test_name, t.room_id,
         r.id AS room_id, r.name AS room_name
   
-      FROM Nurses n
-      LEFT JOIN Appointments a ON a.nurse_id = n.id
-      LEFT JOIN Tests t ON t.nurse_id = n.id
-      LEFT JOIN Rooms r ON t.room_id = r.id
+      FROM nurse n
+      LEFT JOIN appointment a ON a.nurse_id = n.id
+      LEFT JOIN test t ON t.nurse_id = n.id
+      LEFT JOIN room r ON t.room_id = r.id
   
       WHERE n.id = $1 AND n.active = TRUE
     `, [id]);
@@ -55,7 +56,7 @@ const createNurseQuery = async (nurse) => {
   const hashedPassword = await bcrypt.hash('password', 10);
 
   await client.query(`
-    INSERT INTO Nurses
+    INSERT INTO nurse
     (name, addr, "phoneNumber", email, gender, shift, qualification, password, "userName")
     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
   `, [name, addr, phoneNumber, email, gender, shift, qualification, hashedPassword, userName]);
@@ -67,7 +68,7 @@ const updateNurseQuery = async (id, updateFields) => {
     .map((key, i) => `${key} = $${i + 2}`).join(', ');
   const values = [id, ...Object.values(updateFields)];
   const result = await client.query(`
-    UPDATE Nurses SET ${setStr}
+    UPDATE nurse SET ${setStr}
     WHERE id = $1
     RETURNING *
   `, values);
@@ -77,7 +78,7 @@ const updateNurseQuery = async (id, updateFields) => {
 // 5. Soft delete a nurse
 const deleteNurseQuery = async (id) => {
   await client.query(`
-    UPDATE Nurses SET active = FALSE WHERE id = $1
+    UPDATE nurse SET active = FALSE WHERE id = $1
   `, [id]);
 };
 

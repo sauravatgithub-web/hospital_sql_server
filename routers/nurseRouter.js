@@ -1,11 +1,19 @@
 import express from 'express'
+// import {
+//     getAllNurse, 
+//     getThisNurse, 
+//     createNurse,
+//     updateNurse,
+//     deleteNurse 
+// } from '../controllers/nurseController.js'
+
 import {
     getAllNurse, 
     getThisNurse, 
     createNurse,
     updateNurse,
     deleteNurse 
-} from '../controllers/nurseController.js'
+} from '../SQLcontrollers/nurseSQLController.js'
 
 const router = express.Router();
 router.get('/all', getAllNurse);

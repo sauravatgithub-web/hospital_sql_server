@@ -4,7 +4,7 @@ import {
     createNurseQuery,
     updateNurseQuery,
     deleteNurseQuery
-  } from '../queries/nurseQueries.js';
+  } from '../queries/nurseQuery.js';
   
   import { tryCatch } from '../middlewares/error.js';
   import { ErrorHandler } from '../utils/utility.js';
