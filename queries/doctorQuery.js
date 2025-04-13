@@ -33,14 +33,16 @@ const getAllDoctorsQuery = async (req, res, next) => {
         r2._id AS test_room_id,
         r2.name AS test_room_name
       FROM doctor d
-      LEFT JOIN Room r ON d.room_id = r._id
-      LEFT JOIN Doctor_HPS dh ON d._id = dh.doctor_id
-      LEFT JOIN Hospital_Professional h ON dh.hps_id = h._id
-      LEFT JOIN Doctor_Appointments da ON d._id = da.doctor_id
-      LEFT JOIN Appointment a ON da.appointment_id = a._id
-      LEFT JOIN Doctor_Tests dt ON d._id = dt.doctor_id
-      LEFT JOIN Test t ON dt.test_id = t._id
-      LEFT JOIN Room r2 ON t.room_id = r2._id
+      LEFT JOIN sits_at sit ON sit.did = d._id
+      LEFT JOIN room r ON sit.rid = r._id
+      LEFT JOIN supervises dh ON d._id = dh.did
+      LEFT JOIN hospital_professional h ON dh.hid = h._id
+      LEFT JOIN treats tr ON d._id = tr.did
+      LEFT JOIN appointment a ON t.aid = a._id
+      LEFT JOIN doctortests dt ON d._id = dt.did
+      LEFT JOIN test t ON dt.tid = t._id
+      LEFT JOIN testroom troom ON troom.tid = t._id
+      LEFT JOIN room r2 ON troom.rid = r2._id
       WHERE d.active = TRUE;
     `);
 
@@ -115,49 +117,48 @@ const getDoctorByIdQuery = async (req, res, next) => {
   const id = req.params.id;
 
   const result = await client.query(
-    `
-      SELECT 
-        d._id AS doctor_id,
-        d.name AS doctor_name,
-        d.addr,
-        d.spec,
-        d.intime,
-        d.outtime,
-        d.phonenumber,
-        d.email,
-        d.username,
-        d.gender,
-        d.role,
-        d.qualification,
-        d.doj,
-        d.active,
-        -- Room information
-        r._id AS room_id,
-        r.name AS room_name,
-        -- Hospital Professionals (HPS)
-        h._id AS hps_id,
-        h.name AS hps_name,
-        -- Appointments
-        a._id AS appt_id,
-        a.time AS appt_time,
-        a.status AS appt_status,
-        -- Tests and associated room for test
-        t._id AS test_id,
-        t.name AS test_name,
-        r2._id AS test_room_id,
-        r2.name AS test_room_name
-      FROM doctor d
-      LEFT JOIN Room r ON d.room_id = r._id
-      LEFT JOIN Doctor_HPS dh ON d._id = dh.doctor_id
-      LEFT JOIN Hospital_Professional h ON dh.hps_id = h._id
-      LEFT JOIN Doctor_Appointments da ON d._id = da.doctor_id
-      LEFT JOIN Appointment a ON da.appointment_id = a._id
-      LEFT JOIN Doctor_Tests dt ON d._id = dt.doctor_id
-      LEFT JOIN Test t ON dt.test_id = t._id
-      LEFT JOIN Room r2 ON t.room_id = r2._id
-      WHERE d.active = TRUE AND d._id = $1;
-      `,
-    [id]
+    `SELECT 
+    d._id AS doctor_id,
+    d.name AS doctor_name,
+    d.addr,
+    d.spec,
+    d."inTime",
+    d."outTime",
+    d."phoneNumber",
+    d.email,
+    d.username,
+    d.gender,
+    d.role,
+    d.qualification,
+    d.doj,
+    d.active,
+    -- Room data (via sits_at)
+    r._id AS room_id,
+    r.name AS room_name,
+    -- Hospital Professionals (HPS)
+    h._id AS hps_id,
+    h.name AS hps_name,
+    -- Appointments
+    a._id AS appt_id,
+    a.time AS appt_time,
+    a.status AS appt_status,
+    -- Tests and associated Room for test
+    t._id AS test_id,
+    t.name AS test_name,
+    r2._id AS test_room_id,
+    r2.name AS test_room_name
+    FROM doctor d
+    LEFT JOIN sits_at sit ON sit.did = d._id
+    LEFT JOIN room r ON sit.rid = r._id
+    LEFT JOIN supervises dh ON d._id = dh.did
+    LEFT JOIN hospital_professional h ON dh.hid = h._id
+    LEFT JOIN treats tr ON d._id = tr.did
+    LEFT JOIN appointment a ON tr.aid = a._id
+    LEFT JOIN doctortests dt ON d._id = dt.did
+    LEFT JOIN test t ON dt.tid = t._id
+    LEFT JOIN testroom troom ON troom.tid = t._id
+    LEFT JOIN room r2 ON troom.rid = r2._id
+    WHERE d.active = TRUE AND d._id = $1;`, [id]
   );
 
   if (result.rows.length === 0) {
@@ -272,36 +273,33 @@ const deleteDoctorQuery = async (id) => {
 
 const getDocAppointment = async (id) => {
   return await client.query(
-    `
-        SELECT 
-          a._id AS appt_id,
-          a.time AS appt_time,
-          a.dischargetime AS discharge_time,
-          a.status AS appt_status,
-          -- Patient fields
-          p._id AS patient_id,
-          p.name AS patient_name,
-          p.gender AS patient_gender,
-          p.age AS patient_age,
-          p.phonenumber AS patient_phonenumber,
-          p.gname AS patient_gname,
-          p.gphoneno AS patient_gphoneno,
-          p.addr AS patient_addr,
-          p.email AS patient_email,
-          p.username AS patient_username,
-          -- Disease fields from the junction table
-          dis._id AS disease_id,
-          dis.name AS disease_name
-        FROM appointment a
-        LEFT JOIN Patient p ON a.patient_id = p._id
-        LEFT JOIN Appointment_Disease ad ON a._id = ad.appointment_id
-        LEFT JOIN Disease dis ON ad.disease_id = dis._id
-        WHERE a.doctor_id = $1
-          AND a.status IN ('Scheduled', 'Completed')
-        `,
-    [id]
-  );
-}
+    `SELECT 
+    a._id AS appt_id,
+    a.time AS appt_time,
+    a.dischargetime AS discharge_time,
+    a.status AS appt_status,
+    -- Patient fields
+    p._id AS patient_id,
+    p.name AS patient_name,
+    p.gender AS patient_gender,
+    p.age AS patient_age,
+    p.phonenumber AS patient_phonenumber,
+    p.gname AS patient_gname,
+    p.gphoneno AS patient_gphoneno,
+    p.addr AS patient_addr,
+    p.email AS patient_email,
+    p.username AS patient_username,
+    -- Disease fields from the junction table
+    dis._id AS disease_id,
+    dis.name AS disease_name
+  FROM appointment a
+  LEFT JOIN patient p ON a.patient_id = p._id
+  LEFT JOIN appointment_disease ad ON a._id = ad.appointment_id
+  LEFT JOIN disease dis ON ad.disease_id = dis._id
+  INNER JOIN treats t ON t.aid = a._id
+  WHERE t.did = $1
+    AND a.status IN ('Scheduled', 'Completed');`
+  ,[id]);}
 
 export {
   getAllDoctorsQuery,
