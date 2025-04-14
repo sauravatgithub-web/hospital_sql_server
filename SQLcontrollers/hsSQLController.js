@@ -1,17 +1,18 @@
 import {
-  getAllHospitalStaffQuery , 
-  getThisHospitalStaffQuery , 
-  createHospitalStaffQuery, 
-  updateHospitalStaffQuery, 
+  getAllHospitalStaffQuery,
+  getThisHospitalStaffQuery,
+  createHospitalStaffQuery,
+  updateHospitalStaffQuery,
   deleteHospitalStaffQuery,
   getAllCurrentDoctorsQuery,
   getAllCurrentNursesQuery,
   getAllCurrentAppointmentsQuery
-}from '../queries/hsQuery.js';
+} from '../queries/hsQuery.js';
 import { tryCatch } from '../middlewares/error.js';
 import { ErrorHandler } from '../utils/utility.js';
 import _ from 'lodash';
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcrypt';
+import client from "../db.js";
 
 const getAllHospitalStaff = tryCatch(async (req, res) => {
   const result = await getAllHospitalStaffQuery();
@@ -79,7 +80,7 @@ const deleteHospitalStaff = tryCatch(async (req, res, next) => {
 });
 
 
-const getAllCurrentDoctors = tryCatch(async (req, res) => {
+const getAllCurrentDoctors = tryCatch(async (req, res, next) => {
   const { rows } = await getAllCurrentDoctorsQuery();
 
   const grouped = _.groupBy(rows, 'doctor_id');
@@ -125,7 +126,7 @@ const getAllCurrentDoctors = tryCatch(async (req, res) => {
   return res.status(200).json({ success: true, data: formatted });
 });
 
-const getAllCurrentNurses = tryCatch(async (req, res) => {
+const getAllCurrentNurses = tryCatch(async (req, res, next) => {
   const now = new Date();
   const hour = now.getHours();
 
@@ -136,67 +137,66 @@ const getAllCurrentNurses = tryCatch(async (req, res) => {
   else if (hour >= 18 && hour < 24) currentShift = 'Evening';
   else currentShift = 'Night';
 
-  try {
-    // Get the query from the sqlQueries file and pass the shift value
-    const query = getAllCurrentNursesQuery(currentShift);
-    
-    // Execute the query using the pg client
-    const result = await client.query(query);
-    const { rows } = result;
+  // Get the query from the sqlQueries file and pass the shift value
+  // Execute the query using the pg client
+  const result = await getAllCurrentNursesQuery(currentShift);
+  const { rows } = result;
 
-    // Group by nurse_id
-    const grouped = _.groupBy(rows, 'nurse_id');
+  // Group by nurse_id
+  const grouped = _.groupBy(rows, 'nurse_id');
+  console.log(grouped);
 
-    // Format the data as needed
-    const formatted = Object.values(grouped).map(group => {
-      const nurse = group[0]; // The first row represents the nurse data
+  // Format the data as needed
+  const formatted = Object.values(grouped).map(group => {
+    const nurse = group[0]; // The first row represents the nurse data
 
-      return {
-        _id: nurse.nurse_id,
-        name: nurse.nurse_name,
-        addr: nurse.addr,
-        email: nurse.email,
-        gender: nurse.gender,
-        role: nurse.role,
-        shift: nurse.shift,
-        userName: nurse.userName,
-        phoneNumber: nurse.phoneNumber,
-        appointments: _.uniqBy(group.filter(r => r.appointment_id), 'appointment_id').map(a => ({
-          _id: a.appointment_id,
-          aTime: a.aTime,
-          dischargeTime: a.dischargeTime,
-          status: a.status
-        })),
-        tests: _.uniqBy(group.filter(r => r.test_id), 'test_id').map(t => ({
-          _id: t.test_id,
-          name: t.test_name,
-          equip: t.test_equip,
-          room: t.room_id ? {
-            _id: t.room_id,
-            name: t.room_name
-          } : null
-        }))
-      };
-    });
+    return {
+      _id: nurse.nurse_id,
+      name: nurse.nurse_name,
+      addr: nurse.addr,
+      email: nurse.email,
+      gender: nurse.gender,
+      role: nurse.role,
+      shift: nurse.shift,
+      userName: nurse.userName,
+      phoneNumber: nurse.phoneNumber,
+      appointments: _.uniqBy(group.filter(r => r.appointment_id), 'appointment_id').map(a => ({
+        _id: a.appointment_id,
+        aTime: a.aTime,
+        dischargeTime: a.dischargeTime,
+        status: a.status
+      })),
+      tests: _.uniqBy(group.filter(r => r.test_id), 'test_id').map(t => ({
+        _id: t.test_id,
+        name: t.test_name,
+        equip: t.test_equip,
+        room: t.room_id ? {
+          _id: t.room_id,
+          name: t.room_name
+        } : null
+      }))
+    };
+  });
+  console.log(formatted);
 
-    // Return the formatted response
-    return res.status(200).json({ success: true, data: formatted });
-  } catch (err) {
-    return next(err);
-  }
+  // Return the formatted response
+  return res.status(200).json({ success: true, data: formatted });
 });
 
 const getCurrentAppointments = tryCatch(async (req, res, next) => {
   // Fetch the data using the SQL query
-  const { rows } = await getAllCurrentAppointmentsQuery();
+  // console.log(0);
+  const result = await getAllCurrentAppointmentsQuery();
+  // console.log(1);
+  // console.log(result);
+  const rows = result.rows;
 
   // Grouping the result by nurse_id to organize the data
   const grouped = _.groupBy(rows, 'nurse_id');
-  
+
   // Formatting the result in the desired structure
   const formatted = Object.values(grouped).map(group => {
     const nurse = group[0]; // Nurse data will be the same across the group
-
     return {
       _id: nurse.nurse_id,
       name: nurse.nurse_name,
@@ -247,7 +247,7 @@ const getCurrentAppointments = tryCatch(async (req, res, next) => {
     };
   });
 
-  return res.status(200).json({ success: true, data: formatted });
+  return res.status(200).json({ success: true, appointments: formatted });
 });
 
 export {

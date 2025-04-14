@@ -11,12 +11,12 @@ import express from 'express'
 // } from '../controllers/hsController.js'
 
 import {
-    getAllHospitalStaff, 
-    getThisHospitalStaff, 
+    getAllHospitalStaff,
+    getThisHospitalStaff,
     createHospitalStaff,
     updateHospitalStaff,
     deleteHospitalStaff,
-    getCurrentAppointments, 
+    getCurrentAppointments,
     getAllCurrentDoctors,
     getAllCurrentNurses
 } from '../SQLcontrollers/hsSQLController.js'
