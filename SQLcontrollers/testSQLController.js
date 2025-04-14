@@ -94,14 +94,14 @@ const createTest = tryCatch(async (req, res, next) => {
   }
 
   const result = await createTestQuery(name, equip, room, doctor, nurse);
-  return res.status(200).json({ success: true, message: "Test created", test: result.rows[0] });
+  return res.status(200).json({ success: true, message: "Test created", test: result });
 });
 
 const updateTest = tryCatch(async (req, res, next) => {
   const { id, ...fields } = req.body;
   const result = await updateTestQuery(id, fields);
   if (result.rows.length === 0) return next(new ErrorHandler("Test not found", 404));
-  return res.status(200).json({ success: true, message: "Test updated", test: result.rows[0] });
+  return res.status(200).json({ success: true, message: "Test updated", test: result });
 });
 
 const deleteTest = tryCatch(async (req, res, next) => {
@@ -113,7 +113,6 @@ const deleteTest = tryCatch(async (req, res, next) => {
 
 export { 
   getAllTest, 
-  getThisTest, 
   createTest, 
   updateTest, 
   deleteTest 

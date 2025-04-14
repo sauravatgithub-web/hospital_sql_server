@@ -10,6 +10,7 @@ import {
 
 import { tryCatch } from '../middlewares/error.js';
 import { ErrorHandler } from '../utils/utility.js';
+import client from "../db.js"
 
 const getAllHospitalProfessional = tryCatch(async (req, res) => {
   const result = await getAllHospitalProfessionalsQuery();
@@ -29,7 +30,7 @@ const createHospitalProfessional = tryCatch(async (req, res, next) => {
     return next(new ErrorHandler("Insufficient input", 404));
 
   const { rows } = await createHospitalProfessionalQuery({ name, addr, phoneNumber, email, gender, uni, degree });
-  const hpId = rows[0].id;
+  const hpId = rows[0]._id;
 
   for (const did of supervisedBy) {
     await insertDoctorHpRelationQuery(did, hpId);
@@ -39,7 +40,8 @@ const createHospitalProfessional = tryCatch(async (req, res, next) => {
 });
 
 const updateHospitalProfessional = tryCatch(async (req, res, next) => {
-  const { id, supervisedBy, ...fieldsToUpdate } = req.body;
+  const { id, supervisedBy, name, addr, phoneNumber, email, gender, uni, degree } = req.body;
+  const fieldsToUpdate = { name, addr, "phoneNumber": phoneNumber, email, gender, uni, degree };
 
   // 1. Update the HP record
   await updateHospitalProfessionalQuery(id, fieldsToUpdate);

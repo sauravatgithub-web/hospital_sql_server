@@ -2,39 +2,39 @@ import client from "../db.js";
 
 // CREATE TEST
 const createTestQuery = async (name, equip, room_id, doctor_id, nurse_id) => {
-    try {
-      await client.query('BEGIN');
-  
-      // Step 1: Insert the test
-      const testResult = await client.query(`
+  try {
+    await client.query('BEGIN');
+
+    // Step 1: Insert the test
+    const testResult = await client.query(`
         INSERT INTO Test (name, equip, active)
         VALUES ($1, $2, TRUE)
         RETURNING *;
       `, [name, equip]);
-  
-      const test = testResult.rows[0];
-      const testId = test._id;
-  
-      // Step 2: Create relationships
-      await client.query(`INSERT INTO DoctorTest (did, tid) VALUES ($1, $2)`, [doctor_id, testId]);
-      await client.query(`INSERT INTO NurseTest (nid, tid) VALUES ($1, $2)`, [nurse_id, testId]);
-      await client.query(`INSERT INTO TestRoom (rid, tid) VALUES ($1, $2)`, [room_id, testId]);
-  
-      // Step 3: Decrement vacancy from Room
-      const roomUpdate = await client.query(`
+
+    const test = testResult.rows[0];
+    const testId = test._id;
+
+    // Step 2: Create relationships
+    await client.query(`INSERT INTO DoctorTest (did, tid) VALUES ($1, $2)`, [doctor_id, testId]);
+    await client.query(`INSERT INTO NurseTest (nid, tid) VALUES ($1, $2)`, [nurse_id, testId]);
+    await client.query(`INSERT INTO TestRoom (rid, tid) VALUES ($1, $2)`, [room_id, testId]);
+
+    // Step 3: Decrement vacancy from Room
+    const roomUpdate = await client.query(`
         UPDATE Room SET vacancy = vacancy - 1 WHERE _id = $1 AND vacancy > 0 RETURNING *;
       `, [room_id]);
-  
-      if (roomUpdate.rows.length === 0) throw new Error("Room is full or doesn't exist");
-  
-      await client.query('COMMIT');
-      return { test, room: roomUpdate.rows[0] };
-    } catch (err) {
-      await client.query('ROLLBACK');
-      throw err;
-    }
-  };
-  
+
+    if (roomUpdate.rows.length === 0) throw new Error("Room is full or doesn't exist");
+
+    await client.query('COMMIT');
+    return { test, room: roomUpdate.rows[0] };
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  }
+};
+
 
 // GET ALL TESTS
 const getAllTestQuery = async () => {
@@ -77,7 +77,7 @@ const getAllTestQuery = async () => {
 
 // GET TEST BY ID
 const getTestByIdQuery = async (id) => {
-    return await client.query(`
+  return await client.query(`
       SELECT 
         t._id AS test_id,
         t.name AS test_name,
@@ -98,8 +98,8 @@ const getTestByIdQuery = async (id) => {
       LEFT JOIN Nurse n ON nt.nid = n._id
       WHERE t._id = $1 AND t.active = TRUE;
     `, [id]);
-  };
-  
+};
+
 
 // UPDATE TEST
 const updateTestQuery = async (id, fields) => {
@@ -126,10 +126,10 @@ const decrementRoomVacancy = async (room_id) => {
 
 // APPEND TEST TO RELATED TABLES (if needed, create relationships here)
 export {
-    createTestQuery,
-    getAllTestQuery,
-    getTestByIdQuery,
-    updateTestQuery,
-    deleteTestQuery,
-    decrementRoomVacancy
+  createTestQuery,
+  getAllTestQuery,
+  getTestByIdQuery,
+  updateTestQuery,
+  deleteTestQuery,
+  decrementRoomVacancy
 }

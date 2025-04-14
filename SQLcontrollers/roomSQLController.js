@@ -27,8 +27,8 @@ const getThisRoom = tryCatch(async (req, res, next) => {
 
 
 const createRoom = tryCatch(async (req, res, next) => {
-  const { name, type, capacity, isAC  } = req.body;
-  if (!name || !type ||  !capacity || !isAC) {
+  const { name, type, capacity, isAC } = req.body;
+  if (!name || !type || !capacity || !isAC) {
     return next(new ErrorHandler("Insufficient input", 400));
   }
 
@@ -38,9 +38,9 @@ const createRoom = tryCatch(async (req, res, next) => {
 
 
 const updateRoom = tryCatch(async (req, res, next) => {
-  const { id,name, type, capacity, isAC  } = req.body;
+  const { id, name, type, capacity, isAC } = req.body;
   const result = await updateRoomQuery(id, name, type, capacity, isAC);
-  
+
   if (result.rows.length === 0) {
     return next(new ErrorHandler("Room not found", 404));
   }
@@ -77,12 +77,12 @@ const getAllVacantRooms = tryCatch(async (req, res) => {
 });
 
 
-export { 
-  getAllRoom, 
-  getThisRoom, 
-  createRoom, 
-  updateRoom, 
-  deleteRoom ,
+export {
+  getAllRoom,
+  getThisRoom,
+  createRoom,
+  updateRoom,
+  deleteRoom,
   getAllVacantDocRooms,
   getAllVacantRooms
 }
