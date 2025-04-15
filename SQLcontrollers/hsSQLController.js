@@ -192,8 +192,9 @@ const formatAppointments = (rows) => {
     if (!appointmentsMap.has(aid)) {
       appointmentsMap.set(aid, {
         _id: aid,
+        name: row.patient_name,
         time: row.time,
-        dischargeTime: row.dischargetime,
+        dischargeTime: row.dischargeTime,
         status: row.status,
         active: row.active,
 
@@ -320,8 +321,8 @@ const getCurrentAppointments = tryCatch(async (req, res, next) => {
     return next(new ErrorHandler('Incorrect appointment id', 404));
   }
 
-  const appointment = formatAppointments(rows);
-  return res.status(200).json({ success: true, appointment });
+  const appointments = formatAppointments(rows);
+  return res.status(200).json({ success: true, appointments });
 });
 
 export {
