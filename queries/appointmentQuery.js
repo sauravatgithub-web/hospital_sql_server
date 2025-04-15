@@ -276,14 +276,12 @@ const deleteAppointmentQuery = async (id) => {
 };
 
 // SQL Query to get current appointments (InProgress)
-const getCurrentAppointmentsQuery = async (entity, id) => {
+const getCurrentAppointmentsQuery = async (entity, _id) => {
     let whereClause = '';
-    if (entity === 'doctor') {
-        whereClause = `trt.did = $1`; 
-    } else if (entity === 'nurse') {
-        whereClause = `la.nid = $1`; 
-    } else {
-        throw new Error('Invalid entity. Must be "doctor" or "nurse"');
+    if (entity === "doctor") {
+        whereClause = `trt.did`; 
+    } else if (entity === "nurse") {
+        whereClause = `la.nid`; 
     }
 
     const result = await client.query(`
@@ -399,8 +397,8 @@ const getCurrentAppointmentsQuery = async (entity, id) => {
         LEFT JOIN study s ON s.aid = a._id
         LEFT JOIN hospital_professional hp ON s.hid = hp._id
 
-        WHERE ${whereClause} AND a.active = TRUE;
-    `, [id]);
+        WHERE ${whereClause} = $1 AND a.active = TRUE;
+    `, [_id]);
 
     return result.rows;
 };
