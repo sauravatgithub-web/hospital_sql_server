@@ -165,44 +165,28 @@ const createAppointmentQuery = async (time, patient, doctor, user) => {
 
 // SQL Query to update an appointment
 const updateAppointmentQuery = async ({
-  id,
-  time,
-  dischargeTime,
-  status,
-  doctorId,
-  patientId,
+  id,time,
+  dischargeTime,status,
+  doctorId,patientId,
   nurseIds = [],
   testDetails = [],
   hpsIds = [],
   diseaseIds = [],
-  roomId,
-  bedId,
+  roomId,bedId,
   drugDetails = [],
   remarks = []
 }) => {
-//   const client = await pool.connect();
   try {
     await client.query('BEGIN');
 
-    // Update main appointment
-    await client.query(`
-        UPDATE appointments
-        SET time = $1, dischargeTime = $2, status = $3
-        WHERE _id = $4
-      `, [time, dischargeTime, status, id]);
-
-    // Update patient-appointment
-    // await client.query(`DELETE FROM ptakes WHERE aid = $1`, [id]);
-    // await client.query(`INSERT INTO ptakes(pid, aid) VALUES ($1, $2)`, [patientId, id]);
-
     // Update doctor-appointment
     await client.query(`DELETE FROM treats WHERE aid = $1`, [id]);
-    await client.query(`INSERT INTO treats(did, aid, remarktime, remarkmsg) VALUES ($1, $2, NOW(), $3)`, [doctorId, patientId, 'Updated']);
+    await client.query(`INSERT INTO treats(did, aid) VALUES ($1, $2)`, [doctorId, id]);
 
     // Update nurse-appointment
     await client.query(`DELETE FROM looks_after WHERE aid = $1`, [id]);
     for (const nid of nurseIds) {
-      await client.query(`INSERT INTO looks_after(nid, aid, remarktime, remarkmsg) VALUES ($1, $2, NOW(), $3)`, [nid, id, 'Updated']);
+      await client.query(`INSERT INTO looks_after(nid, aid) VALUES ($1, $2)`, [nid, id]);
     }
 
     // Update HPS
@@ -220,8 +204,7 @@ const updateAppointmentQuery = async ({
     // Update tests
     await client.query(`DELETE FROM apptakest WHERE aid = $1`, [id]);
     for (const { testId, remark } of testDetails) {
-      await client.query(`INSERT INTO apptakest(aid, tid) VALUES ($1, $2)`, [id, testId]);
-      await client.query(`UPDATE apptakest SET remarkmsg = $1 WHERE tid = $2`, [remark, testId]);
+      await client.query(`INSERT INTO apptakest(aid, tid, remarkmsg) VALUES ($1, $2, $3)`, [id, testId, remark]);
     }
 
     // Update bed
@@ -234,36 +217,28 @@ const updateAppointmentQuery = async ({
       await client.query(`INSERT INTO prescription(aid, dgid, dosage) VALUES ($1, $2, $3)`, [id, drugId, dosage]);
     }
 
-    // Optionally insert remarks into a separate `appointment_remarks` table
+    // insert remarks into a separate `appointment_remarks` table
     for (const { remarkUser, remarkUserRole, remarkMsg } of remarks) {
       if (remarkUserRole === "Nurse") {
         await client.query(`
-                INSERT INTO looks_after(nid, aid, remarkTime, remarkMsg)
+                INSERT INTO looks_after(nid, aid, remarktime, remarkmsg)
                 VALUES ($1, $2, NOW(), $3)
               `, [, id, remarkUser, remarkUserRole, remarkMsg]);
       }
-      await client.query(`
-          INSERT INTO appointment_remarks(aid, remarkTime, remarkUser, remarkUserRole, remarkMsg)
-          VALUES ($1, NOW(), $2, $3, $4)
-        `, [id, remarkUser, remarkUserRole, remarkMsg]);
+      else{
+          await client.query(`
+              INSERT INTO treats(aid,did, remarktime, remarkmsg)
+              VALUES ($1, $2, NOW(), $3)
+            `, [id, doctorId, remarkMsg]);
+      }
     }
-
-    // Update room for doctor (sitsat)
-    await client.query(`DELETE FROM sitsat WHERE did = $1`, [doctorId]);
-    await client.query(`INSERT INTO sitsat(did, rid) VALUES ($1, $2)`, [doctorId, roomId]);
-
-    // Update appointment's room
-    await client.query(`UPDATE appointments SET room = $1 WHERE _id = $2`, [roomId, id]);
-
 
     await client.query('COMMIT');
     return { success: true };
   } catch (err) {
     await client.query('ROLLBACK');
     throw err;
-  } finally {
-    client.release();
-  }
+  } 
 };
 
 // SQL Query to delete an appointment (mark as inactive)
