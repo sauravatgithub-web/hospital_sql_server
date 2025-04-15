@@ -180,7 +180,7 @@ const updateAppointmentQuery = async ({
   drugDetails = [],
   remarks = []
 }) => {
-  const client = await pool.connect();
+//   const client = await pool.connect();
   try {
     await client.query('BEGIN');
 
@@ -192,12 +192,12 @@ const updateAppointmentQuery = async ({
       `, [time, dischargeTime, status, id]);
 
     // Update patient-appointment
-    await client.query(`DELETE FROM ptakes WHERE aid = $1`, [id]);
-    await client.query(`INSERT INTO ptakes(pid, aid) VALUES ($1, $2)`, [patientId, id]);
+    // await client.query(`DELETE FROM ptakes WHERE aid = $1`, [id]);
+    // await client.query(`INSERT INTO ptakes(pid, aid) VALUES ($1, $2)`, [patientId, id]);
 
     // Update doctor-appointment
-    await client.query(`DELETE FROM treats WHERE pid = $1`, [patientId]);
-    await client.query(`INSERT INTO treats(did, pid, remarktime, remarkmsg) VALUES ($1, $2, NOW(), $3)`, [doctorId, patientId, 'Updated']);
+    await client.query(`DELETE FROM treats WHERE aid = $1`, [id]);
+    await client.query(`INSERT INTO treats(did, aid, remarktime, remarkmsg) VALUES ($1, $2, NOW(), $3)`, [doctorId, patientId, 'Updated']);
 
     // Update nurse-appointment
     await client.query(`DELETE FROM looks_after WHERE aid = $1`, [id]);
