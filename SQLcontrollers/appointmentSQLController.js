@@ -219,7 +219,8 @@ const getCurrentAppointments = tryCatch(async (req, res, next) => {
       return next(new ErrorHandler("No appointments found", 404));
    }
 
-   return res.status(200).json({ success: true, appointments: currentAppointments });
+   const appointments = formatAppointment(currentAppointments);
+   return res.status(200).json({ success: true, appointments });
 });
 
 const dischargeAppointment = tryCatch(async (req,res,next)=>{

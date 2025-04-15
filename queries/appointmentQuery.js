@@ -276,28 +276,135 @@ const deleteAppointmentQuery = async (id) => {
 };
 
 // SQL Query to get current appointments (InProgress)
-const getCurrentAppointmentsQuery = async (entity, _id) => {
-  const result = await client.query(`
-        SELECT a._id AS appointment_id, 
-               a.time, a.status, 
-               p._id AS patient_id, p.name AS patient_name, 
-               d._id AS doctor_id, d.name AS doctor_name, 
-               n._id AS nurse_id, n.name AS nurse_name, 
-               hps._id AS hps_id, hps.name AS hps_name, 
-               r._id AS room_id, r.name AS room_name, 
-               t._id AS test_id, t.name AS test_name 
-        FROM appointment a
-        LEFT JOIN patient p ON a.patient = p._id
-        LEFT JOIN doctor d ON a.doctor = d._id
-        LEFT JOIN nurse n ON a.nurse = n._id
-        LEFT JOIN hospital_professional hps ON a.hps = hps._id
-        LEFT JOIN test t ON a.tests = t._id
-        LEFT JOIN room r ON a.room = r._id
-        WHERE a.status = 'InProgress' AND a.${entity} = $1;
-    `, [_id]);
+const getCurrentAppointmentsQuery = async (entity, id) => {
+    let whereClause = '';
+    if (entity === 'doctor') {
+        whereClause = `trt.did = $1`; 
+    } else if (entity === 'nurse') {
+        whereClause = `la.nid = $1`; 
+    } else {
+        throw new Error('Invalid entity. Must be "doctor" or "nurse"');
+    }
 
-  return result.rows;
+    const result = await client.query(`
+        SELECT
+        a._id AS appointment_id,
+        a.time,
+        a."dischargeTime",
+        a.status,
+        a.active,
+
+        -- Patient Info
+        p._id AS patient_id,
+        p.name AS patient_name,
+        p.addr AS patient_address,
+        p.age AS patient_age,
+        p."phoneNumber" AS patient_phone,
+        p.email AS patient_email,
+        p."userName" AS patient_username,
+        p.gender AS patient_gender,
+        p.gname AS patient_guardian_name,
+        p."gPhoneNo" AS patient_guardian_phone,
+
+        -- Doctor Info
+        d._id AS doctor_id,
+        d.name AS doctor_name,
+        d.gender AS doctor_gender,
+        d."phoneNumber" AS doctor_phone,
+        d."inTime" AS doctor_in_time,
+        d."outTime" AS doctor_out_time,
+        d.spec AS doctor_specialization,
+        trt.remarktime AS doctor_remark_time,
+        trt.remarkmsg AS doctor_remark_msg,
+
+        -- Doctor's Room
+        r._id AS doctor_roomId,
+        r.name AS doctor_roomName,
+
+        -- Bed Info
+        b._id AS bed_id,
+        b.name AS bed_name,
+        b."isOccupied" AS bed_occupied,
+        
+        -- Patient's Room
+        r2._id AS patient_roomId,
+        r2.name AS patient_roomName,
+
+        -- Drug Info
+        dr._id AS drug_id,
+        dr.name AS drug_name,
+        pr.dosage AS drug_dosage,
+
+        -- Disease Info
+        dis._id AS disease_id,
+        dis.name AS disease_name,
+
+        -- Test Info
+        t._id AS test_id,
+        t.name AS test_name,
+        tr._id AS test_room_id,
+        tr.name AS test_room_name,
+        dt._id AS test_doctor_id,
+        dt.name AS test_doctor_name,
+        at.remarkmsg AS test_remark,
+
+        -- Nurse Info
+        n._id AS nurse_id,
+        n.name AS nurse_name,
+        n."phoneNumber" AS nurse_phone,
+        n.shift AS nurse_shift,
+        n.gender AS nurse_gender,
+        la.remarktime AS nurse_remark_time,
+        la.remarkmsg AS nurse_remark_msg,
+
+        -- Hospital Professional Info
+        hp._id AS hps_id,
+        hp.name AS hps_name,
+        hp."phoneNumber" AS hps_phone,
+        hp.gender AS hps_gender
+
+        FROM appointment a
+
+        LEFT JOIN ptakes pt ON pt.aid = a._id
+        LEFT JOIN patient p ON pt.pid = p._id
+
+        LEFT JOIN treats trt ON trt.aid = a._id
+        LEFT JOIN doctor d ON trt.did = d._id
+
+        LEFT JOIN sits_at sa ON sa.did = d._id
+        LEFT JOIN room r ON sa.rid = r._id
+
+        LEFT JOIN stays_at sa2 ON sa2.aid = a._id
+        LEFT JOIN bed b ON sa2.bid = b._id
+
+        LEFT JOIN roomhasbed rhb ON rhb.bid = b._id
+        LEFT JOIN room r2 on r2._id = rhb.rid
+
+        LEFT JOIN prescription pr ON pr.aid = a._id
+        LEFT JOIN drugs dr ON pr.dgid = dr._id
+
+        LEFT JOIN apphasdis ad ON ad.aid = a._id
+        LEFT JOIN disease dis ON ad.disid = dis._id
+
+        LEFT JOIN apptakest at ON at.aid = a._id
+        LEFT JOIN test t ON at.tid = t._id
+        LEFT JOIN testroom trm ON trm.tid = t._id
+        LEFT JOIN room tr ON trm.rid = tr._id
+        LEFT JOIN doctortest dtj ON dtj.tid = t._id
+        LEFT JOIN doctor dt ON dtj.did = dt._id
+
+        LEFT JOIN looks_after la ON la.aid = a._id
+        LEFT JOIN nurse n ON la.nid = n._id
+
+        LEFT JOIN study s ON s.aid = a._id
+        LEFT JOIN hospital_professional hp ON s.hid = hp._id
+
+        WHERE ${whereClause} AND a.active = TRUE;
+    `, [id]);
+
+    return result.rows;
 };
+      
 
 const dischargeAppointmentQuery = async (id, dischargeTime) => {
   return await client.query(`
