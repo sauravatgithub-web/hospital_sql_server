@@ -4,6 +4,12 @@ import { tryCatch } from "../middlewares/error.js";
 import { ErrorHandler, sendEmail } from "../utils/utility.js";
 import client from "../db.js";
 
+import {
+    doctorQuery,
+    nurseQuery,
+    hospitalStaffQuery
+} from '../queries/authQuery.js';
+
 const emailTokens = {};
 let userRole;
 
@@ -22,17 +28,23 @@ const sendOTP = async (email, message, next) => {
 };
 
 const getUserByEmail = async (email, role) => {
-    let table;
-    if (role === "Doctor") table = "Doctor";
-    else if (role === "Nurse") table = "Nurse";
-    else if (role === "FDO" || role === "DEO") table = "Hospital_Staff";
-    else return null;
+    // let table;
+    // if (role === "Doctor") table = "Doctor";
+    // else if (role === "Nurse") table = "Nurse";
+    // else if (role === "FDO" || role === "DEO") table = "Hospital_Staff";
+    // else return null;
 
-    const { rows } = await client.query(
-        `SELECT * FROM ${table} WHERE email = $1 AND active = TRUE`,
-        [email]
-    );
-    return rows[0];
+    if (role === "Doctor") return doctorQuery('email',email);
+    else if (role === "Nurse") return nurseQuery('email',email);
+    else if (role === "FDO" || role === "DEO") return hospitalStaffQuery('email',email);
+    else return null;
+    
+
+    // const { rows } = await client.query(
+    //     `SELECT * FROM ${table} WHERE email = $1 AND active = TRUE`,
+    //     [email]
+    // );
+    // return rows[0];
 };
 
 const emailVerification = tryCatch(async (req, res, next) => {
@@ -113,17 +125,23 @@ const updateUserName = tryCatch(async (req, res) => {
 });
 
 const getUserById = async (id, role) => {
-    let table;
-    if (role === "Doctor") table = "Doctor";
-    else if (role === "Nurse") table = "Nurse";
-    else if (role === "FDO" || role === "DEO") table = "Hospital_Staff";
-    else return null;
 
-    const { rows } = await client.query(
-        `SELECT * FROM ${table} WHERE _id = $1 AND active = TRUE`,
-        [id]
-    );
-    return rows[0];
+    if (role === "Doctor") return doctorQuery('_id',id);
+    else if (role === "Nurse") return nurseQuery('_id',id);
+    else if (role === "FDO" || role === "DEO") return hospitalStaffQuery('_id',id);
+    else return null;
+    
+    // let table;
+    // if (role === "Doctor") table = "Doctor";
+    // else if (role === "Nurse") table = "Nurse";
+    // else if (role === "FDO" || role === "DEO") table = "Hospital_Staff";
+    // else return null;
+
+    // const { rows } = await client.query(
+    //     `SELECT * FROM ${table} WHERE _id = $1 AND active = TRUE`,
+    //     [id]
+    // );
+    // return rows[0];
 };
 
 const getMyProfile = tryCatch(async (req, res) => {
