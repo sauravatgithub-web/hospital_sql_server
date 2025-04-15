@@ -54,13 +54,13 @@ const formatAppointments = (rows) => {
           outTime: row.doctor_out_time,
           spec: row.doctor_specialization,
           room: {
-            _id: row.doctor_roomId,
+            _id: row.doctor_room,
             name: row.doctor_roomName,
           },
         },
 
         room: {
-          _id: row.patient_roomId,
+          _id: row.patient_room,
           name: row.patient_roomName,
         },
 
@@ -117,7 +117,7 @@ const formatAppointments = (rows) => {
       });
     }
 
-    if (row.nurse_id && row.nurse_remark_time && row.nurse_remark_msg) {
+    if (row.nurse_id && row.nurse_remark_time && row.nurse_remark_msg && !appointment.remarks.find((val) => val.remarkTime === row.nurse_remark_time)) {
       appointment.remarks.push({
         remarkTime: row.nurse_remark_time,
         remarkUser: row.nurse_name,
@@ -126,7 +126,7 @@ const formatAppointments = (rows) => {
       });
     }
 
-    if (row.doctor_id && row.doctor_remark_time && row.doctor_remark_msg) {
+    if (row.doctor_id && row.doctor_remark_time && row.doctor_remark_msg && !appointment.remarks.find((val) => val.remarkTime === row.doctor_remark_time)) {
       appointment.remarks.push({
         remarkTime: row.doctor_remark_time,
         remarkUser: row.doctor_name,
@@ -176,34 +176,36 @@ const createAppointment = tryCatch(async (req, res, next) => {
 
 // Controller for updating an appointment
 const updateAppointment = tryCatch(async (req, res, next) => {
-  const {
-    id, time,
-    dischargeTime, status,
-    doctorId, patientId,
-    nurseIds, testDetails,
-    hpsIds, diseaseIds,
-    roomId, bedId,
-    drugDetails, remarks
-  } = req.body;
+  const { tests, drugs } = req.body;
 
-  if (!id || !doctorId || !patientId) {
+  const id = req.body.id;
+  const doctor = req.body?.doctor;
+  const nurse = req.body?.nurse?.map(n => n._id);
+  const hps = req.body?.hps?.map(h => h._id);
+  const disease = req.body?.disease?.map(d => d._id);
+  const room = req.body?.room?._id;
+  const bed = req.body?.bed?._id;
+  const allRemarks = req.body?.remarks
+  const remarks = allRemarks[allRemarks.length - 1];
+  console.log(remarks);
+
+  if (!id) {
     return next(new ErrorHandler("Insufficient input for update", 400));
   }
 
   await updateAppointmentQuery({
-    id, time,
-    dischargeTime, status,
-    doctorId, patientId,
-    nurseIds, testDetails,
-    hpsIds, diseaseIds,
-    roomId, bedId,
-    drugDetails, remarks
+    id,
+    doctor,
+    nurse, tests,
+    hps, disease,
+    room, bed,
+    drugs, remarks
   });
 
   const rows = await getAppointmentByIdQuery(id);
-  const appointment = formatAppointment(rows);
+  const appointment = formatAppointments(rows);
 
-  return res.status(200).json({ success: true, appointment });
+  return res.status(200).json({ success: true, appointment: appointment[0] });
 });
 
 // Controller for deleting an appointment (mark as inactive)

@@ -164,82 +164,181 @@ const createAppointmentQuery = async (time, patient, doctor, user) => {
 };
 
 // SQL Query to update an appointment
+// const updateAppointmentQuery = async ({
+//   id,time,
+//   dischargeTime,status,
+//   doctorId,patientId,
+//   nurseIds = [],
+//   test = [],
+//   hps = [],
+//   disease = [],
+//   roomId,bedId,
+//   drugDetails = [],
+//   remarks = []
+// }) => {
+//   try {
+//     await client.query('BEGIN');
+
+//     // Update doctor-appointment
+//     await client.query(`DELETE FROM treats WHERE aid = $1`, [id]);
+//     await client.query(`INSERT INTO treats(did, aid) VALUES ($1, $2)`, [doctorId, id]);
+
+//     // Update nurse-appointment
+//     await client.query(`DELETE FROM looks_after WHERE aid = $1`, [id]);
+//     for (const nid of nurseIds) {
+//       await client.query(`INSERT INTO looks_after(nid, aid) VALUES ($1, $2)`, [nid, id]);
+//     }
+
+//     // Update HPS
+//     await client.query(`DELETE FROM study WHERE aid = $1`, [id]);
+//     for (const hid of hps) {
+//       await client.query(`INSERT INTO study(aid, hid) VALUES ($1, $2)`, [id, hid]);
+//     }
+
+//     // Update diseases
+//     await client.query(`DELETE FROM apphasdis WHERE aid = $1`, [id]);
+//     for (const disid of disease) {
+//       await client.query(`INSERT INTO apphasdis(aid, disid) VALUES ($1, $2)`, [id, disid]);
+//     }
+
+//     // Update tests
+//     await client.query(`DELETE FROM apptakest WHERE aid = $1`, [id]);
+//     for (const { testId, remark } of test) {
+//       await client.query(`INSERT INTO apptakest(aid, tid, remarkmsg) VALUES ($1, $2, $3)`, [id, testId, remark]);
+//     }
+
+//     // Update bed
+//     await client.query(`DELETE FROM stays_at WHERE aid = $1`, [id]);
+//     await client.query(`INSERT INTO stays_at(aid, bid) VALUES ($1, $2)`, [id, bedId]);
+
+//     // Update drugs
+//     await client.query(`DELETE FROM prescription WHERE aid = $1`, [id]);
+//     for (const { drugId, dosage } of drugDetails) {
+//       await client.query(`INSERT INTO prescription(aid, dgid, dosage) VALUES ($1, $2, $3)`, [id, drugId, dosage]);
+//     }
+
+//     // insert remarks into a separate `appointment_remarks` table
+//     for (const { remarkUser, remarkUserRole, remarkMsg } of remarks) {
+//       if (remarkUserRole === "Nurse") {
+//         await client.query(`
+//                 INSERT INTO looks_after(nid, aid, remarktime, remarkmsg)
+//                 VALUES ($1, $2, NOW(), $3)
+//               `, [, id, remarkUser, remarkUserRole, remarkMsg]);
+//       }
+//       else{
+//           await client.query(`
+//               INSERT INTO treats(aid,did, remarktime, remarkmsg)
+//               VALUES ($1, $2, NOW(), $3)
+//             `, [id, doctorId, remarkMsg]);
+//       }
+//     }
+
+//     await client.query('COMMIT');
+//     return { success: true };
+//   } catch (err) {
+//     await client.query('ROLLBACK');
+//     throw err;
+//   } 
+// };
+
 const updateAppointmentQuery = async ({
-  id,time,
-  dischargeTime,status,
-  doctorId,patientId,
-  nurseIds = [],
-  testDetails = [],
-  hpsIds = [],
-  diseaseIds = [],
-  roomId,bedId,
-  drugDetails = [],
-  remarks = []
+  id,
+  doctor,
+  nurse = [],
+  tests = [],
+  hps = [],
+  disease = [],
+  room, bed,
+  drugs = [],
+  remarks
 }) => {
   try {
     await client.query('BEGIN');
 
-    // Update doctor-appointment
-    await client.query(`DELETE FROM treats WHERE aid = $1`, [id]);
-    await client.query(`INSERT INTO treats(did, aid) VALUES ($1, $2)`, [doctorId, id]);
-
-    // Update nurse-appointment
-    await client.query(`DELETE FROM looks_after WHERE aid = $1`, [id]);
-    for (const nid of nurseIds) {
-      await client.query(`INSERT INTO looks_after(nid, aid) VALUES ($1, $2)`, [nid, id]);
+    // Doctor
+    if (doctor) {
+      await client.query(`DELETE FROM treats WHERE aid = $1`, [id]);
+      await client.query(`INSERT INTO treats(did, aid) VALUES ($1, $2)`, [doctor, id]);
     }
 
-    // Update HPS
-    await client.query(`DELETE FROM study WHERE aid = $1`, [id]);
-    for (const hid of hpsIds) {
-      await client.query(`INSERT INTO study(aid, hid) VALUES ($1, $2)`, [id, hid]);
+    // Nurse
+    if (Array.isArray(nurse) && nurse.length > 0) {
+      await client.query(`DELETE FROM looks_after WHERE aid = $1`, [id]);
+      for (const nid of nurse) {
+        await client.query(`INSERT INTO looks_after(nid, aid) VALUES ($1, $2)`, [nid, id]);
+      }
     }
 
-    // Update diseases
-    await client.query(`DELETE FROM apphasdis WHERE aid = $1`, [id]);
-    for (const disid of diseaseIds) {
-      await client.query(`INSERT INTO apphasdis(aid, disid) VALUES ($1, $2)`, [id, disid]);
+    // HPS
+    if (Array.isArray(hps) && hps.length > 0) {
+      await client.query(`DELETE FROM study WHERE aid = $1`, [id]);
+      for (const hid of hps) {
+        await client.query(`INSERT INTO study(aid, hid) VALUES ($1, $2)`, [id, hid]);
+      }
     }
 
-    // Update tests
-    await client.query(`DELETE FROM apptakest WHERE aid = $1`, [id]);
-    for (const { testId, remark } of testDetails) {
-      await client.query(`INSERT INTO apptakest(aid, tid, remarkmsg) VALUES ($1, $2, $3)`, [id, testId, remark]);
+    // Diseases
+    if (Array.isArray(disease) && disease.length > 0) {
+      await client.query(`DELETE FROM apphasdis WHERE aid = $1`, [id]);
+      for (const disid of disease) {
+        await client.query(`INSERT INTO apphasdis(aid, disid) VALUES ($1, $2)`, [id, disid]);
+      }
     }
 
-    // Update bed
-    await client.query(`DELETE FROM stays_at WHERE aid = $1`, [id]);
-    await client.query(`INSERT INTO stays_at(aid, bid) VALUES ($1, $2)`, [id, bedId]);
-
-    // Update drugs
-    await client.query(`DELETE FROM prescription WHERE aid = $1`, [id]);
-    for (const { drugId, dosage } of drugDetails) {
-      await client.query(`INSERT INTO prescription(aid, dgid, dosage) VALUES ($1, $2, $3)`, [id, drugId, dosage]);
+    // Tests
+    if (Array.isArray(tests) && tests.length > 0) {
+      await client.query(`DELETE FROM apptakest WHERE aid = $1`, [id]);
+      for (const { test, remark } of tests) {
+        await client.query(
+          `INSERT INTO apptakest(aid, tid, remarkmsg) VALUES ($1, $2, $3)`,
+          [id, test._id, remark]
+        );
+      }
     }
 
-    // insert remarks into a separate `appointment_remarks` table
-    for (const { remarkUser, remarkUserRole, remarkMsg } of remarks) {
+    // Bed
+    if (bed) {
+      await client.query(`DELETE FROM stays_at WHERE aid = $1`, [id]);
+      await client.query(`INSERT INTO stays_at(aid, bid) VALUES ($1, $2)`, [id, bed]);
+    }
+
+    // Drugs
+    if (Array.isArray(drugs) && drugs.length > 0) {
+      await client.query(`DELETE FROM prescription WHERE aid = $1`, [id]);
+      for (const { drug, dosage } of drugs) {
+        await client.query(
+          `INSERT INTO prescription(aid, dgid, dosage) VALUES ($1, $2, $3)`,
+          [id, drug, dosage]
+        );
+      }
+    }
+
+    // Remarks
+    if (remarks) {
+      const { remarkUserId, remarkUserRole, remarkMsg } = remarks;
+
       if (remarkUserRole === "Nurse") {
-        await client.query(`
-                INSERT INTO looks_after(nid, aid, remarktime, remarkmsg)
-                VALUES ($1, $2, NOW(), $3)
-              `, [, id, remarkUser, remarkUserRole, remarkMsg]);
-      }
-      else{
-          await client.query(`
-              INSERT INTO treats(aid,did, remarktime, remarkmsg)
-              VALUES ($1, $2, NOW(), $3)
-            `, [id, doctorId, remarkMsg]);
+        await client.query(
+          `INSERT INTO looks_after(nid, aid, remarktime, remarkmsg) VALUES ($1, $2, NOW(), $3)`,
+          [remarkUserId, id, remarkMsg]
+        );
+      } else {
+        await client.query(
+          `INSERT INTO treats(aid, did, remarktime, remarkmsg) VALUES ($1, $2, NOW(), $3)`,
+          [id, remarkUserId, remarkMsg]
+        );
       }
     }
+
 
     await client.query('COMMIT');
-    return { success: true };
+    // return { success: true };
   } catch (err) {
     await client.query('ROLLBACK');
     throw err;
-  } 
+  }
 };
+
 
 // SQL Query to delete an appointment (mark as inactive)
 const deleteAppointmentQuery = async (id) => {
