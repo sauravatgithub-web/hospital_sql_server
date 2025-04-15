@@ -299,7 +299,7 @@ const getDocAppointment = async (id) => {
     , [id]);
 }
 
-const getAppointmentsQuery = async (id) => {
+const getAppointmentsQuery = async (_id) => {
   const result = await client.query(`
       SELECT
       a._id AS appointment_id,
@@ -414,7 +414,7 @@ const getAppointmentsQuery = async (id) => {
       LEFT JOIN hospital_professional hp ON s.hid = hp._id
 
       WHERE trt.did = $1 AND a.active = TRUE AND a.status in ('Scheduled', 'Completed');
-  `, [id]);
+  `, [_id]);
 
   return result.rows;
 };

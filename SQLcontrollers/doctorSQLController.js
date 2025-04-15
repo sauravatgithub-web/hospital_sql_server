@@ -53,139 +53,147 @@ const deleteDoctor = tryCatch(async (req, res, next) => {
   return res.status(200).json({ message: 'Doctor deleted successfully' });
 });
 
-const formatAppointment = (rows) => {
-  const row = rows[0];
+const formatAppointments = (rows) => {
+  const appointmentsMap = new Map();
 
-  const appointment = {
-    _id: row.appointment_id,
-    time: row.time,
-    dischargeTime: row.dischargetime,
-    status: row.status,
-    active: row.active,
+  for (const row of rows) {
+    const aid = row.appointment_id;
 
-    patient: {
-      _id: row.patient_id,
-      name: row.patient_name,
-      addr: row.patient_address,
-      age: row.patient_age,
-      phoneNumber: row.patient_phone,
-      email: row.patient_email,
-      userName: row.patient_username,
-      gender: row.patient_gender,
-      gname: row.patient_guardian_name,
-      gPhoneNo: row.patient_guardian_phone,
-    },
+    if (!appointmentsMap.has(aid)) {
+      appointmentsMap.set(aid, {
+        _id: aid,
+        name: row.patient_name,
+        age: row.patient_age,
+        time: row.time,
+        dischargeTime: row.dischargeTime,
+        status: row.status,
+        active: row.active,
 
-    doctor: {
-      _id: row.doctor_id,
-      name: row.doctor_name,
-      gender: row.doctor_gender,
-      phoneNumber: row.doctor_phone,
-      inTime: row.doctor_in_time,
-      outTime: row.doctor_out_time,
-      spec: row.doctor_specialization,
-      room: {
-      _id: row.doctor_roomId,
-      name: row.doctor_roomName,
-    },
-    },
+        patient: {
+          _id: row.patient_id,
+          name: row.patient_name,
+          addr: row.patient_address,
+          age: row.patient_age,
+          phoneNumber: row.patient_phone,
+          email: row.patient_email,
+          userName: row.patient_username,
+          gender: row.patient_gender,
+          gname: row.patient_guardian_name,
+          gPhoneNo: row.patient_guardian_phone,
+        },
 
-    room: {
-      _id: row.patient_roomId,
-      name: row.patient_roomName,
-    },
+        doctor: {
+          _id: row.doctor_id,
+          name: row.doctor_name,
+          gender: row.doctor_gender,
+          phoneNumber: row.doctor_phone,
+          inTime: row.doctor_in_time,
+          outTime: row.doctor_out_time,
+          spec: row.doctor_specialization,
+          room: {
+            _id: row.doctor_roomId,
+            name: row.doctor_roomName,
+          },
+        },
 
-    bed: {
-      _id: row.bed_id,
-      name: row.bed_name,
-      isOccupied: row.bed_occupied,
-    },
+        room: {
+          _id: row.patient_roomId,
+          name: row.patient_roomName,
+        },
 
-    drugs: [],
-    disease: [],
-    tests: [],
-    nurse: [],
-    remarks: [],
-    hps: [],
-  };
+        bed: {
+          _id: row.bed_id,
+          name: row.bed_name,
+          isOccupied: row.bed_occupied,
+        },
 
-  for (const r of rows) {
-    if (r.drug_id && !appointment.drugs.find(d => d.drug && d.drug._id === r.drug_id)) {
+        drugs: [],
+        disease: [],
+        tests: [],
+        nurse: [],
+        remarks: [],
+        hps: [],
+      });
+    }
+
+    const appointment = appointmentsMap.get(aid);
+
+    if (row.drug_id && !appointment.drugs.find(d => d.drug && d.drug._id === row.drug_id)) {
       appointment.drugs.push({
-        drug: { _id: r.drug_id, name: r.drug_name },
-        dosage: r.drug_dosage,
+        drug: { _id: row.drug_id, name: row.drug_name },
+        dosage: row.drug_dosage,
       });
     }
 
-    if (r.disease_id && !appointment.disease.find(d => d._id === r.disease_id)) {
+    if (row.disease_id && !appointment.disease.find(d => d._id === row.disease_id)) {
       appointment.disease.push({
-        _id: r.disease_id,
-        name: r.disease_name,
+        _id: row.disease_id,
+        name: row.disease_name,
       });
     }
 
-    if (r.test_id && !appointment.tests.find(t => t.test && t.test._id === r.test_id)) {
+    if (row.test_id && !appointment.tests.find(t => t.test && t.test._id === row.test_id)) {
       appointment.tests.push({
         test: {
-          _id: r.test_id,
-          name: r.test_name,
-          room: r.test_room_id ? { _id: r.test_room_id, name: r.test_room_name } : undefined,
-          doctor: r.test_doctor_id ? { _id: r.test_doctor_id, name: r.test_doctor_name } : undefined
+          _id: row.test_id,
+          name: row.test_name,
+          room: row.test_room_id ? { _id: row.test_room_id, name: row.test_room_name } : undefined,
+          doctor: row.test_doctor_id ? { _id: row.test_doctor_id, name: row.test_doctor_name } : undefined
         },
-        remark: r.test_remark,
+        remark: row.test_remark,
       });
     }
 
-    if (r.nurse_id && !appointment.nurse.find(n => n._id === r.nurse_id)) {
+    if (row.nurse_id && !appointment.nurse.find(n => n._id === row.nurse_id)) {
       appointment.nurse.push({
-        _id: r.nurse_id,
-        name: r.nurse_name,
-        phoneNumber: r.nurse_phone,
-        shift: r.nurse_shift,
-        gender: r.nurse_gender,
+        _id: row.nurse_id,
+        name: row.nurse_name,
+        phoneNumber: row.nurse_phone,
+        shift: row.nurse_shift,
+        gender: row.nurse_gender,
       });
     }
 
-    if (r.nurse_id && r.nurse_remark_time && r.nurse_remark_msg) {
+    if (row.nurse_id && row.nurse_remark_time && row.nurse_remark_msg) {
       appointment.remarks.push({
-        remarkTime: r.nurse_remark_time,
-        remarkUser: r.nurse_name,
+        remarkTime: row.nurse_remark_time,
+        remarkUser: row.nurse_name,
         remarkUserRole: 'Nurse',
-        remarkMsg: r.nurse_remark_msg,
+        remarkMsg: row.nurse_remark_msg,
       });
     }
 
-    if (r.doctor_id && r.doctor_remark_time && r.doctor_remark_msg) {
-     appointment.remarks.push({
-       remarkTime: r.doctor_remark_time,
-       remarkUser: r.doctor_name,
-       remarkUserRole: 'Doctor',
-       remarkMsg: r.doctor_remark_msg,
-     });
-   }
+    if (row.doctor_id && row.doctor_remark_time && row.doctor_remark_msg) {
+      appointment.remarks.push({
+        remarkTime: row.doctor_remark_time,
+        remarkUser: row.doctor_name,
+        remarkUserRole: 'Doctor',
+        remarkMsg: row.doctor_remark_msg,
+      });
+    }
 
-    if (r.hps_id && !appointment.hps.find(h => h._id === r.hps_id)) {
+    if (row.hps_id && !appointment.hps.find(h => h._id === row.hps_id)) {
       appointment.hps.push({
-        _id: r.hps_id,
-        name: r.hps_name,
-        phoneNumber: r.hps_phone,
-        gender: r.hps_gender,
+        _id: row.hps_id,
+        name: row.hps_name,
+        phoneNumber: row.hps_phone,
+        gender: row.hps_gender,
       });
     }
   }
 
-  return appointment;
+  return Array.from(appointmentsMap.values());
 };
 
 const getAppointments = tryCatch(async (req, res, next) => {
-  const { id } = req.body;
-   const currentAppointments = await getAppointmentsQuery(id);
+  const { _id } = req.query;
+   const currentAppointments = await getAppointmentsQuery(_id);
 
    if (!currentAppointments || currentAppointments.length === 0) {
       return next(new ErrorHandler("No appointments found", 404));
    }
 
-   const appointments = formatAppointment(currentAppointments);
+   const appointments = formatAppointments(currentAppointments);
    return res.status(200).json({ success: true, appointments });
 });
 

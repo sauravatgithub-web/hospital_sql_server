@@ -180,7 +180,7 @@ const updateAppointmentQuery = async ({
   drugDetails = [],
   remarks = []
 }) => {
-//   const client = await pool.connect();
+  //   const client = await pool.connect();
   try {
     await client.query('BEGIN');
 
@@ -277,89 +277,89 @@ const deleteAppointmentQuery = async (id) => {
 
 // SQL Query to get current appointments (InProgress)
 const getCurrentAppointmentsQuery = async (entity, _id) => {
-    let whereClause = '';
-    if (entity === "doctor") {
-        whereClause = `trt.did`; 
-    } else if (entity === "nurse") {
-        whereClause = `la.nid`; 
-    }
+  let whereClause = '';
+  if (entity === "doctor") {
+    whereClause = `trt.did`;
+  } else if (entity === "nurse") {
+    whereClause = `la.nid`;
+  }
 
-    const result = await client.query(`
+  const result = await client.query(`
         SELECT
-        a._id AS appointment_id,
-        a.time,
-        a."dischargeTime",
-        a.status,
-        a.active,
+          a._id AS appointment_id,
+          a.time,
+          a."dischargeTime",
+          a.status,
+          a.active,
 
-        -- Patient Info
-        p._id AS patient_id,
-        p.name AS patient_name,
-        p.addr AS patient_address,
-        p.age AS patient_age,
-        p."phoneNumber" AS patient_phone,
-        p.email AS patient_email,
-        p."userName" AS patient_username,
-        p.gender AS patient_gender,
-        p.gname AS patient_guardian_name,
-        p."gPhoneNo" AS patient_guardian_phone,
+          -- Patient Info
+          p._id AS patient_id,
+          p.name AS patient_name,
+          p.addr AS patient_address,
+          p.age AS patient_age,
+          p."phoneNumber" AS patient_phone,
+          p.email AS patient_email,
+          p."userName" AS patient_username,
+          p.gender AS patient_gender,
+          p.gname AS patient_guardian_name,
+          p."gPhoneNo" AS patient_guardian_phone,
 
-        -- Doctor Info
-        d._id AS doctor_id,
-        d.name AS doctor_name,
-        d.gender AS doctor_gender,
-        d."phoneNumber" AS doctor_phone,
-        d."inTime" AS doctor_in_time,
-        d."outTime" AS doctor_out_time,
-        d.spec AS doctor_specialization,
-        trt.remarktime AS doctor_remark_time,
-        trt.remarkmsg AS doctor_remark_msg,
+          -- Doctor Info
+          d._id AS doctor_id,
+          d.name AS doctor_name,
+          d.gender AS doctor_gender,
+          d."phoneNumber" AS doctor_phone,
+          d."inTime" AS doctor_in_time,
+          d."outTime" AS doctor_out_time,
+          d.spec AS doctor_specialization,
+          trt.remarktime AS doctor_remark_time,
+          trt.remarkmsg AS doctor_remark_msg,
 
-        -- Doctor's Room
-        r._id AS doctor_roomId,
-        r.name AS doctor_roomName,
+          -- Doctor's Room
+          r._id AS doctor_roomId,
+          r.name AS doctor_roomName,
 
-        -- Bed Info
-        b._id AS bed_id,
-        b.name AS bed_name,
-        b."isOccupied" AS bed_occupied,
-        
-        -- Patient's Room
-        r2._id AS patient_roomId,
-        r2.name AS patient_roomName,
+          -- Bed Info
+          b._id AS bed_id,
+          b.name AS bed_name,
+          b."isOccupied" AS bed_occupied,
+          
+          -- Patient's Room
+          r2._id AS patient_roomId,
+          r2.name AS patient_roomName,
 
-        -- Drug Info
-        dr._id AS drug_id,
-        dr.name AS drug_name,
-        pr.dosage AS drug_dosage,
+          -- Drug Info
+          dr._id AS drug_id,
+          dr.name AS drug_name,
+          pr.dosage AS drug_dosage,
 
-        -- Disease Info
-        dis._id AS disease_id,
-        dis.name AS disease_name,
+          -- Disease Info
+          dis._id AS disease_id,
+          dis.name AS disease_name,
 
-        -- Test Info
-        t._id AS test_id,
-        t.name AS test_name,
-        tr._id AS test_room_id,
-        tr.name AS test_room_name,
-        dt._id AS test_doctor_id,
-        dt.name AS test_doctor_name,
-        at.remarkmsg AS test_remark,
+          -- Test Info
+          t._id AS test_id,
+          t.name AS test_name,
+          tr._id AS test_room_id,
+          tr.name AS test_room_name,
+          dt._id AS test_doctor_id,
+          dt.name AS test_doctor_name,
+          at.remarkmsg AS test_remark,
 
-        -- Nurse Info
-        n._id AS nurse_id,
-        n.name AS nurse_name,
-        n."phoneNumber" AS nurse_phone,
-        n.shift AS nurse_shift,
-        n.gender AS nurse_gender,
-        la.remarktime AS nurse_remark_time,
-        la.remarkmsg AS nurse_remark_msg,
+          -- Nurse Info
+          n._id AS nurse_id,
+          n.name AS nurse_name,
+          n."phoneNumber" AS nurse_phone,
+          n.shift AS nurse_shift,
+          n.gender AS nurse_gender,
+          la.remarktime AS nurse_remark_time,
+          la.remarkmsg AS nurse_remark_msg,
 
-        -- Hospital Professional Info
-        hp._id AS hps_id,
-        hp.name AS hps_name,
-        hp."phoneNumber" AS hps_phone,
-        hp.gender AS hps_gender
+          -- Hospital Professional Info
+          hp._id AS hps_id,
+          hp.name AS hps_name,
+          hp."phoneNumber" AS hps_phone,
+          hp.gender AS hps_gender
 
         FROM appointment a
 
@@ -397,12 +397,12 @@ const getCurrentAppointmentsQuery = async (entity, _id) => {
         LEFT JOIN study s ON s.aid = a._id
         LEFT JOIN hospital_professional hp ON s.hid = hp._id
 
-        WHERE ${whereClause} = $1 AND a.active = TRUE;
+        WHERE ${whereClause} = $1 AND a.active = TRUE AND a.status = 'InProgress';
     `, [_id]);
 
-    return result.rows;
+  return result.rows;
 };
-      
+
 
 const dischargeAppointmentQuery = async (id, dischargeTime) => {
   return await client.query(`

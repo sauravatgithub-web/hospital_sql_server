@@ -22,16 +22,21 @@ const getThisPatient = tryCatch(async (req, res, next) => {
   const id = req.params.id;
   const result = await getThisPatientQuery(id);
   if (result.rows.length === 0) return next(new ErrorHandler("Incorrect patient ID", 404));
-  return res.status(200).json({ success: true, patient: result.rows[0] });
+
+  const patient = { ...result.rows[0] };
+  delete patient.appointment_id;
+
+  const appointmentIDs = result.rows.map(row => row.appointment_id);
+  const appointments = await getPatientAppointmentsQuery(appointmentIDs);
+  patient.appointments = appointments;
+
+  return res.status(200).json({ success: true, patient });
 });
 
 const getPatientByNumber = tryCatch(async (req, res, next) => {
   const number = req.params.phoneNo;
   const result = await getPatientByNumberQuery(number);
-
-  if (result.rows.length === 0) {
-    return next(new ErrorHandler("No match found", 404));
-  }
+  if (result.rows.length === 0) return next(new ErrorHandler("No match found", 404));
 
   const patient = { ...result.rows[0] };
   delete patient.appointment_id;
