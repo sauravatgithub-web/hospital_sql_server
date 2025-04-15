@@ -156,13 +156,13 @@ const formatAppointment = (rows) => {
 
 // Controller for creating a new appointment
 const createAppointment = tryCatch(async (req, res, next) => {
-   const { time, patient, doctor } = req.body;
+   const { time, patient, doctor, user } = req.body;
 
    if (!patient || !doctor ) {
       return next(new ErrorHandler("Insufficient input", 400));
    }
 
-   const appointment= await createAppointmentQuery(time, patient, doctor);
+   const appointment= await createAppointmentQuery(time, patient, doctor, user);
    return res.status(201).json({ message: 'Appointment created successfully', appointment });
 });
 

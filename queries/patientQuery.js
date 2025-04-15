@@ -10,17 +10,17 @@ const getThisPatientQuery = async (id) => {
 
 const getPatientByNumberQuery = async (phoneNumber) => {
   return await client.query(`
-      SELECT 
-        p.*, 
-        a._id AS appointment_id, 
-        a.time, 
-        a."dischargeTime", 
-        a.status
-      FROM Patient p
-      LEFT JOIN pTakes pt ON pt.pid = p._id
-      LEFT JOIN Appointment a ON a._id = pt.aid
-      WHERE p.active = TRUE AND p."phoneNumber" = $1;
-    `, [phoneNumber]);
+    SELECT 
+      p.*, 
+      a._id AS appointment_id, 
+      a.time, 
+      a."dischargeTime", 
+      a.status
+    FROM Patient p
+    LEFT JOIN pTakes pt ON pt.pid = p._id
+    LEFT JOIN Appointment a ON a._id = pt.aid
+    WHERE p.active = TRUE AND p."phoneNumber" = $1;
+  `, [phoneNumber]);
 };
 
 const getPatientByEmailQueryWithAppointments = async (email) => {

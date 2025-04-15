@@ -9,6 +9,7 @@ import {
   deletePatientQuery
 } from '../queries/patientQuery.js';
 import { tryCatch } from '../middlewares/error.js';
+import { getPatientAppointmentsQuery } from '../queries/appointmentQuery.js'
 import { ErrorHandler } from '../utils/utility.js';
 
 const getAllPatient = tryCatch(async (req, res) => {
@@ -32,18 +33,12 @@ const getPatientByNumber = tryCatch(async (req, res, next) => {
     return next(new ErrorHandler("No match found", 404));
   }
 
-  // Group appointments under patient
-  const patient = {
-    ...result.rows[0],
-    appointments: result.rows
-      .filter(r => r.appointment_id)
-      .map(r => ({
-        _id: r.appointment_id,
-        time: r.atime,
-        dischargeTime: r.dischargetime,
-        status: r.status
-      }))
-  };
+  const patient = { ...result.rows[0] };
+  delete patient.appointment_id;
+
+  const appointmentIDs = result.rows.map(row => row.appointment_id);
+  const appointments = await getPatientAppointmentsQuery(appointmentIDs);
+  patient.appointments = appointments;
 
   return res.status(200).json({ success: true, patient });
 });

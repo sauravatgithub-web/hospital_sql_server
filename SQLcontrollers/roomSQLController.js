@@ -33,7 +33,7 @@ const createRoom = tryCatch(async (req, res, next) => {
   }
 
   const result = await createRoomQuery(name, type, capacity, isAC);
-  return res.status(201).json({ message: 'Room created successfully', room: result.rows[0] });
+  return res.status(201).json({ message: 'Room created successfully', room: result });
 });
 
 
@@ -44,7 +44,7 @@ const updateRoom = tryCatch(async (req, res, next) => {
   if (result.rows.length === 0) {
     return next(new ErrorHandler("Room not found", 404));
   }
-  return res.status(200).json({ message: 'Room updated successfully', room: result.rows[0] });
+  return res.status(200).json({ message: 'Room updated successfully', room: result });
 });
 
 

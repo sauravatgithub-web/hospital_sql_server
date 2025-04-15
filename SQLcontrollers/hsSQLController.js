@@ -144,7 +144,6 @@ const getAllCurrentNurses = tryCatch(async (req, res, next) => {
 
   // Group by nurse_id
   const grouped = _.groupBy(rows, 'nurse_id');
-  console.log(grouped);
 
   // Format the data as needed
   const formatted = Object.values(grouped).map(group => {
@@ -177,7 +176,6 @@ const getAllCurrentNurses = tryCatch(async (req, res, next) => {
       }))
     };
   });
-  console.log(formatted);
 
   // Return the formatted response
   return res.status(200).json({ success: true, data: formatted });
@@ -192,10 +190,10 @@ const getCurrentAppointments = tryCatch(async (req, res, next) => {
   const rows = result.rows;
 
   // Grouping the result by nurse_id to organize the data
-  const grouped = _.groupBy(rows, 'nurse_id');
+  // const grouped = _.groupBy(rows, 'nurse_id');
 
   // Formatting the result in the desired structure
-  const formatted = Object.values(grouped).map(group => {
+  const formatted = Object.values(rows).map(group => {
     const nurse = group[0]; // Nurse data will be the same across the group
     return {
       _id: nurse.nurse_id,
