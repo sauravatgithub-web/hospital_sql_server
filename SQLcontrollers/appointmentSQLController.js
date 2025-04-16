@@ -186,7 +186,7 @@ const updateAppointment = tryCatch(async (req, res, next) => {
   const room = req.body?.room?._id;
   const bed = req.body?.bed?._id;
   const allRemarks = req.body?.remarks
-  const remarks = allRemarks[allRemarks.length - 1];
+  const remarks = allRemarks ? allRemarks[allRemarks.length - 1] : null;
   console.log(remarks);
 
   if (!id) {
