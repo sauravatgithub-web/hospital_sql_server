@@ -44,18 +44,13 @@ const updateHospitalProfessional = tryCatch(async (req, res, next) => {
   const { id, supervisedBy, name, addr, phoneNumber, email, gender, uni, degree } = req.body;
   const fieldsToUpdate = { name, addr, "phoneNumber": phoneNumber, email, gender, uni, degree };
 
-  // 1. Update the HP record
   await updateHospitalProfessionalQuery(id, fieldsToUpdate);
-
-  // 2. Clear existing doctor-hp relations for this HP
   await client.query('DELETE FROM Supervises WHERE hid = $1;', [id]);
 
-  // 3. Add new doctor-hp pairs
   for (const doctorId of supervisedBy) {
     await insertDoctorHpRelationQuery(doctorId, id);
   }
 
-  // 4. Fetch updated HP with populated supervisor info
   const result = await getUpdatedHospitalProfessionalQuery(id);
   res.status(200).json({
     message: 'Updated successfully',

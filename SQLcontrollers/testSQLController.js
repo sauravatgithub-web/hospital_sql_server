@@ -25,24 +25,24 @@ const getAllTest = tryCatch(async (req, res) => {
         active: row.active,
         doctor: row.doctor_id
           ? {
-              _id: row.doctor_id,
-              name: row.doctor_name,
-              email: row.doctor_email
-            }
+            _id: row.doctor_id,
+            name: row.doctor_name,
+            email: row.doctor_email
+          }
           : null,
         nurse: row.nurse_id
           ? {
-              _id: row.nurse_id,
-              name: row.nurse_name,
-              email: row.nurse_email
-            }
+            _id: row.nurse_id,
+            name: row.nurse_name,
+            email: row.nurse_email
+          }
           : null,
         room: row.room_id
           ? {
-              _id: row.room_id,
-              name: row.room_name,
-              type: row.room_type
-            }
+            _id: row.room_id,
+            name: row.room_name,
+            type: row.room_type
+          }
           : null
       });
     }
@@ -58,7 +58,7 @@ const getThisTestById = tryCatch(async (req, res, next) => {
 
   // Execute query to fetch test by ID
   const result = await getTestByIdQuery(id);
-  
+
   if (!result.rows.length) {
     return next(new ErrorHandler("Test not found", 404));
   }
@@ -98,10 +98,10 @@ const createTest = tryCatch(async (req, res, next) => {
 });
 
 const updateTest = tryCatch(async (req, res, next) => {
-  const { id, name , equip, doctor, nurse, room } = req.body;
-  if(!id) return next(new ErrorHandler("Insufficient input",404));
-  await updateTestQuery( id, name , equip, doctor, nurse, room);
-  return res.status(200).json({ success: true, message: "Test updated successfully"});
+  const { id, name, equip, doctor, nurse, room } = req.body;
+  if (!id) return next(new ErrorHandler("Insufficient input", 404));
+  await updateTestQuery(id, name, equip, doctor, nurse, room);
+  return res.status(200).json({ success: true, message: "Test updated successfully" });
 });
 
 const deleteTest = tryCatch(async (req, res, next) => {
@@ -111,10 +111,10 @@ const deleteTest = tryCatch(async (req, res, next) => {
   return res.status(200).json({ success: true, message: "Test deleted successfully" });
 });
 
-export { 
-  getAllTest, 
-  createTest, 
-  updateTest, 
+export {
+  getAllTest,
+  createTest,
+  updateTest,
   deleteTest,
   getThisTestById
 };

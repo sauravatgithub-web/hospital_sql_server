@@ -1,8 +1,10 @@
-import {getAllDiseaseQuery , 
-        getThisDiseaseQuery , 
-        createDiseaseQuery, 
-        updateDiseaseQuery, 
-        deleteDiseaseQuery} from '../queries/diseaseQuery.js'
+import {
+  getAllDiseaseQuery,
+  getThisDiseaseQuery,
+  createDiseaseQuery,
+  updateDiseaseQuery,
+  deleteDiseaseQuery
+} from '../queries/diseaseQuery.js'
 import { tryCatch } from '../middlewares/error.js';
 import { ErrorHandler } from '../utils/utility.js';
 
@@ -34,7 +36,7 @@ const createDisease = tryCatch(async (req, res, next) => {
 const updateDisease = tryCatch(async (req, res, next) => {
   const { id, name, symp, desc } = req.body;
   const result = await updateDiseaseQuery(id, name, symp, desc);
-  
+
   if (result.rows.length === 0) {
     return next(new ErrorHandler("Disease not found", 404));
   }
@@ -52,4 +54,10 @@ const deleteDisease = tryCatch(async (req, res, next) => {
   return res.status(200).json({ message: 'Disease deleted successfully' });
 });
 
-export { getAllDisease, getThisDisease, createDisease, updateDisease, deleteDisease };
+export { 
+  getAllDisease, 
+  getThisDisease, 
+  createDisease, 
+  updateDisease, 
+  deleteDisease 
+};

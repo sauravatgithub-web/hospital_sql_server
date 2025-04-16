@@ -99,49 +99,6 @@ const updatePatient = tryCatch(async (req, res, next) => {
   return res.status(200).json({ success: true, message: 'Patient updated successfully' });
 });
 
-
-// const createPatient = tryCatch(async (req, res, next) => {
-//   const { name, addr, phoneNumber, email, gender, gname, gPhoneNo, age, role } = req.body;
-//   if (!name || !phoneNumber || !gname || !gPhoneNo || !email)
-//     return next(new ErrorHandler("Insufficient input", 404));
-
-//   await Patient.create({ ...req.body, password: 'password' });
-
-//   if(role === "FDO") {
-//     const patient = await Patient.findOne({ email: email }).populate({
-//       path: 'appointments',
-//       select: '_id time dischargeTime status'
-//     });
-//     return res.status(200).json({ success: true, message: "Patient created", patient: patient });
-//   }
-  
-//   return res.status(200).json({ success: true, message: "Patient created" });
-// });
-
-// const updatePatient = tryCatch(async (req, res, next) => {
-//   const { id, role } = req.body;
-//   delete req.body.id;
-
-//   const updatedPatient = await Patient.findByIdAndUpdate(
-//     id,
-//     req.body, 
-//     { new: true, runValidators: true }
-//   );
-
-//   if(!updatedPatient) return next(new ErrorHandler("Patient not found", 404));
-
-//   if(role === "FDO") {
-//     const populatedPatient = await Patient.findById(id).populate({
-//       path: 'appointments',
-//       select: '_id time dischargeTime status'
-//     });
-//     return res.status(200).json({ success: true, message: "Patient updated", patient: populatedPatient });
-//   }
-
-//   return res.status(200).json({ success: true, message: 'Patient updated successfully', patient: updatedPatient });
-// });
-
-
 const deletePatient = tryCatch(async (req, res, next) => {
   const { id } = req.body;
   const result = await deletePatientQuery(id);

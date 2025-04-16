@@ -16,7 +16,6 @@ const getAllRoom = tryCatch(async (req, res) => {
   return res.status(200).json({ success: true, data: result.rows });
 });
 
-
 const getThisRoom = tryCatch(async (req, res, next) => {
   const id = req.params.id;
   const result = await getThisRoomQuery(id);
@@ -25,7 +24,6 @@ const getThisRoom = tryCatch(async (req, res, next) => {
   }
   return res.status(200).json({ success: true, room: result.rows[0] });
 });
-
 
 const createRoom = tryCatch(async (req, res, next) => {
   const { name, type, capacity, isAC } = req.body;
@@ -37,7 +35,6 @@ const createRoom = tryCatch(async (req, res, next) => {
   return res.status(201).json({ message: 'Room created successfully', room: result });
 });
 
-
 const updateRoom = tryCatch(async (req, res, next) => {
   const { id, name, type, capacity, isAC } = req.body;
   const result = await updateRoomQuery(id, name, type, capacity, isAC);
@@ -47,7 +44,6 @@ const updateRoom = tryCatch(async (req, res, next) => {
   }
   return res.status(200).json({ message: 'Room updated successfully', room: result });
 });
-
 
 const deleteRoom = tryCatch(async (req, res, next) => {
   const { id } = req.body;
@@ -63,10 +59,6 @@ const getAllVacantDocRooms = tryCatch(async (req, res) => {
   const result = await getAllVacantDocRoomsQuery();
   return res.status(200).json({ success: true, data: result.rows });
 });
-
-// {
-//   roomName : [{bed_id, bed_name}]
-// }
 
 const getAllVacantBeds = tryCatch(async (req, res) => {
   const rawResult = await useGetAllVacantBedsQuery();

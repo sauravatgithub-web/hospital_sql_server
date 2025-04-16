@@ -13,7 +13,6 @@ const getAllDrug = tryCatch(async (req, res) => {
   return res.status(200).json({ success: true, data: result.rows });
 });
 
-
 const getThisDrug = tryCatch(async (req, res, next) => {
   const name = req.params.name;
   const result = await getThisDrugQuery(name);
@@ -22,7 +21,6 @@ const getThisDrug = tryCatch(async (req, res, next) => {
   }
   return res.status(200).json({ success: true, drug: result.rows[0] });
 });
-
 
 const createDrug = tryCatch(async (req, res, next) => {
   const { name, composition } = req.body;
@@ -34,17 +32,15 @@ const createDrug = tryCatch(async (req, res, next) => {
   return res.status(201).json({ message: 'Drug created successfully', drug: result.rows[0] });
 });
 
-
 const updateDrug = tryCatch(async (req, res, next) => {
   const { id, name, composition } = req.body;
   const result = await updateDrugQuery(id, name, composition);
-  
+
   if (result.rows.length === 0) {
     return next(new ErrorHandler("Drug not found", 404));
   }
   return res.status(200).json({ message: 'Drug updated successfully', drug: result.rows[0] });
 });
-
 
 const deleteDrug = tryCatch(async (req, res, next) => {
   const { id } = req.body;
@@ -56,5 +52,10 @@ const deleteDrug = tryCatch(async (req, res, next) => {
   return res.status(200).json({ message: 'Drug deleted successfully' });
 });
 
-
-export { getAllDrug, getThisDrug, createDrug, updateDrug, deleteDrug }
+export {
+  getAllDrug,
+  getThisDrug,
+  createDrug,
+  updateDrug,
+  deleteDrug
+}
