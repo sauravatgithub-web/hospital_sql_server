@@ -99,6 +99,7 @@ const createTest = tryCatch(async (req, res, next) => {
 
 const updateTest = tryCatch(async (req, res, next) => {
   const { id, ...fields } = req.body;
+  console.log(fields);
   const result = await updateTestQuery(id, fields);
   if (result.rows.length === 0) return next(new ErrorHandler("Test not found", 404));
   return res.status(200).json({ success: true, message: "Test updated", test: result });

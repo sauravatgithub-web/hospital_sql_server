@@ -190,10 +190,6 @@ const getAppointments = tryCatch(async (req, res, next) => {
   const { _id } = req.query;
    const currentAppointments = await getAppointmentsQuery(_id);
 
-   if (!currentAppointments || currentAppointments.length === 0) {
-      return next(new ErrorHandler("No appointments found", 404));
-   }
-
    const appointments = formatAppointments(currentAppointments);
    return res.status(200).json({ success: true, appointments });
 });
