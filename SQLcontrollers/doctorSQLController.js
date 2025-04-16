@@ -8,7 +8,7 @@ import {
   getAppointmentsQuery
 } from '../queries/doctorQuery.js'
 import { tryCatch } from '../middlewares/error.js';
-import { ErrorHandler } from '../utils/utility.js';
+import { ErrorHandler, sendEmail } from '../utils/utility.js';
 import client from '../db.js';
 
 
@@ -35,6 +35,7 @@ const createDoctor = tryCatch(async (req, res, next) => {
   const doctor = await createDoctorQuery(doctorData);
   await client.query(`UPDATE Room SET vacancy = vacancy - 1 WHERE _id = $1`, [doctorData.room]);
 
+  await sendEmail(doctor.email, "New Joinee", null, 'Doctor', doctor.name);
   return res.status(200).json({ success: true, doctor: doctor });
 });
 

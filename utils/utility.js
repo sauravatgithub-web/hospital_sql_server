@@ -20,14 +20,18 @@ class ErrorHandler extends Error {
     }
 }
 
-const sendEmail = (email, subject, sharedToken) => {
+const sendEmail = (email, subject, sharedToken, entity, name) => {
+    const text = 
+        (sharedToken) ? `Your OTP is: ${sharedToken}` : 
+        `Hello ${name}, Congratulations on being added as a new ${entity} on AzureMed Hospital.`
+
     return new Promise((resolve, reject) => {
         const mailOptions = {
             from: process.env.ADMIN_EMAIL,
             to: email,
             subject: subject,
-            text: `Your OTP: ${sharedToken}`
-        };
+            text: text
+        }
 
         transporter.sendMail(mailOptions, (error, info) => {
             if(error) {

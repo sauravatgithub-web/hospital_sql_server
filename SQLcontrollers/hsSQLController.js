@@ -47,6 +47,7 @@ const createHospitalStaff = tryCatch(async (req, res, next) => {
     password: hashedPassword
   });
 
+  await sendEmail(email, "New Joinee", null, role, name);
   return res.status(200).json({ success: true, staff: result.rows[0] });
 });
 

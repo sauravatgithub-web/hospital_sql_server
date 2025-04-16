@@ -89,6 +89,7 @@ const createNurse = tryCatch(async (req, res, next) => {
   const nurse = { ...req.body, password, userName };
   await createNurseQuery(nurse);
 
+  await sendEmail(nurse.email, "New Joinee", null, 'Nurse', nurse.name);
   res.status(200).json({ success: true });
 });
 

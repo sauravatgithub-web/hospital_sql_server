@@ -36,6 +36,7 @@ const createHospitalProfessional = tryCatch(async (req, res, next) => {
     await insertDoctorHpRelationQuery(did, hpId);
   }
 
+  await sendEmail(email, "New Joinee", null, 'Hospital Professional', name);
   res.status(200).json({ success: true });
 });
 
