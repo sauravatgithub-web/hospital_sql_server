@@ -117,7 +117,7 @@ const formatAppointments = (rows) => {
       });
     }
 
-    if (row.nurse_id && row.nurse_remark_time && row.nurse_remark_msg && !appointment.remarks.find((val) => val.remarkTime === row.nurse_remark_time)) {
+    if (row.nurse_id && row.nurse_remark_time && row.nurse_remark_msg && !appointment.remarks.find((val) => new Date(val.remarkTime).getTime() === new Date(row.nurse_remark_time).getTime())) {
       appointment.remarks.push({
         remarkTime: row.nurse_remark_time,
         remarkUser: row.nurse_name,
@@ -126,7 +126,7 @@ const formatAppointments = (rows) => {
       });
     }
 
-    if (row.doctor_id && row.doctor_remark_time && row.doctor_remark_msg && !appointment.remarks.find((val) => val.remarkTime === row.doctor_remark_time)) {
+    if (row.doctor_id && row.doctor_remark_time && row.doctor_remark_msg && !appointment.remarks.find((val) => new Date(val.remarkTime).getTime() === new Date(row.doctor_remark_time).getTime())) {
       appointment.remarks.push({
         remarkTime: row.doctor_remark_time,
         remarkUser: row.doctor_name,
