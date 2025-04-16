@@ -15,7 +15,7 @@ const getThisPatientQuery = async (id) => {
     FROM Patient p
     LEFT JOIN pTakes pt ON pt.pid = p._id
     LEFT JOIN Appointment a ON a._id = pt.aid
-    WHERE p.active = TRUE AND p._id = $1;
+    WHERE p.active = TRUE AND p._id = $1 AND a.active = TRUE;
   `, [id]);
 };
 
@@ -30,7 +30,7 @@ const getPatientByNumberQuery = async (phoneNumber) => {
     FROM Patient p
     LEFT JOIN pTakes pt ON pt.pid = p._id
     LEFT JOIN Appointment a ON a._id = pt.aid
-    WHERE p.active = TRUE AND p."phoneNumber" = $1;
+    WHERE p.active = TRUE AND p."phoneNumber" = $1 AND a.active = TRUE;
   `, [phoneNumber]);
 };
 
@@ -45,7 +45,7 @@ const getPatientByEmailQueryWithAppointments = async (email) => {
       FROM Patient p
       LEFT JOIN pTakes pt ON pt.pid = p._id
       LEFT JOIN Appointment a ON a._id = pt.aid
-      WHERE p.active = TRUE AND p.email = $1;
+      WHERE p.active = TRUE AND p.email = $1 AND a.active = TRUE;
     `, [email]);
 };
 
@@ -60,7 +60,7 @@ const getPatientByIdQueryWithAppointments = async (id) => {
       FROM Patient p
       LEFT JOIN pTakes pt ON pt.pid = p._id
       LEFT JOIN Appointment a ON a._id = pt.aid
-      WHERE p.active = TRUE AND p._id = $1;
+      WHERE p.active = TRUE AND p._id = $1 AND a.active = TRUE;
     `, [id]);
 };
 

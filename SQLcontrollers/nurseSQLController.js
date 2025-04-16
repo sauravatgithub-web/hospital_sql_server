@@ -16,63 +16,53 @@ const getAllNurse = tryCatch(async (req, res) => {
 
 const getThisNurse = tryCatch(async (req, res, next) => {
   const { id } = req.params;
-  const { rows } = await getNurseByIdQuery(id);
+  const result = await getNurseByIdQuery(id);
 
-  if (rows.length === 0) {
-    return res.status(404).json({ error: 'Nurse not found' });
+  if (!result || result.rows.length === 0) {
+    return next(new ErrorHandler('Nurse not found', 404));
   }
 
-  // Group by nurse ID (since we are getting only one nurse, this is more relevant)
-  const nurseMap = new Map();
+  // Format the data
+  const base = result.rows[0];
+  const nurse = {
+    _id: base._id,
+    name: base.name,
+    email: base.email,
+    addr: base.addr,
+    phoneNumber: base.phoneNumber,
+    userName: base.userName,
+    shift: base.shift,
+    gender: base.gender,
+    qualification: base.qualification,
+    role: base.role,
+    active: base.active,
+    tests: []
+  };
 
-  for (const row of rows) {
-    const nurseId = row.id;
+  // Group tests (if any)
+  const testMap = new Map();
+  result.rows.forEach(row => {
+    if (!row.test_id) return;
 
-    if (!nurseMap.has(nurseId)) {
-      nurseMap.set(nurseId, {
-        id: nurseId,
-        name: row.name,
-        email: row.email,
-        addr: row.addr,
-        phoneNumber: row.phonenumber,
-        userName: row.username,
-        shift: row.shift,
-        gender: row.gender,
-        qualification: row.qualification,
-        role: row.role,
-        active: row.active,
-        appointments: [],
-        tests: []
-      });
-    }
-
-    const nurse = nurseMap.get(nurseId);
-
-    // Add appointment if exists and not already added
-    if (row.appointment_id && !nurse.appointments.some(a => a.id === row.appointment_id)) {
-      nurse.appointments.push({
-        id: row.appointment_id,
-        date: row.appointment_date,
-        patient_id: row.patient_id,
-      });
-    }
-
-    // Add test if exists and not already added
-    if (row.test_id && !nurse.tests.some(t => t.id === row.test_id)) {
-      nurse.tests.push({
-        id: row.test_id,
+    if (!testMap.has(row.test_id)) {
+      testMap.set(row.test_id, {
+        _id: row.test_id,
         name: row.test_name,
+        equip: row.test_equip,
         room: row.room_id ? {
-          id: row.room_id,
+          _id: row.room_id,
           name: row.room_name
         } : null
       });
     }
-  }
+  });
 
-  const result = Array.from(nurseMap.values())[0]; // We expect only one nurse
-  res.status(200).json(result);
+  nurse.tests = Array.from(testMap.values());
 
+  return res.status(200).json({
+    success: true,
+    nurse,
+  });
 });
 
 const createNurse = tryCatch(async (req, res, next) => {
@@ -94,12 +84,21 @@ const createNurse = tryCatch(async (req, res, next) => {
 });
 
 const updateNurse = tryCatch(async (req, res, next) => {
-  const { id, name, gender, qualification, email, phoneNumber, addr, shift } = req.body;
-  const fieldsToUpdate = { name, gender, qualification, email, "phoneNumber": phoneNumber, addr, shift };
+  const { id } = req.params;
+  const {
+    name, gender, qualification, email,
+    phoneNumber, addr, shift
+  } = req.body;
+
+  const fieldsToUpdate = {
+    name, gender, qualification, email,
+    phoneNumber, addr, shift
+  };
+
   const result = await updateNurseQuery(id, fieldsToUpdate);
 
   if (result.rowCount === 0)
-    return next(new ErrorHandler("Nurse not found", 404));
+    return next(new ErrorHandler("No fields provided or Nurse not found", 404));
 
   res.status(200).json({ success: true, nurse: result.rows[0] });
 });

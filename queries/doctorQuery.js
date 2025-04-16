@@ -268,37 +268,6 @@ const deleteDoctorQuery = async (id) => {
     `, [id]);
 };
 
-const getDocAppointment = async (id) => {
-  return await client.query(
-    `SELECT 
-    a._id AS appt_id,
-    a.time AS appt_time,
-    a.dischargetime AS discharge_time,
-    a.status AS appt_status,
-    -- Patient fields
-    p._id AS patient_id,
-    p.name AS patient_name,
-    p.gender AS patient_gender,
-    p.age AS patient_age,
-    p.phonenumber AS patient_phonenumber,
-    p.gname AS patient_gname,
-    p.gphoneno AS patient_gphoneno,
-    p.addr AS patient_addr,
-    p.email AS patient_email,
-    p.username AS patient_username,
-    -- Disease fields from the junction table
-    dis._id AS disease_id,
-    dis.name AS disease_name
-  FROM appointment a
-  LEFT JOIN patient p ON a.patient_id = p._id
-  LEFT JOIN appointment_disease ad ON a._id = ad.appointment_id
-  LEFT JOIN disease dis ON ad.disease_id = dis._id
-  INNER JOIN treats t ON t.aid = a._id
-  WHERE t.did = $1
-    AND a.status IN ('Scheduled', 'Completed');`
-    , [id]);
-}
-
 const getAppointmentsQuery = async (_id) => {
   const result = await client.query(`
       SELECT
@@ -425,6 +394,5 @@ export {
   createDoctorQuery,
   updateDoctorQuery,
   deleteDoctorQuery,
-  getDocAppointment,
   getAppointmentsQuery
 }

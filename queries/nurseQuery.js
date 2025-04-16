@@ -14,17 +14,17 @@ const getAllNursesQuery = async () => {
 const getNurseByIdQuery = async (id) => {
   const result = await client.query(`
     SELECT 
-      n.*, 
-      a._id AS appointment_id, a.date AS appointment_date, a.patient, -- or all appointment fields
-      t._id AS test_id, t.name AS test_name, t.room,
+      n.*,
+      t._id AS test_id, t.name AS test_name, t.equip AS test_equip,
       r._id AS room_id, r.name AS room_name
 
     FROM nurse n
-    LEFT JOIN appointment a ON a.nurse = n._id
-    LEFT JOIN test t ON t.nurse_id = n._id
-    LEFT JOIN room r ON t.room_id = r._id
+    LEFT JOIN nursetest nt ON nt.nid = n._id 
+    LEFT JOIN test t ON t._id = nt.tid
+    LEFT JOIN testroom tr ON tr.tid = t._id 
+    LEFT JOIN room r ON r._id = tr.rid
 
-    WHERE n._id = $1 AND n.active = TRUE
+    WHERE n._id = $1 AND n.active = TRUE;
   `, [id]);
   return result;
 };
@@ -55,16 +55,24 @@ const createNurseQuery = async (nurse) => {
 
 // 4. Update a nurse
 const updateNurseQuery = async (id, updateFields) => {
-  const setStr = Object.keys(updateFields)
-    .map((key, i) => `"${key}" = $${i + 2}`).join(', ');
-  const values = [id, ...Object.values(updateFields)];
+  // Filter out undefined or null fields
+  const filteredEntries = Object.entries(updateFields).filter(([_, v]) => v !== undefined && v !== null);
+
+  if (filteredEntries.length === 0) return { rowCount: 0, rows: [] };
+
+  const keys = filteredEntries.map(([k]) => `"${k}"`);
+  const values = filteredEntries.map(([_, v]) => v);
+  const setStr = keys.map((key, i) => `${key} = $${i + 2}`).join(', ');
+
   const result = await client.query(`
     UPDATE nurse SET ${setStr}
     WHERE _id = $1
     RETURNING *
-  `, values);
+  `, [id, ...values]);
+
   return result;
 };
+
 
 // 5. Soft delete a nurse
 const deleteNurseQuery = async (id) => {

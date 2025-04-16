@@ -79,7 +79,7 @@ const updateHospitalProfessionalQuery = async (id, fields) => {
 };
 
 const getUpdatedHospitalProfessionalQuery = async (id) => {
-  return await client.query(`SELECT * FROM hospital_professional WHERE _id = $1;`, [id]);
+  return await client.query(`SELECT * FROM hospital_professional WHERE _id = $1 and active = TRUE;`, [id]);
 };
 
 const deleteHospitalProfessionalQuery = async (id) => {

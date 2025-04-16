@@ -4,7 +4,6 @@ import {
   createDoctorQuery,
   updateDoctorQuery,
   deleteDoctorQuery,
-  getDocAppointment,
   getAppointmentsQuery
 } from '../queries/doctorQuery.js'
 import { tryCatch } from '../middlewares/error.js';
