@@ -102,15 +102,44 @@ const getTestByIdQuery = async (id) => {
 
 
 // UPDATE TEST
-const updateTestQuery = async (id, fields) => {
-  const keys = Object.keys(fields);
-  const values = Object.values(fields);
-  const setClause = keys.map((k, i) => `${k} = $${i + 2}`).join(", ");
+const updateTestQuery = async ( id, name , equip, doctor, nurse, room) => {
+  try {
+    await client.query('BEGIN');
 
-  return await client.query(`
-    UPDATE Test SET ${setClause} WHERE _id = $1 RETURNING *;
-  `, [id, ...values]);
-};
+    // Update main test table
+    await client.query(`
+      UPDATE test
+      SET name = $1, equip = $2
+      WHERE _id = $3;
+    `, [name, equip, id]);
+
+    // Upsert into doctortest
+    if (doctor !== undefined) {
+      await client.query(`DELETE FROM doctortest WHERE tid = $1;`, [id]);
+      await client.query(`INSERT INTO doctortest (did, tid) VALUES ($1, $2);`, [doctor, id]);
+    }
+
+    // Upsert into nursetest
+    if (nurse !== undefined) {
+      await client.query(`DELETE FROM nursetest WHERE tid = $1;`, [id]);
+      await client.query(`INSERT INTO nursetest (nid, tid) VALUES ($1, $2);`, [nurse, id]);
+    }
+
+    // Upsert into testroom
+    if (room !== undefined) {
+      await client.query(`DELETE FROM testroom WHERE tid = $1;`, [id]);
+      await client.query(`INSERT INTO testroom (rid, tid) VALUES ($1, $2);`, [room, id]);
+    }
+
+    // const testResult = await client.query(`SELECT * FROM test WHERE _id = $1;`, [id]);
+    // await client.query('COMMIT');
+    // return testResult.rows[0];
+    return await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  };
+}
 
 // DELETE (SOFT) TEST
 const deleteTestQuery = async (id) => {
