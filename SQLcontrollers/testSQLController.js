@@ -57,7 +57,7 @@ const getThisTestById = tryCatch(async (req, res, next) => {
   const { id } = req.params;
 
   // Execute query to fetch test by ID
-  const result = await getThisTestByIdQuery(id);
+  const result = await getTestByIdQuery(id);
   
   if (!result.rows.length) {
     return next(new ErrorHandler("Test not found", 404));
@@ -98,10 +98,11 @@ const createTest = tryCatch(async (req, res, next) => {
 });
 
 const updateTest = tryCatch(async (req, res, next) => {
-  const { id, ...fields } = req.body;
-  const result = await updateTestQuery(id, fields);
+  const { id, name , equip, doctor, nurse, room } = req.body;
+  if(!id) return next(new ErrorHandler("Insufficient input",404));
+  const result = await updateTestQuery( id, name , equip, doctor, nurse, room);
   if (result.rows.length === 0) return next(new ErrorHandler("Test not found", 404));
-  return res.status(200).json({ success: true, message: "Test updated", test: result });
+  return res.status(200).json({ success: true, message: "Test updated successfully"});
 });
 
 const deleteTest = tryCatch(async (req, res, next) => {
@@ -115,5 +116,6 @@ export {
   getAllTest, 
   createTest, 
   updateTest, 
-  deleteTest 
+  deleteTest,
+  getThisTestById
 };
