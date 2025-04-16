@@ -12,6 +12,7 @@ import {
     getAllRoom, 
     getThisRoom, 
     getAllVacantRooms,
+    getAllVacantBeds,
     createRoom,
     updateRoom,
     deleteRoom 
@@ -21,6 +22,7 @@ const router = express.Router();
 router.get('/all', getAllRoom);
 router.get('/this/:id', getThisRoom);
 router.get('/allVacantRooms', getAllVacantRooms);
+router.get('/bed/allVacantBeds', getAllVacantBeds);
 router.post('/new', createRoom);
 router.put('/update', updateRoom);
 router.delete('/delete', deleteRoom);

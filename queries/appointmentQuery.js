@@ -49,8 +49,8 @@ const getAppointmentByIdQuery = async (id) => {
         trt.remarkmsg AS doctor_remark_msg,
 
         -- Doctor's Room
-        r._id AS doctor_roomId,
-        r.name AS doctor_roomName,
+        r._id AS "doctor_roomId",
+        r.name AS "doctor_roomName",
 
         -- Bed Info
         b._id AS bed_id,
@@ -58,8 +58,8 @@ const getAppointmentByIdQuery = async (id) => {
         b."isOccupied" AS bed_occupied,
         
         -- Patient's Room
-        r2._id AS patient_roomId,
-        r2.name AS patient_roomName,
+        r2._id AS "patient_roomId",
+        r2.name AS "patient_roomName",
 
         -- Drug Info
         dr._id AS drug_id,
@@ -265,7 +265,7 @@ const updateAppointmentQuery = async ({
     if (Array.isArray(nurse) && nurse.length > 0) {
       await client.query(`DELETE FROM looks_after WHERE aid = $1`, [id]);
       for (const nid of nurse) {
-        await client.query(`INSERT INTO looks_after(nid, aid) VALUES ($1, $2)`, [nid, id]);
+        await client.query(`INSERT INTO looks_after(nid, aid, remarktime) VALUES ($1, $2, NOW())`, [nid, id]);
       }
     }
 

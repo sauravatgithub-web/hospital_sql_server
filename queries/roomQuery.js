@@ -81,6 +81,17 @@ const getAllVacantRoomsByTypeQuery = async (typeArray) => {
   `, typeArray);
 };
 
+const useGetAllVacantBedsQuery = async()=>{
+  return await client.query(`
+    SELECT r.name as "roomName",
+    b._id as _id, b.name as name
+    FROM ROOM r
+    LEFT JOIN roomhasbed rhb ON rhb.rid = r._id
+    LEFT JOIN bed b ON b._id = rhb.bid
+    WHERE r."type" = 'General Ward' AND r.active =TRUE
+    AND b."isOccupied" = FALSE;
+  `)
+};
 export {
   getAllRoomQuery,
   getThisRoomQuery,
@@ -88,5 +99,6 @@ export {
   updateRoomQuery,
   deleteRoomQuery,
   getAllVacantDocRoomsQuery,
-  getAllVacantRoomsByTypeQuery
+  getAllVacantRoomsByTypeQuery,
+  useGetAllVacantBedsQuery
 }

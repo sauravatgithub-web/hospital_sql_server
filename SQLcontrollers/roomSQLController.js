@@ -5,7 +5,8 @@ import {
   updateRoomQuery,
   deleteRoomQuery,
   getAllVacantDocRoomsQuery,
-  getAllVacantRoomsByTypeQuery
+  getAllVacantRoomsByTypeQuery,
+  useGetAllVacantBedsQuery
 } from '../queries/roomQuery.js';
 import { tryCatch } from '../middlewares/error.js';
 import { ErrorHandler } from '../utils/utility.js';
@@ -63,6 +64,30 @@ const getAllVacantDocRooms = tryCatch(async (req, res) => {
   return res.status(200).json({ success: true, data: result.rows });
 });
 
+// {
+//   roomName : [{bed_id, bed_name}]
+// }
+
+const getAllVacantBeds = tryCatch(async (req, res) => {
+  const rawResult = await useGetAllVacantBedsQuery();
+
+  const formatted = {};
+
+  rawResult.rows.forEach(row => {
+    const { roomName, _id, name } = row;
+
+    if (!formatted[roomName]) {
+      formatted[roomName] = [];
+    }
+
+    if (_id && name) {
+      formatted[roomName].push({ _id, name });
+    }
+  });
+
+  return res.status(200).json({ success: true, data: formatted });
+})
+
 const getAllVacantRooms = tryCatch(async (req, res) => {
   const { type } = req.query;
 
@@ -84,5 +109,6 @@ export {
   updateRoom,
   deleteRoom,
   getAllVacantDocRooms,
-  getAllVacantRooms
+  getAllVacantRooms,
+  getAllVacantBeds
 }

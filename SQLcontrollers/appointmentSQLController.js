@@ -180,14 +180,14 @@ const updateAppointment = tryCatch(async (req, res, next) => {
 
   const id = req.body.id;
   const doctor = req.body?.doctor;
-  const nurse = req.body?.nurse?.map(n => n._id);
+  const nurse = req.body?.nurse;
   const hps = req.body?.hps?.map(h => h._id);
   const disease = req.body?.disease?.map(d => d._id);
   const room = req.body?.room?._id;
-  const bed = req.body?.bed?._id;
+  const bed = req.body?.bed;
   const allRemarks = req.body?.remarks
   const remarks = allRemarks ? allRemarks[allRemarks.length - 1] : null;
-  console.log(remarks);
+  console.log(req.body);
 
   if (!id) {
     return next(new ErrorHandler("Insufficient input for update", 400));

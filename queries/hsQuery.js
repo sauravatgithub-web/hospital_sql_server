@@ -145,8 +145,8 @@ const getAllCurrentAppointmentsQuery = async () => {
         trt.remarkmsg AS doctor_remark_msg,
 
         -- Doctor's Room
-        r._id AS doctor_roomId,
-        r.name AS doctor_roomName,
+        r._id AS "doctor_roomId",
+        r.name AS "doctor_roomName",
 
         -- Bed Info
         b._id AS bed_id,
@@ -154,8 +154,8 @@ const getAllCurrentAppointmentsQuery = async () => {
         b."isOccupied" AS bed_occupied,
         
         -- Patient's Room
-        r2._id AS patient_roomId,
-        r2.name AS patient_roomName,
+        r2._id AS "patient_roomId",
+        r2.name AS "patient_roomName",
 
         -- Drug Info
         dr._id AS drug_id,
