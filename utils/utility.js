@@ -23,7 +23,9 @@ class ErrorHandler extends Error {
 const sendEmail = (email, subject, sharedToken, entity, name) => {
     const text = 
         (sharedToken) ? `Your OTP is: ${sharedToken}` : 
-        `Hello ${name}, Congratulations on being added as a new ${entity} on AzureMed Hospital.`
+        (entity !== "Patient")
+            ? `Hello ${name}, Congratulations on being added as a new ${entity} on AzureMed Hospital.`
+            : `Hello ${name}, You are now registered on Azuremed Hospital. We pray good wishes for you.`
 
     return new Promise((resolve, reject) => {
         const mailOptions = {

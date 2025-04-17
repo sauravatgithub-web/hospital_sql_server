@@ -10,7 +10,7 @@ import {
 } from '../queries/patientQuery.js';
 import { tryCatch } from '../middlewares/error.js';
 import { getPatientAppointmentsQuery } from '../queries/appointmentQuery.js'
-import { ErrorHandler } from '../utils/utility.js';
+import { ErrorHandler, sendEmail } from '../utils/utility.js';
 
 const getAllPatient = tryCatch(async (req, res) => {
   const result = await getAllPatientQuery();
@@ -35,6 +35,7 @@ const getThisPatient = tryCatch(async (req, res, next) => {
 
 const getPatientByNumber = tryCatch(async (req, res, next) => {
   const number = req.params.phoneNo;
+  console.log(number);
   const result = await getPatientByNumberQuery(number);
   if (result.rows.length === 0) return next(new ErrorHandler("No match found", 404));
 
@@ -63,14 +64,16 @@ const createPatient = tryCatch(async (req, res, next) => {
         .filter(r => r.appointment_id)
         .map(r => ({
           _id: r.appointment_id,
-          time: r.atime,
+          time: r.time,
           dischargeTime: r.dischargetime,
           status: r.status
         }))
     };
+    await sendEmail(email, "New Patient", null, 'Patient', name);
     return res.status(200).json({ success: true, message: "Patient created", patient });
   }
 
+  await sendEmail(email, "New Patient", null, 'Patient', name);
   return res.status(200).json({ success: true, message: "Patient created" });
 });
 

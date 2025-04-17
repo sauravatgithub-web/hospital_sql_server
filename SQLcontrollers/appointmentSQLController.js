@@ -55,7 +55,6 @@ const updateAppointment = tryCatch(async (req, res, next) => {
   const bed = req.body?.bed;
   const allRemarks = req.body?.remarks
   const remarks = allRemarks ? allRemarks[allRemarks.length - 1] : null;
-  console.log(req.body);
 
   if (!id) {
     return next(new ErrorHandler("Insufficient input for update", 400));

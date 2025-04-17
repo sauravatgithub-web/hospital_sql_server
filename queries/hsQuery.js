@@ -64,9 +64,11 @@ const deleteHospitalStaffQuery = async (id) => {
 
 const getAllCurrentDoctorsQuery = async () => {
   const now = new Date();
-  const time = now.toISOString().slice(11, 16); // e.g., "14:32"
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const time = `${hours}:${minutes}`;
 
-  const query = `
+  return await client.query(`
     SELECT 
       d._id AS doctor_id, d.name AS doctor_name, d.addr, d.email, d.gender,
       d.role, d.spec, d.qualification, d."userName", d."phoneNumber",
@@ -84,15 +86,25 @@ const getAllCurrentDoctorsQuery = async () => {
     LEFT JOIN hospital_professional hp ON hp._id = s.hid
     LEFT JOIN doctortest dt ON dt.did = d._id
     LEFT JOIN Test t ON t._id = dt.tid
-    WHERE d.active = TRUE AND $1::time BETWEEN d."inTime"::time AND d."outTime"::time
-  `;
-
-  return await client.query(query, [time]);
+    WHERE d.active = TRUE AND (
+      (
+        d."inTime" <= d."outTime" AND
+        $1 BETWEEN d."inTime" AND d."outTime"
+      )
+    OR
+      (
+        d."inTime" > d."outTime" AND (
+          $1 >= d."inTime" OR 
+          $1 <= d."outTime"
+        )
+      )
+    );
+  `,[time]);
 };
 
 
 const getAllCurrentNursesQuery = async (shift) => {
-  const query = `
+  return await client.query(`
     SELECT
       n._id AS nurse_id, n.name AS nurse_name, n.addr, n.email, n.gender, 
       n.role, n.shift, n."userName", n."phoneNumber",
@@ -106,10 +118,8 @@ const getAllCurrentNursesQuery = async (shift) => {
     LEFT JOIN Test t ON t._id = nt.tid
     LEFT JOIN testroom troom ON troom.tid = t._id
     LEFT JOIN Room r ON r._id = troom.rid
-    WHERE n.active = TRUE;
-  `;
-
-  return await client.query(query);
+    WHERE n.active = TRUE AND n.shift = $1;
+  `,[shift]);
 };
 
 const getAllCurrentAppointmentsQuery = async () => {

@@ -137,17 +137,13 @@ const getAllCurrentNurses = tryCatch(async (req, res, next) => {
   else if (hour >= 18 && hour < 24) currentShift = 'Evening';
   else currentShift = 'Night';
 
-  // Get the query from the sqlQueries file and pass the shift value
-  // Execute the query using the pg client
   const result = await getAllCurrentNursesQuery(currentShift);
   const { rows } = result;
 
-  // Group by nurse_id
   const grouped = _.groupBy(rows, 'nurse_id');
 
-  // Format the data as needed
   const formatted = Object.values(grouped).map(group => {
-    const nurse = group[0]; // The first row represents the nurse data
+    const nurse = group[0]; 
 
     return {
       _id: nurse.nurse_id,
@@ -177,7 +173,6 @@ const getAllCurrentNurses = tryCatch(async (req, res, next) => {
     };
   });
 
-  // Return the formatted response
   return res.status(200).json({ success: true, data: formatted });
 });
 

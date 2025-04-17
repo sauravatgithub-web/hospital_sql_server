@@ -142,7 +142,7 @@ const getAppointmentByIdQuery = async (id) => {
         LEFT JOIN hospital_professional hp ON s.hid = hp._id
 
         WHERE
-        a._id = $1 AND a.active = TRUE;
+        a._id = $1;
     `, [id]);
 
   return result.rows;
@@ -158,7 +158,7 @@ const createAppointmentQuery = async (time, patient, doctor, user) => {
   const aid = result.rows[0]._id;
 
   await client.query(`INSERT INTO ptakes (aid, pid, sid) VALUES ($1, $2, $3);`, [aid, patient, user]);
-  await client.query(`INSERT INTO treats (aid, did) VALUES ($1, $2);`, [aid, doctor]);
+  await client.query(`INSERT INTO treats (aid, did, remarktime) VALUES ($1, $2, NOW());`, [aid, doctor]);
 
   return result.rows[0];
 };
