@@ -40,9 +40,9 @@ const createDoctor = tryCatch(async (req, res, next) => {
 });
 
 const updateDoctor = tryCatch(async (req, res, next) => {
-  const { id, name, addr, spec, inTime, outTime, phoneNumber, email, gender, qualification } = req.body;
-  const updates = { name, addr, spec, "inTime": inTime, "outTime": outTime, "phoneNumber": phoneNumber, email, gender, qualification };
-  const result = await updateDoctorQuery(id, updates);
+  const { id, name, addr, spec, inTime, outTime, phoneNumber, email, gender, qualification, room } = req.body;
+  const updates = { name, addr, spec, "inTime": inTime, "outTime": outTime, "phoneNumber": phoneNumber, email, gender, qualification};
+  const result = await updateDoctorQuery(id, updates, room);
   if (result.rowCount === 0) return next(new ErrorHandler("Doctor not found", 404));
   return res.status(200).json({ message: 'Doctor updated successfully', doctor: result.rows[0] });
 });

@@ -241,7 +241,7 @@ const createDoctorQuery = async (doctor) => {
 };
 
 
-const updateDoctorQuery = async (id, updates) => {
+const updateDoctorQuery = async (id, updates, room) => {
   updates["userName"] = (() => {
     const namePart = updates.name.toLowerCase().split(' ');
     const emailPart = updates.email.toLowerCase().split('@')[0];
@@ -252,6 +252,12 @@ const updateDoctorQuery = async (id, updates) => {
   const values = Object.values(updates);
 
   const setClause = fields.map((field, i) => `"${field}" = $${i + 2}`).join(", ");
+
+  if(room){
+    await client.query(`DELETE FROM sits_at WHERE did = $1`, [id]);
+    await client.query(`INSERT INTO sits_at (did, rid) VALUES ($1, $2)`, [id, room]);
+  }
+  
   return await client.query(`
       UPDATE doctor
       SET ${setClause}
