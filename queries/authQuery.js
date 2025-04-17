@@ -4,10 +4,17 @@ const doctorQuery = async (type, value) => {
     const { rows } = await client.query(`
         SELECT 
           d.*, 
-          t._id AS test_id, t.name AS test_name,
-          tr.rid AS test_room_id, r.name AS test_room_name,
-          h._id AS hps_id, h.name AS hps_name, h.degree AS hps_degree
+          t._id AS test_id, 
+          t.name AS test_name,
+          tr.rid AS test_room_id, 
+          r.name AS test_room_name,
+          h._id AS hps_id, 
+          h.name AS hps_name, 
+          h.degree AS hps_degree,
+          r2.name AS doctor_room_name
         FROM doctor d
+        LEFT JOIN sits_at sat ON sat.did = d._id
+        LEFT JOIN room r2 ON r2._id = sat.rid
         LEFT JOIN doctortest dt ON dt.did = d._id
         LEFT JOIN test t ON t._id = dt.tid
         LEFT JOIN testroom tr ON tr.tid = t._id
@@ -22,6 +29,7 @@ const doctorQuery = async (type, value) => {
         _id: rows[0]._id,
         name: rows[0].name,
         gender: rows[0].gender,
+        room : rows[0].doctor_room_name,
         password: rows[0].password,
         phoneNumber: rows[0].phoneNumber,
         inTime: rows[0].inTime,
