@@ -49,7 +49,7 @@ const getPatientByNumber = tryCatch(async (req, res, next) => {
 });
 
 const createPatient = tryCatch(async (req, res, next) => {
-  const { name, addr, phoneNumber, email, gender, gname, gPhoneNo, age} = req.body;
+  const { name, addr, phoneNumber, email, gender, gname, gPhoneNo, age, role } = req.body;
   if (!name || !phoneNumber || !gname || !gPhoneNo || !email)
     return next(new ErrorHandler("Insufficient input", 404));
 

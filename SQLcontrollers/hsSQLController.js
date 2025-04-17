@@ -9,7 +9,7 @@ import {
   getAllCurrentAppointmentsQuery
 } from '../queries/hsQuery.js';
 import { tryCatch } from '../middlewares/error.js';
-import { ErrorHandler } from '../utils/utility.js';
+import { ErrorHandler, sendEmail} from '../utils/utility.js';
 import _ from 'lodash';
 import bcrypt from 'bcrypt';
 import { formatAppointments3 } from '../lib/formatter.js';
@@ -34,20 +34,17 @@ const createHospitalStaff = tryCatch(async (req, res, next) => {
     name, addr, phoneNumber, email, gender,
     department, designation, shift, role
   } = req.body;
-  console.log(req.body);
 
   if (!name || !addr || !phoneNumber || !email || !department || !designation || !shift || !role)
     return next(new ErrorHandler("Insufficient input", 404));
 
   const hashedPassword = await bcrypt.hash('password', 10);
   const result = await createHospitalStaffQuery({
-    // name, addr, phoneNumber, email, gender,
-    // department, designation, shift, role,
     ...req.body,
     password: hashedPassword
   });
 
-  await sendEmail(email, "New Joinee", null, role, name);
+  await sendEmail(email, "New Joinee", null, designation, name);
   return res.status(200).json({ success: true, staff: result.rows[0] });
 });
 

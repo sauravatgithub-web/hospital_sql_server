@@ -54,21 +54,17 @@ const createNurseQuery = async (nurse) => {
 };
 
 // 4. Update a nurse
-const updateNurseQuery = async (id, updateFields) => {
-  // Filter out undefined or null fields
-  const filteredEntries = Object.entries(updateFields).filter(([_, v]) => v !== undefined && v !== null);
-
-  if (filteredEntries.length === 0) return { rowCount: 0, rows: [] };
-
-  const keys = filteredEntries.map(([k]) => `"${k}"`);
-  const values = filteredEntries.map(([_, v]) => v);
-  const setStr = keys.map((key, i) => `${key} = $${i + 2}`).join(', ');
+const updateNurseQuery = async (id, name, gender, qualification, email,
+  phoneNumber, addr, shift) => {
 
   const result = await client.query(`
-    UPDATE nurse SET ${setStr}
-    WHERE _id = $1
+    UPDATE nurse SET 
+    name = $2 , gender = $3 , qualification = $4,
+    email = $5, "phoneNumber" = $6, addr = $7,
+    shift = $8 WHERE _id = $1
     RETURNING *
-  `, [id, ...values]);
+  `, [id, name, gender, qualification, email,
+    phoneNumber, addr, shift]);
 
   return result;
 };

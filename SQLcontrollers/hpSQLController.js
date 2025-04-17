@@ -9,7 +9,7 @@ import {
 } from '../queries/hpQuery.js';
 
 import { tryCatch } from '../middlewares/error.js';
-import { ErrorHandler } from '../utils/utility.js';
+import { ErrorHandler, sendEmail } from '../utils/utility.js';
 import client from "../db.js"
 
 const getAllHospitalProfessional = tryCatch(async (req, res) => {

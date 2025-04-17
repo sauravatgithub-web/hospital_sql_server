@@ -7,7 +7,7 @@ import {
 } from '../queries/nurseQuery.js';
 
 import { tryCatch } from '../middlewares/error.js';
-import { ErrorHandler } from '../utils/utility.js';
+import { ErrorHandler, sendEmail } from '../utils/utility.js';
 
 const getAllNurse = tryCatch(async (req, res) => {
   const result = await getAllNursesQuery();
@@ -84,20 +84,13 @@ const createNurse = tryCatch(async (req, res, next) => {
 });
 
 const updateNurse = tryCatch(async (req, res, next) => {
-  const { id } = req.params;
-  const {
-    name, gender, qualification, email,
-    phoneNumber, addr, shift
-  } = req.body;
+  const {id, name, gender, qualification, email,
+    phoneNumber, addr, shift} = req.body;
 
-  const fieldsToUpdate = {
-    name, gender, qualification, email,
-    phoneNumber, addr, shift
-  };
+  const result = await updateNurseQuery(id, name, gender, qualification, email,
+    phoneNumber, addr, shift);
 
-  const result = await updateNurseQuery(id, fieldsToUpdate);
-
-  if (result.rowCount === 0)
+  if (result.rows === 0)
     return next(new ErrorHandler("No fields provided or Nurse not found", 404));
 
   res.status(200).json({ success: true, nurse: result.rows[0] });
