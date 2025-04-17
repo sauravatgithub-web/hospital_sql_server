@@ -97,10 +97,10 @@ const getCurrentAppointments = tryCatch(async (req, res, next) => {
 });
 
 const dischargeAppointment = tryCatch(async (req, res, next) => {
-  const { id, dischargeTime } = req.body;
-  if (!id || !dischargeTime) return next(new ErrorHandler("Insufficient Fields", 404));
+  const { id } = req.body;
+  if (!id) return next(new ErrorHandler("Insufficient Fields", 404));
 
-  const dischargeApp = await dischargeAppointmentQuery(id, dischargeTime);
+  const dischargeApp = await dischargeAppointmentQuery(id);
   if (!dischargeApp) return next(new ErrorHandler("No appointment Found", 404));
 
   return res.status(200).json({ success: true, dischargeApp });
