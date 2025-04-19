@@ -38,7 +38,8 @@ const createAppointment = tryCatch(async (req, res, next) => {
     return next(new ErrorHandler("Insufficient input", 400));
   }
 
-  const appointment = await createAppointmentQuery(time, patient, doctor, user);
+  const newTime = new Date(time);
+  const appointment = await createAppointmentQuery(newTime, patient, doctor, user);
   return res.status(201).json({ message: 'Appointment created successfully', appointment });
 });
 
