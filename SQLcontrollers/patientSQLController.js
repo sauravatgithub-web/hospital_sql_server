@@ -35,7 +35,6 @@ const getThisPatient = tryCatch(async (req, res, next) => {
 
 const getPatientByNumber = tryCatch(async (req, res, next) => {
   const number = req.params.phoneNo;
-  console.log(number);
   const result = await getPatientByNumberQuery(number);
   if (result.rows.length === 0) return next(new ErrorHandler("No match found", 404));
 

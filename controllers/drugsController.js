@@ -42,4 +42,10 @@ const deleteDrug = tryCatch(async(req, res, next) => {
   return res.status(200).json({message : 'Drug deleted successfully'});
 });
 
-export { getAllDrug, getThisDrug, createDrug, updateDrug, deleteDrug }
+export { 
+  getAllDrug, 
+  getThisDrug, 
+  createDrug, 
+  updateDrug, 
+  deleteDrug 
+}

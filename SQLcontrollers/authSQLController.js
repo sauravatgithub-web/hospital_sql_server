@@ -17,7 +17,6 @@ const sendOTP = async (email, message, next) => {
     const otp = Math.floor(10000 + Math.random() * 90000).toString();
     const expirationTime = new Date(Date.now() + 2 * 60 * 60 * 1000);
     const sharedToken = `${otp}`;
-    console.log(otp);
     try {
         await sendEmail(email, message, sharedToken);
         emailTokens[email] = { otp, expirationTime };

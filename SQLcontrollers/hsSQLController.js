@@ -51,7 +51,6 @@ const createHospitalStaff = tryCatch(async (req, res, next) => {
 
 const updateHospitalStaff = tryCatch(async (req, res, next) => {
   const { id } = req.body;
-  console.log(req.body);
   if (!id)
     return next(new ErrorHandler("Staff ID is required", 400));
 

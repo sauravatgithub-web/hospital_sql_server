@@ -4,7 +4,6 @@ import http from 'http';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
-// require('./db');
 import './db.js';
 
 import { connectDB } from './utils/features.js';
