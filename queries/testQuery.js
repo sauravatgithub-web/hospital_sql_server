@@ -143,7 +143,16 @@ const updateTestQuery = async ( id, name , equip, doctor, nurse, room) => {
 
 // DELETE (SOFT) TEST
 const deleteTestQuery = async (id) => {
-  return await client.query(`UPDATE Test SET active = FALSE WHERE _id = $1`, [id]);
+  try {
+    await client.query('BEGIN');
+    await client.query(`DELETE FROM doctortest WHERE tid = $1;`, [id]);
+    await client.query(`DELETE FROM nursetest WHERE tid = $1;`, [id]);
+    await client.query(`UPDATE Test SET active = FALSE WHERE _id = $1`, [id]);
+    return await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  };
 };
 
 // UPDATE ROOM VACANCY
