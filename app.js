@@ -22,7 +22,7 @@ import roomRoute         from './routers/roomRouter.js';
 import testRoute         from './routers/testRouter.js';
 
 const corsOptions = {
-    origin: ['http://localhost:3000'],
+    origin: ['http://localhost:3000', 'https://hospital-frontend-xi.vercel.app/', 'https://hospital-frontend-xi.vercel.app'],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
 }
