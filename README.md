@@ -3,6 +3,9 @@
 
 A full-stack Hospital Management System with a structured relational database and a responsive web interface. Built to streamline hospital operations like patient appointments, doctor scheduling, room assignments, and test/drug tracking.
 
+## Project Link
+[AzureMed Hospitals](https://hospital-frontend-xi.vercel.app)
+
 ## Table of Contents
 - [Salient Features](#salient-features)
 - [Role-Based Features](#role-based-features)
