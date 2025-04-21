@@ -213,15 +213,18 @@ const updateAppointmentQuery = async ({
       for (const { test, remark } of tests) {
         await client.query(
           `INSERT INTO apptakest(aid, tid, remarkmsg) VALUES ($1, $2, $3)`,
-          [id, test._id, remark]
+          [id, test, remark]
         );
       }
     }
 
     // Bed
     if (bed) {
+      await client.query(`UPDATE bed set "isOccupied" = FALSE where _id = (select bid from stays_at WHERE aid = $1)`,[id]);
       await client.query(`DELETE FROM stays_at WHERE aid = $1`, [id]);
       await client.query(`INSERT INTO stays_at(aid, bid) VALUES ($1, $2)`, [id, bed]);
+      await client.query(`UPDATE bed set "isOccupied" = TRUE where _id = $1`,[bed]);
+      await client.query(`UPDATE appointment set status = 'InProgress' where _id = $1`,[id]);
     }
 
     // Drugs

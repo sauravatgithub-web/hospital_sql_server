@@ -1,0 +1,287 @@
+-- TABLE DECLARATION
+
+CREATE TABLE doctor (
+    _id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(200) NOT NULL,
+    addr VARCHAR(200),
+    spec VARCHAR(200),
+    inTime STRING,
+    outTime STRING,
+    phoneNumber VARCHAR(15) UNIQUE NOT NULL,
+    email VARCHAR(200) UNIQUE NOT NULL,
+    "userName" VARCHAR(200) UNIQUE,
+    password VARCHAR(200) CHECK (LENGTH(password) >= 8),
+    gender VARCHAR(10) CHECK (gender IN 'Male', 'Female'),
+    role VARCHAR(200) CHECK (role IN 'doctor')
+    qualification VARCHAR(200),
+    DOJ TIMESTAMP,
+    active BOOLEAN DEFAULT TRUE
+);
+
+CREATE TABLE nurse (
+    _id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(200) NOT NULL,
+    email VARCHAR(200) UNIQUE NOT NULL,
+    addr VARCHAR(200),
+    phoneNumber VARCHAR(200) UNIQUE NOT NULL,
+    "userName" VARCHAR(200) UNIQUE,
+    shift VARCHAR(200) CHECK (shift IN 'Morning' , 'Afternoon' , 'Evening', 'Night'),
+    password VARCHAR(200) CHECK (LENGTH(password) >= 8),
+    gender VARCHAR(200) CHECK (gender IN 'Male', 'Female'),
+    qualification VARCHAR(200),
+    role VARCHAR(200) CHECK (role IN 'nurse'),
+    active BOOLEAN DEFAULT TRUE
+);
+
+CREATE TABLE hospital_professional (
+    _id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(200) NOT NULL,
+    addr VARCHAR(200),
+    phoneNumber VARCHAR(200) UNIQUE NOT NULL,
+    email VARCHAR(200) UNIQUE NOT NULL,
+    "userName" VARCHAR(200) UNIQUE,
+    gender VARCHAR(200) CHECK (gender IN 'Male', 'Female'),
+    uni VARCHAR(200) NOT NULL,
+    degree VARCHAR(200) NOT NULL,
+    active BOOLEAN DEFAULT TRUE
+);
+
+CREATE TABLE hospital_staff (
+    _id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(200) NOT NULL,
+    addr VARCHAR(200),
+    phoneNumber VARCHAR(15) UNIQUE NOT NULL,
+    email VARCHAR(200) UNIQUE NOT NULL,
+    "userName" VARCHAR(200) UNIQUE,
+    role VARCHAR(200) CHECK (role IN 'DEO', 'FDO', 'Others'),
+    password VARCHAR(200) CHECK (LENGTH(password) >= 8),
+    gender VARCHAR(200) CHECK (gender IN 'Male', 'Female'),
+    department VARCHAR(200) NOT NULL,
+    designation VARCHAR(200) NOT NULL,
+    shift VARCHAR(200) CHECK (shift IN 'Morning' , 'Afternoon' , 'Evening', 'Night'),
+    active BOOLEAN DEFAULT TRUE
+);
+
+CREATE TABLE patient (
+    _id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(200) NOT NULL,
+    age INT,
+    addr VARCHAR(200),
+    "phoneNumber" VARCHAR(200) NOT NULL,
+    email VARCHAR(200) UNIQUE NOT NULL,
+    "userName" VARCHAR(200) UNIQUE,
+    gender VARCHAR(200) CHECK (gender IN 'Male', 'Female'),
+    gname VARCHAR(200) NOT NULL,
+    "gPhoneNo" VARCHAR(200) NOT NULL,
+    active BOOLEAN DEFAULT TRUE
+);
+
+CREATE TABLE appointment (
+    _id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "time" TIMESTAMP,
+    "dischargeTime" TIMESTAMP,
+    status VARCHAR(200) CHECK (status IN 'Scheduled', 'Completed', 'Cancelled', 'InProgress'),
+    active BOOLEAN DEFAULT TRUE
+);
+
+CREATE TABLE room (
+    _id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(100),
+    "type" VARCHAR(50) CHECK ("type" IN 'Consultation', 'ICU', 'General Ward', 'test room'), -- change in Modal
+    capacity INT,
+    isAC BOOLEAN,
+    vacancy INT,
+    active BOOLEAN DEFAULT TRUE
+);
+
+CREATE TABLE bed (
+    _id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(20) NOT NULL,
+    "isOccupied" BOOLEAN
+);
+
+CREATE TABLE disease (
+    _id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(50) NOT NULL,
+    symp VARCHAR(200),
+    "desc" VARCHAR(200),
+    active BOOLEAN DEFAULT TRUE
+);
+
+CREATE TABLE test (
+    _id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(50) NOT NULL,
+    equip VARCHAR(200),
+    active BOOLEAN DEFAULT TRUE
+);
+
+CREATE TABLE drugs (
+    _id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(50) NOT NULL,
+    composition VARCHAR(200),
+    active BOOLEAN DEFAULT TRUE
+);
+
+-- doctor supervises Hospital Professionals
+CREATE TABLE supervises (
+    did UUID,
+    hid UUID,
+    PRIMARY KEY (did, hid)
+);
+
+-- doctor sits at room
+CREATE TABLE sits_at (
+    did UUID,
+    rid UUID,
+    PRIMARY KEY (did, rid)
+);
+
+-- rooms have beds (except Consultation and test rooms)
+CREATE TABLE roomhasbed (
+    rid UUID,
+    bid UUID,
+    PRIMARY KEY (rid, bid)
+);
+
+-- patient stays at bed
+CREATE TABLE stays_at (
+    aid UUID NOT NULL,
+    bid UUID,
+    PRIMARY KEY (aid, bid)
+);
+
+-- Each test has a room
+CREATE TABLE testroom (
+    rid UUID,
+    tid UUID,
+    PRIMARY KEY (rid, tid)
+);
+
+-- nurse does tests
+CREATE TABLE nursetest (
+    tid UUID,
+    nid UUID,
+    PRIMARY KEY (tid, nid)
+);
+
+-- doctor assigned to test
+CREATE TABLE doctortest (
+    did UUID,
+    tid UUID,
+    PRIMARY KEY (did, tid)
+);
+
+-- appointment takes test
+CREATE TABLE apptakest (
+    aid UUID,
+    tid UUID,
+    remarkmsg VARCHAR(200),
+    PRIMARY KEY (aid, tid)
+);
+
+-- doctor treats appointment
+CREATE TABLE treats (
+    did UUID,
+    aid UUID,
+    remarktime TIMESTAMP,
+    remarkmsg VARCHAR(200),
+    PRIMARY KEY (did, aid)
+);
+
+-- nurse looks after appointment
+CREATE TABLE looks_after (
+    nid UUID,
+    aid UUID,
+    remarkmsg VARCHAR(200),
+    remaketime TIMESTAMP,
+    PRIMARY KEY (nid, aid)
+);
+
+-- Hospital Professional studies appointment
+CREATE TABLE study (
+    aid UUID,
+    hid UUID,
+    PRIMARY KEY (aid, hid)
+);
+
+-- appointment has disease
+CREATE TABLE AppHasDis (
+    aid UUID,
+    disid UUID,
+    PRIMARY KEY (aid, disid)
+);
+
+-- Prescription given to appointment
+CREATE TABLE prescription (
+    aid UUID,
+    dgid UUID,
+    dosage VARCHAR(50),
+    PRIMARY KEY (aid, dgid)
+);
+
+-- patient takes appointment and is assigned a Hospital staff
+CREATE TABLE ptakes (
+    pid UUID,
+    aid UUID,
+    sid UUID,
+    PRIMARY KEY (pid, aid, sid)
+);
+
+-- ADDING FOREIGN KEYS
+
+ALTER TABLE supervises
+    ADD FOREIGN KEY (did) REFERENCES doctor(_id),
+    ADD FOREIGN KEY (hid) REFERENCES hospital_professional(_id);
+
+ALTER TABLE treats
+    ADD FOREIGN KEY (did) REFERENCES doctor(_id),
+    ADD FOREIGN KEY (aid) REFERENCES appointment(_id);
+
+ALTER TABLE looks_after
+    ADD FOREIGN KEY (nid) REFERENCES nurse(_id),
+    ADD FOREIGN KEY (aid) REFERENCES appointment(_id);
+
+ALTER TABLE study
+    ADD FOREIGN KEY (aid) REFERENCES appointment(_id),
+    ADD FOREIGN KEY (hid) REFERENCES hospital_professional(_id);
+
+ALTER TABLE sits_at
+    ADD FOREIGN KEY (rid) REFERENCES room(_id),
+    ADD FOREIGN KEY (did) REFERENCES doctor(_id);
+
+ALTER TABLE roomhasbed
+    ADD FOREIGN KEY (rid) REFERENCES room(_id),
+    ADD FOREIGN KEY (bid) REFERENCES bed(_id);
+
+ALTER TABLE stays_at
+    ADD FOREIGN KEY (bid) REFERENCES bed(_id),
+    ADD FOREIGN KEY (aid) REFERENCES appointment(_id);
+
+ALTER TABLE testroom
+    ADD FOREIGN KEY (rid) REFERENCES room(_id),
+    ADD FOREIGN KEY (tid) REFERENCES test(_id);
+
+ALTER TABLE nursetest
+    ADD FOREIGN KEY (tid) REFERENCES test(_id),
+    ADD FOREIGN KEY (nid) REFERENCES nurse(_id);
+    
+ALTER TABLE doctortest
+    ADD FOREIGN KEY (did) REFERENCES doctor(_id),
+    ADD FOREIGN KEY (tid) REFERENCES test(_id);
+
+ALTER TABLE apptakest
+    ADD FOREIGN KEY (aid) REFERENCES appointment(_id),
+    ADD FOREIGN KEY (tid) REFERENCES test(_id);
+
+ALTER TABLE apphasdis
+    ADD FOREIGN KEY (aid) REFERENCES appointment(_id),
+    ADD FOREIGN KEY (disid) REFERENCES disease(_id);
+
+ALTER TABLE prescription
+    ADD FOREIGN KEY (aid) REFERENCES appointment(_id),
+    ADD FOREIGN KEY (dgid) REFERENCES drugs(_id);
+
+ALTER TABLE ptakes
+    ADD FOREIGN KEY (pid) REFERENCES patient(_id),
+    ADD FOREIGN KEY (aid) REFERENCES appointment(_id),
+    ADD FOREIGN KEY (sid) REFERENCES hospital_staff(_id);

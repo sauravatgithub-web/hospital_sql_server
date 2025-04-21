@@ -4,7 +4,8 @@
 A full-stack Hospital Management System with a structured relational database and a responsive web interface. Built to streamline hospital operations like patient appointments, doctor scheduling, room assignments, and test/drug tracking.
 
 ## Table of Contents
-- [Features](#features)
+- [Salient Features](#salient-features)
+- [Role-Based Features](#role-based-features)
 - [Setup Instructions](#setup-instructions)
 - [Tech Stack](#tech-stack)
 - [ER Diagram](#er-diagram)
@@ -15,13 +16,24 @@ A full-stack Hospital Management System with a structured relational database an
   - [Backend](#backend)
 - [Contributors](#contributors)
 
-## Features
-- Manage doctors, nurses, hospital staff & professionals
-- Administer patients, appointments, beds, and room allocations
-- Track prescriptions, drugs, and tests
-- Test and disease management with assigned doctors and nurses
-- Handles shifts, roles, specializations, and departments
-- Web-based interface for easy interaction
+## Salient Features
+
+- **Patient History Tracking**: Every patient’s medical history is preserved for future reference and ongoing treatment plans.
+- **Doctor Access to Medical History**: Doctors can view all previous diseases, tests, and prescriptions of a patient.
+- **Smart Doctor Assignment**: FDOs can assign doctors to appointments based on their availability (check-in and check-out times).
+- **Role-Based Access Control**: Ensures that users only access data and perform operations relevant to their role.
+- **Complete Hospital Workflow Integration**: From patient registration to discharge, every step is handled in the system.
+
+## Role-Based Features
+
+The system enforces role-based access to ensure that each entity can perform operations appropriate to their responsibility:
+
+| Role   | Permissions |
+|--------|-------------|
+| **DEO (Data Entry Operator)** | - Add, update, and delete all records: <br>  • Patients<br> • Doctors<br> • Nurses<br> • Tests<br> • Diseases<br> • Drugs<br> • Rooms<br> • Hospital Professionals<br> • Hospital Staff |
+| **FDO (Front Desk Operator)** | - Add entries of new patients<br>- Schedule appointments for new and existing patients<br>- Assign doctors, nurses, and rooms to appointments<br>- Discharge patients |
+| **Doctor** | - Assign tests and diseases to patients<br>- Add remarks to patient records<br>- Assign hospital professionals to study and support patients |
+| **Nurse** | - Look after assigned patients<br>- Add patient care remarks and observations |
 
 ## Setup Instructions
 **Backend Github repo:**
