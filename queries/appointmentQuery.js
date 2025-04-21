@@ -213,7 +213,7 @@ const updateAppointmentQuery = async ({
       for (const { test, remark } of tests) {
         await client.query(
           `INSERT INTO apptakest(aid, tid, remarkmsg) VALUES ($1, $2, $3)`,
-          [id, test, remark]
+          [id, test._id || test, remark]
         );
       }
     }
@@ -233,7 +233,7 @@ const updateAppointmentQuery = async ({
       for (const { drug, dosage } of drugs) {
         await client.query(
           `INSERT INTO prescription(aid, dgid, dosage) VALUES ($1, $2, $3)`,
-          [id, drug, dosage]
+          [id, drug._id || drug, dosage]
         );
       }
     }
