@@ -20,7 +20,7 @@ const getAppointmentByIdQuery = async (id) => {
   const result = await client.query(`
         SELECT
         a._id AS appointment_id,
-        a.time,
+        a.appointment_time,
         a."dischargeTime",
         a.status,
         a.active,
@@ -151,7 +151,7 @@ const getAppointmentByIdQuery = async (id) => {
 // SQL Query to create a new appointment
 const createAppointmentQuery = async (time, patient, doctor, user) => {
   const result = await client.query(`
-        INSERT INTO appointment (time, status)
+        INSERT INTO appointment (appointment_time, status)
         VALUES ($1, 'Scheduled') RETURNING *;
     `, [time]);
 
@@ -286,7 +286,7 @@ const getCurrentAppointmentsQuery = async (entity, _id) => {
   const result = await client.query(`
         SELECT
           a._id AS appointment_id,
-          a.time,
+          a.appointment_time,
           a."dischargeTime",
           a.status,
           a.active,

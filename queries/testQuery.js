@@ -58,7 +58,7 @@ const getAllTestQuery = async () => {
       -- Room details
       r._id AS room_id,
       r.name AS room_name,
-      r.type AS room_type
+      r.room_type AS room_type
 
     FROM Test t
     LEFT JOIN DoctorTest dt ON t._id = dt.tid

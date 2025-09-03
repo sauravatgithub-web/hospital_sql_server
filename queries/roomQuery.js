@@ -14,7 +14,7 @@ const createRoomQuery = async (name, type, capacity, isAC) => {
 
     // Step 1: Create room
     const roomResult = await client.query(
-      'INSERT INTO Room (name, type, capacity, "isAC", active, vacancy) VALUES ($1, $2, $3, $4, TRUE, $3) RETURNING *;',
+      'INSERT INTO Room (name, room_type, capacity, "isAC", active, vacancy) VALUES ($1, $2, $3, $4, TRUE, $3) RETURNING *;',
       [name, type, capacity, isAC]
     );
 
@@ -50,7 +50,7 @@ const createRoomQuery = async (name, type, capacity, isAC) => {
 
 const updateRoomQuery = async (id, name, type, capacity, isAC) => {
   return await client.query(
-    'UPDATE Room SET name = $1, type = $2, capacity = $3, "isAC" = $4 WHERE _id = $5 RETURNING *;',
+    'UPDATE Room SET name = $1, room_type = $2, capacity = $3, "isAC" = $4 WHERE _id = $5 RETURNING *;',
     [name, type, capacity, isAC, id]
   );
 };
@@ -65,7 +65,7 @@ const deleteRoomQuery = async (id) => {
 const getAllVacantDocRoomsQuery = async () => {
   return await client.query(`
       SELECT * FROM Room 
-      WHERE type = 'Consultation' 
+      WHERE room_type = 'Consultation' 
         AND vacancy = 1 
         AND active = TRUE;
     `);
@@ -75,7 +75,7 @@ const getAllVacantRoomsByTypeQuery = async (typeArray) => {
   const placeholders = typeArray.map((_, i) => `$${i + 1}`).join(", ");
   return await client.query(`
     SELECT * FROM Room
-    WHERE type IN (${placeholders})
+    WHERE room_type IN (${placeholders})
       AND vacancy > 0
       AND active = TRUE;
   `, typeArray);
@@ -88,7 +88,7 @@ const useGetAllVacantBedsQuery = async()=>{
     FROM ROOM r
     LEFT JOIN roomhasbed rhb ON rhb.rid = r._id
     LEFT JOIN bed b ON b._id = rhb.bid
-    WHERE r."type" = 'General Ward' AND r.active =TRUE
+    WHERE r."room_type" = 'General Ward' AND r.active =TRUE
     AND b."isOccupied" = FALSE;
   `)
 };

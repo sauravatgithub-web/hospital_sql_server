@@ -9,7 +9,7 @@ const getThisPatientQuery = async (id) => {
     SELECT 
       p.*, 
       a._id AS appointment_id, 
-      a.time, 
+      a.appointment_time, 
       a."dischargeTime", 
       a.status
     FROM Patient p
@@ -24,7 +24,7 @@ const getPatientByNumberQuery = async (phoneNumber) => {
     SELECT 
       p.*, 
       a._id AS appointment_id, 
-      a.time, 
+      a.appointment_time, 
       a."dischargeTime", 
       a.status
     FROM Patient p
@@ -39,7 +39,7 @@ const getPatientByEmailQueryWithAppointments = async (email) => {
       SELECT 
         p.*, 
         a._id AS appointment_id, 
-        a."time", 
+        a."appointment_time", 
         a."dischargeTime", 
         a.status
       FROM Patient p
@@ -54,7 +54,7 @@ const getPatientByIdQueryWithAppointments = async (id) => {
       SELECT 
         p.*, 
         a._id AS appointment_id, 
-        a.time, 
+        a.appointment_time, 
         a."dischargeTime", 
         a.status
       FROM Patient p

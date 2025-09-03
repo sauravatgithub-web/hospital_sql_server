@@ -1,0 +1,15 @@
+name: Keep Backend & Supabase Alive
+
+on:
+  schedule:
+    - cron: "*/15 * * * *" # every 15 minutes
+  workflow_dispatch: # manual trigger
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Keep-Alive Endpoint
+        run: |
+          echo "Pinging backend keep-alive endpoint..."
+          curl -v https://your-backend-domain.com/keep-alive

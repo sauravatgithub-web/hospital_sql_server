@@ -23,7 +23,7 @@ const getAllDoctorsQuery = async () => {
         h._id AS hps_id,
         h.name AS hps_name,
         a._id AS appt_id,
-        a.time AS appt_time,
+        a.appointment_time AS appt_time,
         a.status AS appt_status,
         t._id AS test_id,
         t.name AS test_name,
@@ -80,7 +80,7 @@ const getAllDoctorsQuery = async () => {
     if (row.appt_id && !doctor.appointments.some(a => a._id === row.appt_id)) {
       doctor.appointments.push({
         _id: row.appt_id,
-        time: row.appt_time,
+        appointment_time: row.appt_time,
         status: row.appt_status
       });
     }
@@ -123,7 +123,7 @@ const getDoctorByIdQuery = async (id) => {
         h.name AS hps_name,
         -- Appointments
         a._id AS appt_id,
-        a.time AS appt_time,
+        a.appointment_time AS appt_time,
         a.status AS appt_status,
         -- Tests and associated Room for test
         t._id AS test_id,
@@ -187,7 +187,7 @@ const getDoctorByIdQuery = async (id) => {
     if (row.appt_id && !doctor.appointments.some(a => a._id === row.appt_id)) {
       doctor.appointments.push({
         _id: row.appt_id,
-        time: row.appt_time,
+        appointment_time: row.appt_time,
         status: row.appt_status
       });
     }
@@ -278,7 +278,7 @@ const getAppointmentsQuery = async (_id) => {
   const result = await client.query(`
       SELECT
       a._id AS appointment_id,
-      a.time,
+      a.appointment_time,
       a."dischargeTime",
       a.status,
       a.active,

@@ -5,8 +5,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import './db.js';
-
-import { connectDB } from './utils/features.js';
+import client from './db.js';
 import { errorMiddleware } from './middlewares/error.js';
 
 import authenticateRoute from './routers/authenticationRouter.js';
@@ -22,7 +21,10 @@ import roomRoute         from './routers/roomRouter.js';
 import testRoute         from './routers/testRouter.js';
 
 const corsOptions = {
-    origin: ['http://localhost:3000', 'https://hospital-frontend-xi.vercel.app/', 'https://hospital-frontend-xi.vercel.app'],
+    origin: [
+        'http://localhost:3000',  
+        'https://hospital-frontend-xi.vercel.app'
+    ],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
 }
@@ -67,6 +69,16 @@ app.use('/api/v1/test',               testRoute);
 app.get('/', (req, res) => {
     res.send('Welcome to MySQL project');
 })
+
+app.get('/keep-alive', async (req, res) => {
+    try {
+        await client.query('SELECT 1');
+        res.status(200).send('Backend & Supabase are alive!');
+    } catch (err) {
+        console.error('Keep-alive check failed:', err);
+        res.status(500).send('Error keeping alive');
+    }
+});
 
 app.use(errorMiddleware);
 

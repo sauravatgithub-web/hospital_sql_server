@@ -74,7 +74,7 @@ const getAllCurrentDoctorsQuery = async () => {
       d.role, d.spec, d.qualification, d."userName", d."phoneNumber",
       d."DOJ", d."inTime", d."outTime",
       r._id AS room_id, r.name AS room_name,
-      a._id AS appointment_id, a."time", a."dischargeTime", a.status,
+      a._id AS appointment_id, a."appointment_time", a."dischargeTime", a.status,
       hp._id AS hp_id, hp.name AS hp_name,
       t._id AS test_id, t.name AS test_name, t.equip AS test_equip
     FROM Doctor d
@@ -108,7 +108,7 @@ const getAllCurrentNursesQuery = async (shift) => {
     SELECT
       n._id AS nurse_id, n.name AS nurse_name, n.addr, n.email, n.gender, 
       n.role, n.shift, n."userName", n."phoneNumber",
-      a._id AS appointment_id, a."time", a."dischargeTime", a.status,
+      a._id AS appointment_id, a."appointment_time", a."dischargeTime", a.status,
       t._id AS test_id, t.name AS test_name, t.equip AS test_equip,
       r._id AS room_id, r.name AS room_name
     FROM Nurse n
@@ -126,7 +126,7 @@ const getAllCurrentAppointmentsQuery = async () => {
   const result = await client.query(`
     SELECT
         a._id AS appointment_id,
-        a.time,
+        a.appointment_time,
         a."dischargeTime",
         a.status,
         a.active,

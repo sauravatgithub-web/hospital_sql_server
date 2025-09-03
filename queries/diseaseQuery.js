@@ -10,14 +10,14 @@ const getThisDiseaseQuery = async (name) => {
 
 const createDiseaseQuery = async (name, symp, desc) => {
     return await client.query(
-        'INSERT INTO Disease (name, symp, "desc", active) VALUES ($1, $2, $3, TRUE) RETURNING *;',
+        'INSERT INTO Disease (name, symp, "description", active) VALUES ($1, $2, $3, TRUE) RETURNING *;',
         [name, symp, desc]
     );
 };
 
 const updateDiseaseQuery = async (id, name, symp, desc) => {
     return await client.query(
-        'UPDATE Disease SET name = $1, symp = $2, "desc" = $3 WHERE _id = $4 RETURNING *;',
+        'UPDATE Disease SET name = $1, symp = $2, "description" = $3 WHERE _id = $4 RETURNING *;',
         [name, symp, desc , id]
     );
 };
