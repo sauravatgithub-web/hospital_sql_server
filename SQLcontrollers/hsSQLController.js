@@ -38,7 +38,8 @@ const createHospitalStaff = tryCatch(async (req, res, next) => {
   if (!name || !addr || !phoneNumber || !email || !department || !designation || !shift || !role)
     return next(new ErrorHandler("Insufficient input", 404));
 
-  const hashedPassword = await bcrypt.hash('password', 10);
+  // const hashedPassword = await bcrypt.hash('password', 10);
+  const hashedPassword = "password";
   const result = await createHospitalStaffQuery({
     ...req.body,
     password: hashedPassword
