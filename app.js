@@ -72,13 +72,14 @@ app.get('/', (req, res) => {
 
 app.get('/keep-alive', async (req, res) => {
     try {
-        await client.query('SELECT 1');
-        res.status(200).send('Backend & Supabase are alive!');
+        const result = await client.query('SELECT NOW();');
+        res.status(200).send(`Backend & Supabase are alive! Current time: ${result.rows[0].now}`);
     } catch (err) {
         console.error('Keep-alive check failed:', err);
         res.status(500).send('Error keeping alive');
     }
 });
+
 
 app.use(errorMiddleware);
 

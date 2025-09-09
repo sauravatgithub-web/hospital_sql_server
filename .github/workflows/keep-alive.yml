@@ -12,4 +12,4 @@ jobs:
       - name: Ping Keep-Alive Endpoint
         run: |
           echo "Pinging backend keep-alive endpoint..."
-          curl -v https://hospital-server-5cxg.onrender.com/keep-alive
+          curl -s https://hospital-server-5cxg.onrender.com/keep-alive
